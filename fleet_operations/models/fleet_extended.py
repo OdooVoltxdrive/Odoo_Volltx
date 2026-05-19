@@ -415,7 +415,7 @@ class FleetOperations(models.Model):
     main_type = fields.Selection(
         [("vehicle", "Vehicle"), ("non-vehicle", "Non-Vehicle")], default="vehicle"
     )
-    vechical_type_id = fields.Many2one("vehicle.type", "Vechical Type")
+    vechical_type_id = fields.Many2one("vehicle.type", "Vechical Type 1")
     engine_no = fields.Char()
     multi_images = fields.Many2many(
         "ir.attachment",
