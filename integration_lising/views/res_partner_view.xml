@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Inherited partner form view -->
+    <record id='view_rent_res_partner_form' model='ir.ui.view'>
+        <field name="name">view.rent.res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="is_driver" string="Is Driver" />
+            </xpath>
+          
+        </field>
+    </record>
+</odoo>
