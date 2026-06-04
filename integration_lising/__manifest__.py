@@ -1,9 +1,9 @@
 {
     # Module Information
-    "name": "Fleet Vehicle voltx drive",
-    "category": "Fleet Rent",
-    "version": "19.0",
-    "license": "LGPL-3",
+    "name": "Fleet_vehicle_leasing",
+    "category": "Fleet leasing",
+    "version": "19.0.0",
+    #"license": "LGPL-3",
     "summary": """Sistema de gestion de leasing""",
     "sequence": 1,
     "author": "Silicon Valley latamn , Colaborador:Ing.Marilyn Millan",
@@ -16,9 +16,8 @@
     "images": ["static/description/icon.jpg"],
 
 
-    'demo': [],
-    'license': 'LGPL-3',
-    'application': True,
+    "installable": True,
+    "application": True,
 }
 
 # -*- coding: utf.8 -*-
