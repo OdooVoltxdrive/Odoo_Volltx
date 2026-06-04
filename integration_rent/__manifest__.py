@@ -28,5 +28,6 @@
     # Technical
     'demo': [],
     'license': 'LGPL-3',
+    "installable": True,
     'application': True,
 }
