@@ -9,8 +9,8 @@
         <field name="arch" type="xml">
           
 
-          <xpath expr="//field[@name='amount']/.." position="after">
-                <group string="Información de Financiamiento (Tercero)">
+          <xpath expr="//field[@name='date']/.." position="after">
+                <group >
                     <field name="total_cuotas" string="Cantidad de Cuotas"/>
                     <field name="precio_cuota" string="Monto de la Cuota ($)" widget="monetary"/>
                     <field name="monto_total_contrato" string="Monto Total Contrato" widget="monetary" readonly="1"/>
