@@ -9,11 +9,13 @@
         <field name="arch" type="xml">
           
 
-           <xpath expr="//field[@name='cost_frequency']" position="after">
-                <field name="total_cuotas"/>
-                <field name="precio_cuota"/>
-                <field name="monto_total_contrato"/>
-            </xpath>
+           <xpath expr="//group[@string='Cost']/group[1]" position="after">
+            <group string="Información de Financiamiento (Tercero)">
+                <field name="total_cuotas" string="Cantidad de Cuotas"/>
+                <field name="precio_cuota" string="Monto de la Cuota ($)" widget="monetary"/>
+                <field name="monto_total_contrato" string="Monto Total Contrato" widget="monetary" readonly="1"/>
+            </group>
+        </xpath>
           
       
         </field>
