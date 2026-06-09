@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+     <!-- Inherited vehicle registration form view added extra fields on fleet vehicle -->
+    <record id='fleet_vehicle_model_form_inherit' model='ir.ui.view'>
+        <field name="name">fleet.vehicle.model.form.inherit</field>
+        <field name="model">fleet.vehicle</field>
+        <field eval="100" name="priority" />
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_form" />
+        <field name="arch" type="xml">
+          
+         <xpath expr="//field[@name='driver_id']" position="attributes">
+                <attribute name="domain">['|', ('company_id', '=', False), ('company_id', '=', company_id), ('is_driver', '=', True)]</attribute>
+                
+                <attribute name="options">{"no_create": true, "no_edit": true, "no_open": true}</attribute>
+        </xpath>
+          
+      
+        </field>
+    </record>
+</odoo>

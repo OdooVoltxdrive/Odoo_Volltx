@@ -1,15 +1,12 @@
 # See LICENSE file for full copyright and licensing details.
 
-import re
-
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class ResPartner(models.Model):
+class FleetVehicle(models.Model):
+    _inherit = "fleet.vehicle"
 
-    _inherit = "res.partner"
+    device = fields.Char("Dispositivo")
 
-    is_driver = fields.Boolean("Is Driver")
-    
     
