@@ -21,4 +21,7 @@
       
         </field>
     </record>
+
+    <menuitem id="fleet.fleet_vehicle_menu" name="Vehículos"/>
+
 </odoo>
