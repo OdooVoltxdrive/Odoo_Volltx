@@ -1,18 +1,13 @@
-# See LICENSE file for full copyright and licensing details.
-
-from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
-
+from odoo import api, fields, models
 
 class FleetVehicle(models.Model):
     _inherit = "fleet.vehicle"
 
-    device = fields.Char("Dispositivo")
-    api_fecha_inicio = fields.Date(string="API Fecha Inicio Contrato", copy=False)
-    api_total_cuotas = fields.Integer(string="API Total Cuotas", copy=False)
-    api_precio_cuota = fields.Float(string="API Precio Cuota", copy=False)
+    # Campos que reciben la data del sistema externo (Tercero)
+    api_contract_date = fields.Date(string="Fecha del Contrato (API)", copy=False)
+    api_cuotas_totales = fields.Integer(string="Cantidad de Cuotas (API)", copy=False)
+    api_monto_recurrente = fields.Float(string="Monto Recurrente (API)", copy=False)
 
-    
     @api.model_create_multi
     def create(self, vals_list):
         # 1. Creamos el vehículo primero de forma nativa
@@ -20,24 +15,19 @@ class FleetVehicle(models.Model):
 
         # 2. Iteramos los vehículos creados para generar su contrato automático
         for vehicle in vehicles:
-            # Validamos que vengan los datos mínimos obligatorios del contrato
             if vehicle.api_cuotas_totales and vehicle.api_monto_recurrente:
                 
-                # Definimos la fecha que usaremos (la que viene de la API o la de hoy si no viene ninguna)
                 fecha_contrato = vehicle.api_contract_date or fields.Date.today()
                 
-                # Preparamos los valores para el nuevo contrato de este vehículo
                 contract_vals = {
                     "vehicle_id": vehicle.id,
                     "driver_id": vehicle.driver_id.id if vehicle.driver_id else False,
+                    "date": fecha_contrato,
+                    "date_start": fecha_contrato,
                     
-                    # Seteamos ambos campos con la misma fecha para que Odoo calcule correctamente la vigencia
-                    "date": fecha_contrato,       # Fecha de contrato
-                    "date_start": fecha_contrato, # Fecha de inicio del contrato 🏁
-                    
-                    # Campos personalizados que añadiste
-                    "cuotas_totales": vehicle.api_cuotas_totales,
-                    "monto_recurrente": vehicle.api_monto_recurrente,
+                    # AQUÍ: Mapeamos los campos 'api_' a los campos reales del contrato corregido
+                    "total_cuotas": vehicle.api_cuotas_totales,
+                    "precio_cuota": vehicle.api_monto_recurrente,
                 }
                 
                 # Creamos el contrato directamente
