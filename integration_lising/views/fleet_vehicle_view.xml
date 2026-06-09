@@ -22,6 +22,8 @@
         </field>
     </record>
 
-    <!--menuitem id="fleet.fleet_vehicle_menu" name="Vehículos"/-->
-
+    <menuitem id="fleet.fleet_vehicle_menu" 
+              name="Vehículos" 
+              parent="fleet.fleet_vehicles" 
+              groups="fleet.fleet_group_user"/>
 </odoo>
