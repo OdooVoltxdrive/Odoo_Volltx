@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+     <!-- Inherited vehicle registration form view added extra fields on fleet vehicle -->
+    <record id='fleet_vehicle_log_contract_form_inherit' model='ir.ui.view'>
+        <field name="name">fleet.vehicle.log.form.inherit</field>
+        <field name="model">fleet.vehicle.log.contract</field>
+        <field eval="100" name="priority" />
+        <field name="inherit_id" ref="fleet.fleet_vehicle_log_contract_view_form" />
+        <field name="arch" type="xml">
+          
+
+           <xpath expr="//field[@name='cost_frequency']" position="after">
+                <field name="total_cuotas"/>
+                <field name="precio_cuota"/>
+                <field name="monto_total_contrato"/>
+            </xpath>
+          
+      
+        </field>
+    </record>
+</odoo>

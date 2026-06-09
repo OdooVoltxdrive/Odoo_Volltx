@@ -13,6 +13,7 @@
         #"security/ir.model.access.csv",
         "views/res_partner_view.xml",
         "views/fleet_vehicle_view.xml",
+        "views/fleet_vehicle_contract_view.xml",
     ],
     "images": ["static/description/icon.jpg"],
 
