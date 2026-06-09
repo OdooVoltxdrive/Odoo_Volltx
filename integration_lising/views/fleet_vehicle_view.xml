@@ -14,6 +14,9 @@
                 <attribute name="options">{"no_create": true, "no_edit": true, "no_open": true}</attribute>
         </xpath>
 
+           <xpath expr="//field[@name='plan_to_change_car']" position="after">
+                <field name="device"/>
+            </xpath>
           
       
         </field>
