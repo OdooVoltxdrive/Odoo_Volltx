@@ -16,6 +16,28 @@
                     <field name="monto_total_contrato" string="Monto Total Contrato" widget="monetary" readonly="1"/>
                 </group>
             </xpath>
+
+        <xpath expr="//sheet" position="inside">
+            <notebook>
+                <page string="Trazabilidad de Cuotas" name="plan_cuotas">
+                    <field name="contract_line_ids" readonly="1">
+                        <list decoration-success="state == 'paid'" 
+                              decoration-danger="state == 'overdue'" 
+                              decoration-warning="state == 'posted'" 
+                              decoration-muted="state == 'draft'">
+                            <field name="numero_cuota"/>
+                            <field name="fecha_vencimiento"/>
+                            <field name="monto" sum="Total Plan"/>
+                            <field name="invoice_id" string="Factura Odoo"/>
+                            <field name="state" widget="badge" 
+                                   decoration-success="state == 'paid'" 
+                                   decoration-danger="state == 'overdue'" 
+                                   decoration-warning="state == 'posted'"/>
+                        </list>
+                    </field>
+                </page>
+            </notebook>
+        </xpath>
           
       
         </field>
