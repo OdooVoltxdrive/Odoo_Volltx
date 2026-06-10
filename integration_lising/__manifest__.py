@@ -8,7 +8,7 @@
     "sequence": 1,
     "author": "Silicon Valley latamn , Colaborador:Ing.Marilyn Millan",
     "website": "www.siliconvalleyve.com",
-    "depends": ["base","fleet", "contacts"],
+    "depends": ["base","fleet", "contacts", "account"],
     "data": [
         #"security/ir.model.access.csv",
         "views/res_partner_view.xml",
