@@ -22,8 +22,18 @@
         </field>
     </record>
 
+    <record id="fleet.fleet_vehicle_action" model="ir.actions.act_window">
+        <field name="name">Vehículos</field>
+    </record>
+
+    <menuitem id="fleet.fleet_vehicles" 
+              name="Vehículos" 
+              parent="fleet.menu_root" 
+              groups="fleet.fleet_group_user"/>
+
     <menuitem id="fleet.fleet_vehicle_menu" 
               name="Vehículos" 
               parent="fleet.fleet_vehicles" 
+              action="fleet.fleet_vehicle_action" 
               groups="fleet.fleet_group_user"/>
 </odoo>
