@@ -22,6 +22,10 @@
         </field>
     </record>
 
+      <record id="fleet.menu_root" model="ir.ui.menu">
+        <field name="name">Vehículos</field>
+    </record>
+
     <record id="fleet.fleet_vehicles" model="ir.ui.menu">
         <field name="name">Vehículos</field>
     </record>
