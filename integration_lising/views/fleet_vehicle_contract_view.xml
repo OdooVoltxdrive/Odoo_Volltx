@@ -7,6 +7,14 @@
         <field eval="100" name="priority" />
         <field name="inherit_id" ref="fleet.fleet_vehicle_log_contract_view_form" />
         <field name="arch" type="xml">
+
+        <xpath expr="//header" position="inside">
+            <button name="action_generar_plan_cuotas" 
+                    string="Generar Plan de Cuotas" 
+                    type="object" 
+                    class="oe_highlight"
+                    invisible="total_cuotas == 0 or precio_cuota == 0"/>
+        </xpath>
           
 
           <xpath expr="//field[@name='date']/.." position="after">
@@ -37,8 +45,7 @@
                     </field>
                 </page>
             </notebook>
-        </xpath>
-          
+        </xpath> 
       
         </field>
     </record>

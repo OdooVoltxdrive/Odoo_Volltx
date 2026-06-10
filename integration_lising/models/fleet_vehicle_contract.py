@@ -29,3 +29,38 @@ class FleetVehicleLogContract(models.Model):
             contract.monto_total_contrato = (
                 contract.precio_cuota * 30 * contract.total_cuotas
             )
+
+
+    def action_generar_plan_cuotas(self):
+        """Este método es el que ejecuta el botón manual e inyecta las líneas en contract_line_ids"""
+        self.ensure_one()
+        # Limpiamos el One2many por si ejecutan el botón más de una vez
+        self.contract_line_ids.unlink()
+
+        lineas = []
+        fecha_inicial = self.date_start or fields.Date.today()
+        # El monto de la factura mensual basado en tus campos (Tarifa diaria x 30)
+        monto_mensual_fijo = self.precio_cuota * 30
+
+        for i in range(1, self.total_cuotas + 1):
+            # Calcula el vencimiento mes a mes a partir de la fecha de inicio del contrato
+            fecha_vencimiento = fecha_inicial + relativedelta(months=i)
+
+            # Estructura de comandos Odoo (0, 0, {valores}) para crear registros en un One2many
+            lineas.append(
+                (
+                    0,
+                    0,
+                    {
+                        "numero_cuota": i,
+                        "fecha_vencimiento": fecha_vencimiento,
+                        "monto": monto_mensual_fijo,
+                        "state": "draft",
+                    },
+                )
+            )
+
+        # Inyectamos de golpe todas las líneas generadas en tu campo contract_line_ids
+        self.write({"contract_line_ids": lineas})
+
+        return True
