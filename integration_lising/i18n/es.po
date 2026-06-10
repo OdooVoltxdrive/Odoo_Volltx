@@ -1,0 +1,6 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#. module: fleet
+#: model:ir.ui.menu,name:fleet.fleet_vehicles
+msgid "Fleet"
+msgstr "Vehículos"
