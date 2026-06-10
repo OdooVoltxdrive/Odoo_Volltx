@@ -16,6 +16,11 @@ class FleetVehicleLogContract(models.Model):
         store=True
     )
 
+    # Nueva pestaña de trazabilidad
+    contract_line_ids = fields.One2many(
+        "fleet.vehicle.contract.line", "contract_id", string="Plan de Cuotas"
+    )
+
     # 2. El decorador DEBE tener exactamente los mismos nombres que declaraste arriba
     @api.depends("total_cuotas", "precio_cuota")  
     def _compute_monto_total(self):
