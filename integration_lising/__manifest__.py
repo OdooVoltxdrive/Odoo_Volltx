@@ -10,7 +10,7 @@
     "website": "www.siliconvalleyve.com",
     "depends": ["base","fleet", "contacts", "account"],
     "data": [
-        #"security/ir.model.access.csv",
+        "security/ir.model.access.csv",
         "views/res_partner_view.xml",
         "views/fleet_vehicle_view.xml",
         "views/fleet_vehicle_contract_view.xml",
