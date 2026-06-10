@@ -21,9 +21,11 @@ class FleetVehicleLogContract(models.Model):
         "fleet.vehicle.contract.line", "contract_id", string="Plan de Cuotas"
     )
 
-    # 2. El decorador DEBE tener exactamente los mismos nombres que declaraste arriba
-    @api.depends("total_cuotas", "precio_cuota")  
+    @api.depends("total_cuotas", "precio_cuota")
     def _compute_monto_total(self):
-        """Calcula el valor total multiplicando las cuotas por su monto"""
+        """Calcula el valor total: Tarifa Diaria x 30 días x N° de Meses"""
         for contract in self:
-            contract.monto_total_contrato = contract.total_cuotas * contract.precio_cuota
+            # Multiplicamos el valor diario por 30 para sacar el mes comercial, y luego por los meses totales
+            contract.monto_total_contrato = (
+                contract.precio_cuota * 30 * contract.total_cuotas
+            )
