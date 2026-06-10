@@ -22,7 +22,7 @@
         </field>
     </record>
 
-     <record id="fleet.fleet_vehicles" model="ir.ui.menu">
+     <record id="fleet.fleet_vehicle_menu" model="ir.ui.menu">
         <field name="name">Vehículos</field>
     </record>
 </odoo>
