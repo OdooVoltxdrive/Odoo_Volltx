@@ -28,7 +28,7 @@ class FleetVehicleLogContract(models.Model):
         for contract in self:
             # Multiplicamos el valor diario por 30 para sacar el mes comercial, y luego por los meses totales
             contract.monto_total_contrato = (
-                contract.precio_cuota * 30 * contract.total_cuotas
+                contract.precio_cuota * contract.total_cuotas
             )
 
 
@@ -43,7 +43,7 @@ class FleetVehicleLogContract(models.Model):
         fecha_inicial = self.start_date or fields.Date.today()
         
         # El monto de la factura mensual basado en tus campos (Tarifa diaria x 30)
-        monto_mensual_fijo = self.precio_cuota * 30
+        monto_mensual_fijo = self.precio_cuota * contract.total_cuotas
 
         for i in range(1, self.total_cuotas + 1):
             # Calcula el vencimiento mes a mes a partir de la fecha de inicio del contrato
