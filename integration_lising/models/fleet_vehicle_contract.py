@@ -22,7 +22,7 @@ class FleetVehicleLogContract(models.Model):
         "fleet.vehicle.contract.line", "contract_id", string="Plan de Cuotas"
     )
 
-    @api.depends("total_cuotas", "precio_cuota")
+    @api.depends("total_cuotas", "precio_cuota","contract_line_ids.monto")
     def _compute_monto_total(self):
         """Calcula el valor total: Tarifa Diaria x 30 días x N° de Meses"""
         for contract in self:
