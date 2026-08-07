@@ -18,7 +18,7 @@
         ],
         'license': 'LGPL-3',
         'installable': True,
-        'application': False, # Cámbialo a True solo si quieres que aparezca como "App" principal en los filtros
+        'application': True, # Cámbialo a True solo si quieres que aparezca como "App" principal en los filtros
         'auto_install': False,
                       
 }
