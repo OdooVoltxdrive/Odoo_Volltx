@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>    
+    <record id="paperformat_libro_diario" model="report.paperformat">
+
+      <field name="default" eval="True"/>
+        <field name="name">Carta Vertical Libro Diario</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">280</field>
+        <field name="page_width">216</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">55</field>
+        <field name="margin_bottom">20</field>
+        <field name="margin_left">15</field>
+        <field name="margin_right">15</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">40</field>
+        <field name="dpi">110</field>
+    </record>
+
+    <!--report id="report_libro_diario"
+        model="wizard.libro.diario"
+        name="l10n_ve_libro_diario.reporte_libro_diario"
+        file="l10n_ve_libro_diario.reporte_libro_diario"
+        string="Reporte Libro Diario"
+        report_type="qweb-html"
+        /--><!-- paperformat="l10n_ve_libro_diario.paperformat_libro_diario"-->
+
+    <record id="action_libro_diario_report" model="ir.actions.report">
+            <field name="name">Libro diario</field>
+            <field name="model">wizard.libro.diario</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">libro_diario.reporte_libro_diario</field>
+            <field name="report_file">libro_diario.reporte_libro_diario</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="libro_diario.paperformat_libro_diario"/>
+    </record>
+
+    <template id="reporte_libro_diario">
+
+       <t t-call="web.html_container" ><!-- realiza llamados a template propio de odoo -->
+         <t t-call="web.basic_layout" ><!-- realiza llamados a template propio de odoo -->
+          <t t-foreach="docs" t-as="o">
+
+            <div class="header">
+              <table width="100%"  class="table table-borderless">
+                  <tr>
+                    <td>
+                        <div align="center">
+                                    <strong>
+                                    <h2 style="font-size:20px;"> <small><t t-esc="o.company_id.name"/> RIF:<t t-esc="o.company_id.partner_id.vat"/></small></h2>
+                                    </strong>
+                                    </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                        <span style="font-weight: bold;">REPORTE: LIBRO DIARIO</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><div align="center">LIBRO DIARIO DEL PERIODO <t t-esc="o.periodo(o.date_to)"/> DESDE <t t-esc="o.formato_fecha(o.date_from)"/> AL <t t-esc="o.formato_fecha(o.date_to)"/></div></td>
+                  </tr>
+                  <tr>
+                    <td>
+                        ======================================================================================================
+                    </td>
+                  </tr>
+                </table>
+
+                <table width="100%"  class="table table-borderless">
+                  <tr>
+                    <td width="32%">&amp;nbsp;</td>
+                    <td width="32%">&amp;nbsp;</td>
+                    <td width="18%"> <div align="center"><strong>DÉBITOS </strong></div></td>
+                    <td width="18%"> <div align="center"><strong>CRÉDITOS </strong></div></td>
+                  </tr>
+                </table>
+
+            </div>
+            <div class="body">
+                <t t-set="acom_deber" t-value="0" />
+                <t t-set="acom_haber" t-value="0" />
+                <table width="100%"  >
+                    <t t-foreach="o.line" t-as="line" >
+                      <tr>
+                        <td><t t-esc="line.account_id.code"/></td>
+                        <td>__<t t-esc="line.name"/></td>
+                        <td align="right"><t t-esc="line.float_format(line.total_deber)"/></td>
+                        <t t-set="acom_deber" t-value="acom_deber+line.total_deber" />
+                        <td align="right"><t t-esc="line.float_format(line.total_haber)"/> </td>
+                        <t t-set="acom_haber" t-value="acom_haber+line.total_haber" />
+                      </tr>
+                    </t>
+                    <tr>
+                      <td colspan="4"><div align="right">==========================================</div></td>
+                  </tr>
+                    <tr style="font-size:14px;">
+                      <td colspan="2">TOTAL GENERAL </td>
+                      <td><div align="right"><t t-esc="o.float_format2(acom_deber)"/> 
+                      </div></td>
+                      <td><div align="right"><t t-esc="o.float_format2(acom_haber)"/> 
+                        </div></td>
+                  </tr>
+                </table>
+            </div >
+
+            
+
+          </t>
+         </t>
+       </t>
+
+     </template>
+  
+  </data>
+</odoo>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="vista_from_islr_retention_fact_dig" model="ir.ui.view">
+        <field name="name">vista.from.islr.retention.fact.dig</field>
+        <field name="model">isrl.retention</field>
+        <field name="inherit_id" ref="isrl_retention.isrl_retention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form//button[@name='comprobante']" position="after">
+                <button name="envia_comp_ret_islr" string="simular" type="object"/>
+            </xpath>
+
+            <xpath expr="/form/sheet/notebook/page" position="after">
+                <page string="Respuesta json" name="studio_page_74e_1juo645nb">
+                  <group name="studio_group_74e">
+                    <group name="studio_group_1s6_left">
+                        <field name="result" readonly="state!='draft'"/>
+                        <field name="hasErrors" string="Hubo Error?" readonly="state!='draft'"/>
+                        <field name="information" string="Informacion:" readonly="state!='draft'"/>
+                        <field name="message" string="Mensaje del api" readonly="state!='draft'"/>
+                    </group>
+                    <group name="studio_group_1s6_right">
+                        <field name="errorMessage" string="Mensaje de error" readonly="state!='draft'"/>
+                        <field name="code" readonly="state!='draft'" class="fw-bold" decoration-success="code == '200'" decoration-danger="code and code != '200'"/>
+                        <field name="json_enviado" readonly="state!='draft'"/>
+                    </group>
+                  </group>
+                </page>
+            </xpath>
+
+
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<record id="vista_from_pago_prog" model="ir.ui.view">
+		<field name="name">vista.from.pago_prog</field>
+		<field name="model">wizard.payment.fact</field>
+		<field name="arch" type="xml">
+			<form string="Registro de Pago Programados">
+                <sheet>
+                	<group name="central">
+					    <group>	
+					    	
+					    	<field name="company_id" string="Compañia" readonly="1"/>
+					    	<field name="move_id" string="Factura" readonly="1"/>
+					    	<field name="account_journal_id" string="Diario" readonly="0" required="1" domain="[('type', 'in',('bank','cash') )]"/>
+					    	<field name="account_payment_method_id" string="Método de Pago" readonly="0" required="1" domain="[('journal_id', '=', account_journal_id),('payment_method_id.payment_type','=',method_payment_type)]"/>
+					    		
+					    </group>
+					    <group>
+					    	<field name="ban" invisible="1"/>
+					    	<field name="method_payment_type" invisible="1"/>
+					    	<field name="moneda" string="Moneda" readonly="0"/>
+					    	<field name="fecha" string="Fecha" readonly="0"/>
+					    	<field name="monta_a_pagar" string="Monto a pagar" widget="monetary"
+                           options="{'currency_field': 'moneda', 'field_digits': True}"/>
+					    	<field name="tasa" string="Tasa" readonly="0"/>
+					    </group>
+					</group>
+					
+				</sheet>
+				<footer>
+					<button name="pagar" string="Registrar Pago" type="object" class="oe_highlight"/>
+				</footer>
+			</form>
+		</field>
+	</record>
+
+</odoo>

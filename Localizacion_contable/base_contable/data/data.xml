@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data >
+        <!-- Add you code here -->
+
+        <record id="update_tasa_bcv" model="ir.cron">
+            <field name="name">Tasa automatica Banco central 2 </field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="priority">2</field>
+            <field name="state">code</field>
+            <field name="model_id" ref="base.res.currency.rate" />
+            <field name="code">model.central_bank()</field>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

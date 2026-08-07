@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data> 
+  
+
+    <record id="action_formato_libre_report_somofi_bs" model="ir.actions.report">
+            <field name="name">Formato Libre Somofi Solo Bs</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">extension_formato_factura.facturas_libre_s_bs</field>
+            <field name="report_file">extension_formato_factura.facturas_libre_s_bs</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+            <!--field name="paperformat_id" ref="factura_formato_libre.paperformat_forma_libre_loca_v17"/-->
+    </record>
+
+    <template id="facturas_libre_s_bs">
+      <t t-call="web.html_container">
+        <t t-call="web.basic_layout" >
+          
+            <div class="page">
+              <!-- cabecera 1 -->
+              <table width="100%" class="table table-borderless">
+                <tr style="font-size:11px;">
+                  <td width="44%"><strong>Nombre o Razón Social: <br/>
+                      <t t-esc="docs.partner_id.doc_tipo"/><t t-esc="docs.partner_id.vat"/>&amp;nbsp;<t t-esc="docs.partner_id.name"/><br/>
+                      Domicilio Fiscal:</strong><br/>
+                      <t t-esc="docs.partner_id.street"/><br/>
+                      <t t-if="docs.partner_id.street2">
+                        <t t-esc="docs.partner_id.street2"/><br/>
+                      </t>
+                      <t t-esc="docs.partner_id.city"/>
+                      <br/>
+                      TELÉFONO: &amp;nbsp;<t t-esc="docs.partner_id.phone"/>/<t t-esc="docs.partner_id.mobile"/>
+                
+                  </td>
+                  <td width="12%">&amp;nbsp;</td>
+                  <td width="37%" style="vertical-align: top;">
+                    <t t-if="docs.move_type == 'out_invoice'">
+                      <strong>FACTURA:</strong>
+                    </t>
+                    <t t-if="docs.move_type == 'out_refund'">
+                      <strong>NOTA DE CRÉDITO:</strong>
+                    </t>
+                    <t t-if="docs.move_type == 'out_receipt'">
+                      <strong>NOTA DE DÉBITO:</strong>
+                    </t>
+                    <br/>
+                    FECHA DE EMISIÓN: <br/>
+                    <strong>SUCURSAL: <span t-field="docs.partner_shipping_id.name"/><br/>
+                    Direccción de Despacho:</strong> <br/>
+                    <span t-field="docs.partner_shipping_id.street"/><br/>
+                    <strong>O.V:</strong>&amp;nbsp;
+                    <span t-field="docs.invoice_origin"/><br/>
+                    <strong>Condición de Pago:</strong>&amp;nbsp;<span t-field="docs.cond_fact"/><br/>
+                    <strong>Fecha Vencimiento:</strong>&amp;nbsp;<span t-field="docs.invoice_date_due"/><br/>
+                    <t t-if="docs.move_type in ('out_refund','out_receipt')">
+                      <strong>Factura Afectada:</strong>&amp;nbsp;
+                      <span t-esc="docs.fact_afectada(docs.fact_afect)"/>
+                    </t>
+                    
+                  </td>
+                  <td width="7%" style="vertical-align: top;">
+                    <strong>
+                     <span t-esc="docs.invoice_number_next"/>
+                    </strong>
+                    <br/>
+                    <span t-field="docs.invoice_date"/>
+                  </td>
+                </tr>
+                <!--tr>
+                  <td>&amp;nbsp;</td>
+                  <td>&amp;nbsp;</td>
+                  <td>&amp;nbsp;</td>
+                  <td>&amp;nbsp;</td>
+                </tr-->
+              </table>
+              <table width="100%" class="table table-borderless table-sm">
+                <tr align="center" style="font-size:11px; color: #000000;">
+                  <td width="55%"><strong>PRODUCTO</strong></td>
+                  <td width="12%"><strong>CANTIDAD.</strong></td>
+                  <td width="10%"><strong>PRECIO UNIT.</strong></td>
+                  <td width="7%"><strong>DCTO (%)</strong></td>
+                  <td width="6%"><strong>IVA</strong></td>
+                  
+                  <td width="10%"><strong>MONTO BS</strong></td>
+                </tr>
+                <tr align="center">
+                  <td colspan="6"> <div style="border-bottom: 1px solid black;"/></td>
+                </tr>
+                <t t-foreach="docs.invoice_line_ids" t-as="o">
+                  <t t-if="o.linea_exenta==False">
+                    <tr style="font-size:11px; color: #000000;">
+                      <td align="left">
+                        <t t-if="o.product_id.default_code">
+                          [<t t-esc="o.product_id.default_code"/>]
+                        </t>
+                        <t t-esc="o.product_id.name"/>
+                      </td>
+                      <td align="right"><t t-esc="o.float_format(o.quantity)"/>&amp;nbsp;<t t-esc="o.product_uom_id.name"/></td>
+                      <td align="right"><t t-esc="o.float_format(o.equivalente_bs(o.price_unit))"/>&amp;nbsp;Bs</td>
+                      <td align="right"><t t-esc="o.float_format(o.discount)"/></td>
+                      <td align="right"><t t-esc="o.float_format(o.tax_ids.amount)"/></td>
+                      
+                      <td align="right"><t t-esc="o.float_format(o.equivalente_bs(o.price_subtotal))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                  </t>
+                </t>
+                <tr align="center">
+                  <td colspan="6"> <div style="border-bottom: 1px solid black;"/></td>
+                </tr>
+              </table>
+              <!--br/><br/-->
+
+              <t t-if="docs.descuento()==0">
+                <table width="100%" style="font-size:11px;  border: 1px solid white;">
+                    <tr>
+                      <td width="52%" rowspan="9">
+                      
+                        TCR TASA OFICIAL BCV DEL <span t-field="docs.invoice_date"/> Bs. <span t-field="docs.tasa"/><br/><br/>
+                        <strong>Realiza Pago a la TCR BCV del dia de pago.</strong><br/>
+                        El pago de esta Factura constituirá
+                        hecho imponible y graverá el IGTF, alicuota 3% sobre el pago que se realice mediante las formas descritas en el articulo 4, numeral 6 según la providencia SNAT/2022/000013
+                        <br/>
+                        <strong>Nota:&amp;nbsp;<span t-field="docs.observacion"/></strong>
+                        <br/>
+                      </td>
+                      <td width="5%" rowspan="9">&amp;nbsp;</td>
+                      <td width="13%">Sub. Total:</td>
+                      <td width="5%" rowspan="9">&amp;nbsp;</td>
+                      <td width="11%">&amp;nbsp;</td>
+                      <td width="5%" rowspan="9">&amp;nbsp;</td>
+                      <td width="9%" align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_untaxed))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>Base Imponible</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_base_imponible))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>Exento</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_exento))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>IVA. (16%)</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_ivag))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>IVA. (08%)</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_ivar))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>IVA. (31%)</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_ivaa))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>IGTF (3%) Sobre</td>
+                      <td align="center"><t t-esc="docs.base_igtf_usd()"/>&amp;nbsp;USD</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_igtf))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Total a Pagar:</strong></td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right">
+                        <strong>
+                        <t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_total))"/>&amp;nbsp;Bs
+                        </strong>
+                      </td>
+                    </tr>
+                </table>
+              </t>
+              <t t-else="">
+                <table width="100%" style="font-size:11px;  border: 1px solid white;">
+                    <tr>
+                      <td width="52%" rowspan="9">
+                        TCR TASA OFICIAL BCV DEL <span t-field="docs.invoice_date"/> Bs. <span t-field="docs.tasa"/><br/><br/>
+                        <strong>Realiza Pago a la TCR BCV del dia de pago.</strong><br/>
+                        El pago de esta Factura constituirá
+                        hecho imponible y graverá el IGTF, alicuota 3% sobre el pago que se realice mediante las formas descritas en el articulo 4, numeral 6 según la providencia SNAT/2022/000013
+                        <br/>
+                        <strong>Nota:&amp;nbsp;<span t-field="docs.observacion"/></strong>
+                        <br/>
+                      </td>
+                      <td width="5%" rowspan="9">&amp;nbsp;</td>
+                      <td width="13%">Total Descuento:</td>
+                      <td width="5%" rowspan="9">&amp;nbsp;</td>
+                      <td width="11%">&amp;nbsp;</td>
+                      <td width="5%" rowspan="9">&amp;nbsp;</td>
+                      <td width="9%" align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.descuento()))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>Sub. Total:</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right">
+                        <t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_untaxed))"/>&amp;nbsp;Bs
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Base Imponible</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_base_imponible))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>Exento</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_exento))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>IVA. (16%)</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_ivag))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>IVA. (8%)</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_ivar))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>IVA. (31%)</td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_ivaa))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td>IGTF (3%) Sobre</td>
+                      <td align="center"><t t-esc="docs.base_igtf_usd()"/>&amp;nbsp;USD</td>
+                      <td align="right"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_igtf))"/>&amp;nbsp;Bs</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Total a Pagar:</strong></td>
+                      <td>&amp;nbsp;</td>
+                      <td align="right">
+                        <strong>
+                        <t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_total-docs.amount_igtf))"/>&amp;nbsp;Bs
+                        </strong>
+                      </td>
+                    </tr>
+                     
+                    
+                </table>
+              </t>
+              <!-- fin cabecera 1 -->
+            </div>
+          
+        </t>
+      </t>
+    </template>
+
+    
+
+        
+  
+  </data>
+</odoo>

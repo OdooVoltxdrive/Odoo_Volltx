@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data> 
+  <record id="paperformat_forma_libre_loca_v17" model="report.paperformat">
+
+      <field name="default" eval="True"/>
+        <field name="name">A4 Factura Forma Libre </field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">279</field>
+        <field name="page_width">216</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">52</field>
+        <field name="margin_bottom">105</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">96</field>
+  </record>
+
+    <record id="action_formato_libre_report" model="ir.actions.report">
+            <field name="name">Formato Libre</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">factura_formato_libre.facturas_libre</field>
+            <field name="report_file">factura_formato_libre.facturas_libre</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="factura_formato_libre.paperformat_forma_libre_loca_v17"/>
+    </record>
+
+    <template id="facturas_libre">
+      <t t-call="web.html_container">
+        <t t-call="web.basic_layout" >
+          
+            <div class="page">
+              <!-- cabecera 1 -->
+                <table width="100%" class="table table-borderless">
+                    <tr>
+                      <td >&amp;nbsp;&amp;nbsp;</td>
+                      <t t-if="docs.move_type == 'out_invoice'">
+                        <td width="250"><strong>&amp;nbsp;&amp;nbsp;Nro Factura:</strong><span t-esc="docs.name"/></td>
+                      </t>
+                      <t t-if="docs.move_type == 'out_refund'">
+                        <td width="250"><strong>&amp;nbsp;&amp;nbsp;Nro Nota de Crédito:</strong><span t-esc="docs.name"/></td>
+                      </t>
+                      <t t-if="docs.move_type == 'out_receipt'">
+                        <td width="250"><strong>&amp;nbsp;&amp;nbsp;Nro Nota de Débito:</strong><span t-esc="docs.name"/></td>
+                      </t>
+                    </tr>
+                    <tr>
+                      <td>&amp;nbsp;&amp;nbsp;</td>
+                      <td >&amp;nbsp;&amp;nbsp;Fecha:<span t-field="docs.invoice_date"/>
+                      &amp;nbsp;&amp;nbsp;Hora:<span t-field="docs.hora_public"/>
+                      </td>
+                    </tr>
+                </table>
+                  
+              <br/><br/><br/>
+                  <!-- cabecera 2 -->
+                  <table width="100%" class="table table-borderless">
+                    <tr>
+                      <td width="100">&amp;nbsp;&amp;nbsp;Cliente:</td>
+                      <td ><t t-esc="docs.partner_id.name"/></td>
+                      <td width="150">&amp;nbsp;&amp;nbsp;Teléfono(s):</td>
+                      <td ><t t-esc="docs.partner_id.phone"/>/<t t-esc="docs.partner_id.mobile"/></td>
+                    </tr>
+                    <tr>
+                      <td>&amp;nbsp;&amp;nbsp;RIF:</td>
+                      <td ><t t-esc="docs.doc_cedula(docs.partner_id.id)"/></td>
+                      <td>&amp;nbsp;&amp;nbsp;Condición de &amp;nbsp;&amp;nbsp;Pago:</td>
+                      <td ><t t-esc="docs.cond_fact"/></td>
+                    </tr>
+                    <tr>
+                      <td>&amp;nbsp;&amp;nbsp;Dirección:</td>
+                      <td colspan="3"><t t-esc="docs.partner_id.street"/></td>
+                    </tr>  
+                  </table>
+              <!-- Cuerpo -->
+                  <table width="100%" class="table table-sm table-bordered">
+                    <thead>
+                      <tr style="background-color:#CCCCCC" align="center">
+                        <td>Descripción</td>
+                        <td>Precio <br/> Unitario Bs.</td>
+                        <td>Cantidad</td>
+                        <td>Alic.<br/>%</td>
+                        <td>Monto <br/>Total Bs.</td>
+                      </tr>
+                    </thead>
+                    <t t-foreach="docs.invoice_line_ids" t-as="o">
+                      <t t-if="o.linea_exenta==False">
+                        <tr style="font-size:13px;">
+                          <td>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;*<t t-esc="o.product_id.name"/></td>
+                          <td align="right"><t t-esc="o.float_format(o.equivalente_bs(o.price_unit))"/></td>
+                          <td align="right"><t t-esc="o.float_format(o.quantity)"/></td>
+                          <td align="center">
+                            <t t-if="o.tax_ids.amount!=0">
+                              <t t-esc="o.float_format(o.tax_ids.amount)"/>
+                            </t>
+                            <t t-else="">
+                              (E)
+                            </t>
+                          </td>
+                          <td align="right"><t t-esc="o.float_format(o.equivalente_bs(o.price_subtotal))"/></td>
+                        </tr>
+                      </t>
+                    </t>
+                  </table>
+
+            </div><!-- fin page -->
+
+            <div class="footer">
+              <table width="100%" style="font-size:12px;" class="table table-borderless">
+                <!-- class="table table-borderless" -->
+                <tr>
+                  <td>
+                    
+                    <table width="100%" style="border: 1px solid black;">
+                          <tr>
+                            <td height="25">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Tasa Cambio BCV: </td>
+                            <td align="right"><span t-field="docs.tasa"/>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td height="25">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Fecha Valor: </td>
+                            <td align="right"><span t-field="docs.invoice_date"/>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td height="25">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Base I.G.T.F $: </td>
+                            <td align="right"><t t-esc="docs.float_format(docs.base_igtf_hablador())"/> &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td height="25">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;I.G.T.F 3,00 %: </td>
+                            <td align="right"><t t-esc="docs.float_format(docs.valor_igtf_hablador())"/> &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</td>
+                          </tr>
+                    </table>
+                    
+                  </td>
+                  <td>
+                    
+                    <table width="100%" class="table table-bordered">
+                      <tr>
+                        <td>
+                          &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;SUB-TOTAL
+                        </td>
+                        <td>
+                          <!--hr style="border:1px dotted red; width:100%"/-->
+                          &amp;nbsp;
+                        </td>
+                        <td width="10%" align="right">
+                          <t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_base_imponible+docs.amount_exento))"/>
+                        </td>
+                      </tr>
+                      
+                       <tr>
+                        <td>
+                          &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;EXENTO
+                        </td>
+                        <td>
+                           &amp;nbsp;
+                        </td>
+                        <td align="right">
+                          <t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_exento))"/>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;BASE IMPONIBLE IVA 16% (<t t-esc="docs.float_format(docs.base_imp_16())"/>)
+                        </td>
+                        <td>
+                          &amp;nbsp;
+                        </td>
+                        <td align="right">
+                          <t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_tax))"/>
+                        </td>
+                      </tr>
+                      
+                      <tr>
+                        <td>
+                          &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;TOTAL FACTURA 
+                        </td>
+                        <td>
+                          &amp;nbsp;
+                        </td>
+                        <td align="right">
+                          <t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_total-docs.amount_igtf))"/>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; I.G.T.F 3% (<t t-esc="docs.float_format(docs.base_igtf())"/>) 
+                        </td>
+                        <td>
+                          &amp;nbsp;
+                        </td>
+                        <td align="right">
+                         <t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_igtf))"/>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; TOTAL COBRADO
+                        </td>
+                        <td>
+                          &amp;nbsp;
+                        </td>
+                        <td align="right">
+                         <t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_total))"/>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Forma de Pago:
+                  </td>
+                  <td>
+                    
+                    <t t-foreach="docs.igtf_ids" t-as="item">
+                      <t t-esc="item.account_journal_id.name"/>
+                      <!--hr style="border:1px dotted black; width:20%" /-->
+                      <span style="color: #FFFFFF;">.............................................................</span>
+                      <t t-esc="docs.formato_fecha(docs.invoice_date)"/>
+                      <span style="color: #FFFFFF;">...........................................................................................................................</span>
+                      <t t-esc="docs.float_format(item.monta_a_pagar_bs)"/>
+                      <br/>
+                    </t>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    Son      :<t t-esc="docs.get_literal_amount(docs.amount_total)"/>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    El Pago total o parcial de esta factura en una moneda diferente a Bolivares causará el 3% de IGTF adicional al monto total indicado.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Procesado por:   <t t-esc="docs.invoice_user_id.name"/>
+                  </td>
+                  <td  align="center">
+                    El cliente acepta las condiciones seeñaladas al dorso de este documento.
+                  </td>
+                </tr>
+              </table>
+            </div><!-- fin footer -->
+          
+        </t>
+      </t>
+    </template>
+
+    
+
+        
+  
+  </data>
+</odoo>

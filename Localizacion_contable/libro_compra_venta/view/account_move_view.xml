@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="resumen_account_view_form" model="ir.ui.view">
+        <field name="name">resumen.account.view.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+
+			<xpath expr="//page[@name='other_info']" position="before">
+			  <page string="Resumen por Alicuota" invisible="move_type=='entry'">
+			   
+                    <!--field name="tax_id"/-->
+                    <field name="alicuota_line_ids" nolabel="1" readonly="True">
+                    <list string="VAT Retention Line">
+                        <field name="tipo_doc"/>
+                        <field name="base_exenta" string="Total Exento"/>
+                        <field name="base_general" string="Base General"/>
+                        <field name="impuesto_general" string="Impuesto General"/>
+                        <field name="base_reducida" string="Base reducida"/>
+                        <field name="impuesto_reducida" string="Impuesto 8%"/>
+                        <field name="base_adicional" string="Base adicional"/>
+                        <field name="impuesto_adicional" string="Impuesto Adicional"/>
+                        <field name="total_fact" string="Monto Total con IVA"/>
+                        <field name="state"/>
+                    </list>
+                    </field>
+			    
+			  </page>
+			</xpath>
+
+            <!--xpath expr="//button[@id='account_invoice_payment_btn']" position="after">
+                         <button name="anular" string="Anular" type="object" invisible="state=='cancel' or state=='draft'" />
+                         
+            </xpath-->
+
+            <!--xpath expr="//button[@id='account_invoice_payment_btn']" position="after">
+                         <button name="llenar" string="Llenar tabla temporal para el resto de las facturas" type="object" />
+                         
+            </xpath-->
+			
+            
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="paperformat_isrl_arc" model="report.paperformat">
+        <field name="name">ISLR ARC</field>
+        <field name="orientation">Landscape</field>
+         <field name="margin_top">44</field>
+        <field name="margin_bottom">20</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+    </record>
+
+    <template id="report_arc">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.basic_layout" t-lang="es_VE">
+                    	<div class="header">
+                    		<div class="container">
+				                <div class="row">
+				                    <div class="col-xs-3 mb4">
+				                        <t t-if="o.company_id.logo">  
+                                            <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}" style="width:auto; height:50px;"/>
+                                        </t>
+				                    </div>
+				                    
+				                </div>
+            				</div>
+                    		<div class="container">
+			                	<div class="row">
+				                    <div class="col-8 mb4">
+				                        <span style="font-size:17px;" t-field="res_company.name"/>
+				                    </div>
+				                    <div class="col-4 mb4 text-right">
+				                        <span>Fecha: &amp;nbsp;&amp;nbsp; <span t-field="o.date_today"/></span>
+				                    </div>
+				                </div>
+			            	</div>
+			            	<div class="container">
+				                <div class="row">
+				                    <div class="col-8 mb4">
+				                        <span style="font-size:17px;">RIF: <span style="font-size:17px;" t-field="res_company.vat"/></span>
+				                    </div>
+				                    <div class="col-4 mb4 text-right">
+				                        <span style="font-size:17px;">Página:</span> <span class="page" style="font-size:17px;"/> / <span class="topage" style="font-size:17px;"/>
+				                    </div>
+				                </div>
+            				</div>
+
+            				<div class="container">
+				                <div class="row">
+				                    <div class="col-12 text-center">
+				                        <span style="font-size: 20px; color: #0406b3;">RELACIÓN ANUAL DE RETENCIONES DE ISLR</span>
+				                    </div>
+				                </div>
+			            	</div>
+
+                    	</div>
+
+                    	<div class="page">
+                    		<div class="container">
+	                            <div class="row">
+	                                <div class="col-12 text-center">
+	                                    <span style="font-size:12px;">DESDE:  <span t-field="o.date_from"/> &amp;nbsp;&amp;nbsp;HASTA: <span t-field="o.date_to" /> </span>
+	                                </div>
+	                            </div>
+                        	</div>
+
+                        	<div class="container">
+	                            <div class="row">
+	                                <div class="col-6">
+	                                    <p>Proveedor&amp;nbsp;&amp;nbsp;&amp;nbsp;:&amp;nbsp;&amp;nbsp;&amp;nbsp;<span t-field="o.name.name"/></p>
+	                                </div>
+	                                <div class="col-1">
+
+	                                </div>
+	                                <div class="col-5">
+	                                    <p>RIF:&amp;nbsp;<span t-field="o.name.doc_tipo"/>-<span t-field="o.name.vat"/></p>
+	                                </div>
+	                            </div>
+                        	</div>
+
+                        	
+                        	<br/>
+	                        <div class="container">
+	                            <div class="row">    
+	                                <table class="table table-bordered table-responsive" style="width:100%;">
+	                                	<tr>
+	                                		<td class="text-center" style="font-size:12px;">NRO COMPROBANTE</td>
+                                            <td class="text-center" style="font-size:12px;">FECHA FACT.</td>
+                                            <td class="text-center" style="font-size:12px;">NRO FACT.</td>
+                                            <td class="text-center" style="font-size:12px;">NRO CONTROL</td>
+                                            <td class="text-center" style="font-size:12px;">CONCEPTO</td>
+                                            <td class="text-center" style="font-size:12px;">TOTAL FACTURA</td>
+                                            <td class="text-center" style="font-size:12px;">MONTO BASE</td>
+                                            <td class="text-center" style="font-size:12px;">% ISLR</td>
+                                            <td class="text-center" style="font-size:12px;">MONTO RETENIDO</td>
+	                                	</tr>
+	                                	<t t-set="amount_total" t-value="0"/>
+                                        <t t-set="base" t-value="0"/>
+                                        <t t-set="total" t-value="0"/>
+	                                	<t t-foreach="o.isrl_id" t-as="line">
+	                                		<tr t-foreach="line.lines_id" t-as="concep" > 
+	                                			<td class="text-center" style="font-size:12px;"><span t-field="line.name"/></td>
+	                                			<td class="text-center" style="font-size:12px;"><span t-field="line.date_isrl"/></td>
+                                                <td class="text-center" style="font-size:12px;"><span t-field="line.invoice_id.invoice_number_next"/></td>
+                                                <td class="text-center" style="font-size:12px;"><span t-field="line.invoice_id.invoice_number_control"/></td>
+                                                <td class="text-center" style="font-size:12px;"><span t-field="concep.name.name"/></td>
+                                                <t t-if="line.invoice_id.journal_id.tipo_doc == 'nc'">
+                                                    <td class="text-right" style="font-size:12px;">-
+                                                    <t t-esc="abs(line.invoice_id.amount_total_signed)" t-options='{"widget": "float", "decimal_precision": "ISRL"}'/>
+                                                    </td>
+                                                    <td class="text-right" style="font-size:12px;">-<t t-esc="concep.base" t-options='{"widget": "float", "decimal_precision": "ISRL"}'/></td>
+                                                    <td class="text-right" style="font-size:12px;"><t t-esc="concep.cantidad" /> %</td>
+                                                    <td class="text-right" style="font-size:12px;">-<t t-esc="concep.total" t-options='{"widget": "float", "decimal_precision": "ISRL"}'/></td>  
+                                                    <t t-set="base" t-value="base - concep.base"/>
+                                                    <t t-set="amount_total" t-value="amount_total - line.invoice_id.amount_total_signed"/>
+                                                    <t t-set="total" t-value="total - concep.total"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <td class="text-right" style="font-size:12px;">
+                                                                <t t-esc="abs(line.invoice_id.amount_total_signed)" t-options='{"widget": "float", "decimal_precision": "ISRL"}'/>
+                                                    </td>
+                                                    <td class="text-right" style="font-size:12px;"><t t-esc="concep.base" t-options='{"widget": "float", "decimal_precision": "ISRL"}'/></td>
+                                                    <td class="text-right" style="font-size:12px;"><t t-esc="concep.cantidad" /> %</td>
+                                                    <td class="text-right" style="font-size:12px;"><t t-esc="concep.total" t-options='{"widget": "float", "decimal_precision": "ISRL"}'/></td>  
+                                                    <t t-set="base" t-value="base + concep.base"/>
+                                                    <t t-set="amount_total" t-value="amount_total + line.invoice_id.amount_total_signed"/>
+                                                    <t t-set="total" t-value="total + concep.total"/>
+                                                </t>
+
+	                                		</tr> 
+	                                	</t>
+	                                	<!--div style="page-break-after: always"></div-->
+                                        <tr style="font-size:12px;">
+                                            <td colspan="5" aling="right"> Total</td>
+                                            <td class="text-right"><t t-esc="abs(amount_total)" t-options='{"widget": "float", "decimal_precision": "ISRL"}'/></td>
+                                            <td class="text-right"><t t-esc="base" t-options='{"widget": "float", "decimal_precision": "ISRL"}'/></td>
+                                            <td></td>
+                                            <td class="text-right"><t t-esc="total" t-options='{"widget": "float", "decimal_precision": "ISRL"}'/></td>
+                                        </tr>
+	                                </table>
+	                            </div>
+	                        </div>
+
+	                        <!-- Nuevo codigo para las firmas -->
+                        	<br/><br/>
+                                <div class="row">
+                                    <div class="col-5 text-center">
+                                            _______________________________________
+                                    </div>
+                                    <div class="col-5 text-center">
+                                            _______________________________________
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-5 text-center">
+                                        <span t-field="o.isrl_id.partner_id.name"/>
+                                        <br/>
+                                        Firma y Sello
+                                    </div>
+
+                                    <div class="col-5 text-center" name="firma2">  
+                                        Usuario:<span t-field="o.write_uid.name"/> 
+                                        <br/>
+                                        <span t-field="o.company_id.name"/>
+                                        <br/>
+                                        Firma y Sello
+                                    </div>
+                                </div>
+                        	<!--Fin Nuevo codigo para las firmas -->
+
+
+                    	</div><!-- **** -->
+
+                    	<div class="footer">
+				            <div class="text-center" style="border-top: 1px solid black;">
+				                
+				            </div>
+        				</div>
+                    </t>
+                </t>
+            </t>
+    </template>
+
+    <record id="action_report_arc" model="ir.actions.report">
+            <field name="name">ARC</field>
+            <field name="model">account.arc.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">isrl_retention.report_arc</field>
+            <field name="report_file">isrl_retention.report_arc</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="isrl_retention.paperformat_isrl_arc"/>
+    </record>
+
+</odoo>

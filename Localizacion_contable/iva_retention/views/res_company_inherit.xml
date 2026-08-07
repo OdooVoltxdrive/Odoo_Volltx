@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="cuentas_retenciones_iva" model="ir.ui.view">
+        <field name="name">cuentas.retenciones.iva</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='confg_cuentas']/group[1]" position="inside">
+                
+                <group name="grupo_12" string="Cuentas Ret. IVA">
+                    <field name="version" string="Version Mod. Ret IVA" invisible='0'/>
+
+                    <field name="account_ret_payable_aux_id" string="Cuenta Ret. por Proveedor" invisible='0'/>
+                    <field name="account_ret_receivable_aux_id" string="Cuenta Ret. Cliente" invisible='0'/>
+                    <field name="journal_ret_aux_id" string="Diario de retenciones" invisible='0'/>
+                </group>
+
+                <group name="grupo_21" string="Config. Ret en Compras">
+                    <field name="aplicar_ret" string="Esta Compañia es Contribuyente Especial?" invisible='0'/>
+                </group>
+
+                <group name="grupo_22" string="% Ret. IVA en Ventas">
+                    <field name="vat_retention_rate_cli" string="Porcentaje retencion aplicar a esta compañia" />
+                </group>
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>

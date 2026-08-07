@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="herencia_pago_odoo_wizard" model="ir.ui.view">
+        <field name="name">herencia.pago.odoo.wizard</field>
+        <field name="model">account.payment.register</field>
+        <field name="inherit_id" ref="account.view_account_payment_register_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='communication']" position="after">
+              <field name="tasa" string="Tasa de Cambio(Bs)" readonly="1"/>
+
+              <field name="amount_igtf" string="Monto IGTF a pagar (Bs)" readonly="0" invisible="currency_id!=1 or aplica_igtf==False"/>
+              <field name="journal_igtf_id" string="Diario de Banco Para IGTF" readonly="0" invisible="currency_id!=1 or aplica_igtf==False" domain="[('type', 'in',('bank','cash'))]"/>
+              <field name="metodo_pago_igtf" string="Método Pago Para IGTF" readonly="0" invisible="currency_id!=1 or aplica_igtf==False" domain="[('journal_id', '=', journal_igtf_id),('payment_method_id.payment_type','=',tipo_doc)]"/>
+              <field name="tipo_doc" invisible="1"/>
+              <field name="aplica_igtf" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="formato_libre_fact_nc_cd_view_form" model="ir.ui.view">
+        <field name="name">formato.libre.fact.nc.cd.view.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            
+            
+            <xpath expr="//button[@name='action_post']" position="before">
+                <button name="formato_libre" string="Imprimir Fact/NC/ND" class="oe_highlight" type="object" invisible="move_type in ('in_invoice', 'in_refund','in_receipt') or state =='draft'" />
+            </xpath>         
+        </field>
+    </record>
+
+</odoo>

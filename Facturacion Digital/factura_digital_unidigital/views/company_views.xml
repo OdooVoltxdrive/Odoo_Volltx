@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="modulo_fact_digital" model="ir.ui.view">
+        <field name="name">modulo.fact.digital</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+          <xpath expr="/form//page[@name='confg_cuentas']" position="after">
+            <page string="Configuracion Facturacion Digital" name="studio_page_7o2_1ju5cctos">
+              <group name="studio_group_7o2">
+                <group name="group_left_unid">
+                  <field name="usar_fact_digi" string="Habilitar Fact. digital?"/>
+                  <field name="url" invisible="usar_fact_digi==False" required="usar_fact_digi==True"/>
+
+                  <field name="enpoint" invisible="usar_fact_digi==False" required="usar_fact_digi==True"/>
+
+                  <field name="enpoint_emision" invisible="usar_fact_digi==False" required="usar_fact_digi==True"/>
+
+                  <field name="unidg_api_user" invisible="usar_fact_digi==False" required="usar_fact_digi==True"/>
+
+                  <field name="unidg_api_password" invisible="usar_fact_digi==False" required="usar_fact_digi==True"/>
+
+                  <field name="sucursal_strong_id" invisible="usar_fact_digi==False" />
+
+                  <field name="unidg_jwt_token" invisible="usar_fact_digi==False"/>
+
+                  <field name="mensaje" invisible="usar_fact_digi==False" />
+
+                  <field name="codigo" invisible="usar_fact_digi==False" />
+
+                  <field name="seriestrongid" invisible="usar_fact_digi==False" />
+
+                  
+                </group>
+
+                <group name="group_right_unid">
+                  <button name="unidg_get_token" string="Validar Token" type="object" invisible="usar_fact_digi==False"/>
+                  <button name="limpia" string="Limpiar" type="object" invisible="usar_fact_digi==False"/>
+                </group>
+              </group>
+            </page>
+          </xpath>
+         </field>
+    </record>
+</odoo>
