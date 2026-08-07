@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_users_inherit_form_loca" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.loca</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                <page string="Permisologia Mov. Contables. " name="studio_page_9n0_1iisbi5rk">
+                  <group name="studio_group_9n0">
+                    <group name="studio_group_9n0_left">
+                      <field name="x_llevar_borra_fact" string="Llevar a Borrador Fact.?" widget="radio"/>
+                    </group>
+                    <group name="studio_group_9n0_right"/>
+                  </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

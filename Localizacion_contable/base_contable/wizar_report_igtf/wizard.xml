@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+       <!-- Wizard para imprimir resumen retenciones iva-->
+      <record id="view_retenciones_igtf" model="ir.ui.view">
+       	    <field name="name">Resumen Retencion IGTF</field>
+            <field name="model">wizard.resumen.igtf</field>
+    	    <field name="arch" type="xml">
+
+    	    	<form string="Reporte Resumen Retenciones IGTF">
+                     <group colspan="8" col="4">
+                         <field name="tipo_empresa" string="Tipo de Empresa" required="1"/>
+                         <field name="tipo_pago" string="Pagos" required="1"/>
+                         <field name="date_from" string="Fecha Desde" required="1"/>
+                         <field name="date_to"  string="Fecha Hasta" required="1"/>
+                                                                          
+                     </group>                   
+                     
+	                <footer>
+	                   <button name="print_resumen_igtf" string="Resumen Retenciones igtf" type="object" class="oe_highlight" />                  
+	                   <button special="cancel" string="Cancel" class="oe_highlight" />
+	                </footer>
+                </form>
+
+    	    </field>
+      </record>
+
+      <record id="action_report_wizards_igtf" model="ir.actions.act_window">
+        	<field name="name">wizard Resumen Retenciones IGTF</field>
+        	<field name="res_model">wizard.resumen.igtf</field>
+        	<field name="view_mode">form</field>
+        	<field name="view_id" ref="view_retenciones_igtf"/>
+        	<field name="target">new</field>
+      </record>
+
+      <menuitem
+        id="menu_resumen_igtf_cli"
+        parent="account.menu_finance_reports"
+        name="Resumen Retenciones IGTF Clientes/Proveedores"
+        sequence="16"
+        action="action_report_wizards_igtf"/>
+
+      <!--menuitem
+        id="menu_resumen_igtf_cli"
+        parent="account.menu_finance_reports"
+        name="Resumen Retenciones IGTF Clientes"
+		    sequence="16"
+        action="action_report_wizards_igtf"/-->
+
+    </data>
+</odoo>

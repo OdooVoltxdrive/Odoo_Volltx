@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data> 
+  <record id="paperformat_forma_libre_loca_v17" model="report.paperformat">
+
+      <field name="default" eval="True"/>
+        <field name="name">A4 Factura Forma Libre </field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">140</field>
+        <field name="page_width">216</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">25</field>
+        <field name="margin_bottom">43</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">96</field>
+  </record>
+
+    <record id="action_formato_libre_report" model="ir.actions.report">
+            <field name="name">Formato Libre</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">factura_formato_libre.facturas_libre</field>
+            <field name="report_file">factura_formato_libre.facturas_libre</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="factura_formato_libre.paperformat_forma_libre_loca_v17"/>
+    </record>
+
+    <template id="facturas_libre">
+      <t t-call="web.html_container">
+        <t t-call="web.basic_layout" >
+          
+            <div class="page">
+              <table width="100%"  class="table table-borderless table-sm" style="font-size:13px;">
+                <tr>
+                  <td width="20%"><samp style="font-weight: bolder">Cod. Cliente</samp></td>
+                  <td width="30%">&amp;nbsp;</td>
+                  <td width="10%">&amp;nbsp;</td>
+                  <td width="20%"><samp style="font-weight: bolder">Caracas</samp></td>
+                  <td width="20%"><samp style="font-weight: bolder"><span t-field="docs.invoice_date"/></samp></td>
+                </tr>
+                <tr>
+                  <td><samp style="font-weight: bolder">Razón Social </samp></td>
+                  <td><samp style="font-weight: bolder"><t t-esc="docs.partner_id.name"/></samp></td>
+                  <td>&amp;nbsp;</td>
+                  <td><samp style="font-weight: bolder">R.I.F.</samp></td>
+                  <td><samp style="font-weight: bolder"><t t-esc="docs.doc_cedula(docs.partner_id.id)"/></samp></td>
+                </tr>
+                <tr>
+                  <td><samp style="font-weight: bolder">DOMICILIO FISCAL</samp></td>
+                  <td rowspan="2">
+                    <samp style="font-weight: bolder">
+                    <t t-esc="docs.partner_id.street"/>, <t t-esc="docs.partner_id.street2"/>, <t t-esc="docs.partner_id.city"/> - <t t-esc="docs.partner_id.state_id.name"/>
+                    </samp>
+                  </td>
+                  <td>&amp;nbsp;</td>
+
+                  <t t-if="docs.move_type == 'out_invoice'">
+                    <t t-if="docs.journal_id.tipo_doc!='ne'">
+                      <td><samp style="font-weight: bolder">Factura:</samp></td>
+                      <td><samp style="font-weight: bolder"><span t-esc="docs.invoice_number_next"/></samp></td>
+                     </t>
+                     <t t-else="">
+                      <td><samp style="font-weight: bolder">Nota de Entrega:</samp></td>
+                      <td><samp style="font-weight: bolder"><span t-esc="docs.delivery_note_next_number"/></samp></td>
+                     </t>
+                  </t>
+                  
+                  <t t-if="docs.move_type == 'out_refund'">
+                    <td><samp style="font-weight: bolder">Nro Nota Crédito:&amp;nbsp;<span t-esc="docs.name"/></samp></td>
+                    <td><samp style="font-weight: bolder">Factura Afectada:&amp;nbsp;<span t-esc="docs.ref"/></samp></td>
+                  </t>
+
+                  <t t-if="docs.move_type == 'out_receipt'">
+                    <td><samp style="font-weight: bolder">Nro Nota Débito:&amp;nbsp;<span t-esc="docs.name"/></samp></td>
+                    <td><samp style="font-weight: bolder">Factura Afectada:&amp;nbsp;<span t-esc="docs.ref"/></samp></td>
+                  </t>
+
+
+                </tr>
+                <tr>
+                  <td>&amp;nbsp;</td>
+                  <td>&amp;nbsp;</td>
+                  <td><samp style="font-weight: bolder">Fecha Venc. </samp></td>
+                  <td><samp style="font-weight: bolder"><span t-field="docs.invoice_date_due"/></samp></td>
+                </tr>
+                <tr>
+                  <td><samp style="font-weight: bolder">Vendedor</samp></td>
+                  <td><samp style="font-weight: bolder"><t t-esc="docs.invoice_user_id.name"/></samp></td>
+                  <td>&amp;nbsp;</td>
+                  <td><samp style="font-weight: bolder">Telf: </samp></td>
+                  <td><samp style="font-weight: bolder">
+                    <t t-esc="docs.partner_id.phone"/>/<t t-esc="docs.partner_id.mobile"/>
+                    </samp>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" class="table table-borderless table-sm">
+              <!--table width="100%" class="table table-borderless table-sm "-->
+                <thead>
+                  <tr align="center"  style="font-size:12px; color: #051B68;">
+                    <td align="left">PRODUCTO</td>
+                    <td>CANTIDAD</td>
+                    <td>CANT. UNIT</td>
+                    <td>PRECIO UNIT</td>
+                    <td>DESC.(%)</td>
+                    <td>I.V.A</td>
+                    <td>SUB TOTAL</td>
+                  </tr>
+                  <tr align="center">
+                    <td colspan='7'><div class="border-bottom border-dark border-1"/></td>
+                  </tr>
+                </thead>
+                <t t-set="num" t-value="1"/>
+                <t t-foreach="docs.invoice_line_ids" t-as="o">
+                  <t t-if="o.linea_exenta==False">
+                    <tr style="font-size:11px;">
+                      <td>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;*<t t-esc="o.vista_espacio(o.name)"/></td>
+                      <td align="right">
+                        <t t-esc="o.float_format(o.quantity)"/>&amp;nbsp;<t t-esc="o.product_uom_id.name"/>
+                        &amp;nbsp;&amp;nbsp;</td>
+                      <td align="right">
+                        <t t-esc="o.float_format(o.x_quantity_unitary)"/>&amp;nbsp;<t t-esc="o.und_presentacion(o.product_id.product_tmpl_id)"/>
+                            &amp;nbsp;&amp;nbsp;</td>
+                      <td align="right"><t t-esc="o.float_format(o.equivalente_bs(o.price_unit))"/>&amp;nbsp;<t t-esc="docs.moneda()"/>&amp;nbsp;</td>
+                      <td align="right"><t t-esc="o.float_format(o.discount)"/>&amp;nbsp;&amp;nbsp;</td>
+                      <td align="center">
+                        <t t-if="o.tax_ids.amount!=0">
+                            <t t-esc="o.float_format(o.tax_ids.amount)"/>
+                        </t>
+                        <t t-else="">
+                          (E)
+                        </t>
+                      </td>
+                      <td align="right"><t t-esc="o.float_format(o.equivalente_bs(o.price_subtotal))"/>&amp;nbsp;<t t-esc="docs.moneda()"/>&amp;nbsp;</td>
+                    </tr>
+                  </t>
+                </t>  
+              </table>
+            </div>
+            <div class="footer">
+              <table width="100%"  class="table table-borderless table-sm" style="font-size:11px;">
+                <tr>
+                  <t t-if="docs.ocultar_hablador()=='no'">
+                    <td colspan="2">
+                        <div class="border-bottom border-dark border-1"/>
+                    </td>
+                  </t>
+                  <t t-else="">
+                      <td colspan="2" width="40%">&amp;nbsp;</td>
+                  </t>
+                  <td width="20%">&amp;nbsp;</td>
+                  <td colspan="2"><div class="border-bottom border-dark border-1"/></td>
+                </tr>
+                <tr>
+                  <t t-if="docs.ocultar_hablador()=='no'">
+                    <td>SubTotal</td>
+                    <td align="right"><t t-esc="docs.float_format(docs.equivalente_fijo(docs.amount_base_imponible+docs.amount_exento))"/>&amp;nbsp;Bs.</td>
+                  </t>
+                  <t t-else="">
+                    <td colspan="2">&amp;nbsp;</td>
+                  </t>
+                  <td width="20%">&amp;nbsp;</td>
+                  <td><samp style="font-weight: bolder">SubTotal</samp></td>
+                  <td align="right"><samp style="font-weight: bolder"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_base_imponible+docs.amount_exento))"/>&amp;nbsp;<t t-esc="docs.moneda()"/></samp></td>
+                </tr>
+                <tr>
+                  <t t-if="docs.ocultar_hablador()=='no'">
+                    <td>Total Imponible</td>
+                    <td align="right"><t t-esc="docs.float_format(docs.equivalente_fijo(docs.amount_base_imponible))"/>&amp;nbsp;Bs.</td>
+                  </t>
+                  <t t-else="">
+                      <td colspan="2">&amp;nbsp;</td>
+                  </t>
+                  <td width="10%">&amp;nbsp;</td>
+                  <td><samp style="font-weight: bolder">Total Imponible</samp></td>
+                  <td align="right"><samp style="font-weight: bolder"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_base_imponible))"/>&amp;nbsp;<t t-esc="docs.moneda()"/></samp></td>
+                </tr>
+                <tr>
+                  <t t-if="docs.ocultar_hablador()=='no'">
+                    <td>Total Exento</td>
+                    <td align="right"><t t-esc="docs.float_format(docs.equivalente_fijo(docs.amount_exento))"/>&amp;nbsp;Bs.</td>
+                  </t>
+                  <t t-else="">
+                      <td colspan="2">&amp;nbsp;</td>
+                  </t>
+                  <td width="10%">&amp;nbsp;</td>
+                  <td><samp style="font-weight: bolder">Total Exento</samp></td>
+                  <td align="right"><samp style="font-weight: bolder"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_exento))"/>&amp;nbsp;<t t-esc="docs.moneda()"/></samp></td>
+                </tr>
+                 <tr>
+                  <t t-if="docs.ocultar_hablador()=='no'">
+                    <td>IVA</td>
+                    <td align="right"><t t-esc="docs.float_format(docs.equivalente_fijo(docs.amount_tax))"/>&amp;nbsp;Bs.</td>
+                  </t>
+                  <t t-else="">
+                      <td colspan="2">&amp;nbsp;</td>
+                  </t>
+                  <td width="10%">&amp;nbsp;</td>
+                  <td><samp style="font-weight: bolder">IVA</samp></td>
+                  <td align="right"><samp style="font-weight: bolder"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_tax))"/>&amp;nbsp;<t t-esc="docs.moneda()"/></samp></td>
+                </tr>
+                <tr>
+                  <t t-if="docs.ocultar_hablador()=='no'">
+                    <td>I.G.T.F</td>
+                    <td align="right"> <t t-esc="docs.float_format(docs.equivalente_fijo(docs.amount_igtf))"/>&amp;nbsp;Bs.</td>
+                  </t>
+                  <t t-else="">
+                      <td colspan="2">&amp;nbsp;</td>
+                  </t>
+                  <td width="10%">&amp;nbsp;</td>
+                  <td><samp style="font-weight: bolder">I.G.T.F</samp></td>
+                  <td align="right"><samp style="font-weight: bolder"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_igtf))"/>&amp;nbsp;<t t-esc="docs.moneda()"/></samp></td>
+                </tr>
+
+                <tr>
+                  <t t-if="docs.ocultar_hablador()=='no'">
+                    <td>Total</td>
+                    <td align="right"><t t-esc="docs.float_format(docs.equivalente_fijo(docs.amount_total))"/>&amp;nbsp;Bs.</td>
+                  </t>
+                  <t t-else="">
+                      <td colspan="2">&amp;nbsp;</td>
+                  </t>
+                  <td width="10%">&amp;nbsp;</td>
+                  <td><samp style="font-weight: bolder">Total</samp></td>
+                  <td align="right"><samp style="font-weight: bolder"><t t-esc="docs.float_format(docs.equivalente_bs(docs.amount_total))"/>&amp;nbsp;<t t-esc="docs.moneda()"/></samp></td>
+                </tr>
+
+                <tr>
+                  <td colspan="5">
+                    <t t-if="docs.journal_id.tipo_doc!='ne'">
+                      <samp style="font-weight: bolder">
+                      Este documento estará sujeto a la percepcion del 3% del IGTF si es pagado en divisas en efectivo según providencia SNAT/2022/000013 GO 42.339 de fecha 17/03/2022.
+                      </samp>
+                    </t>
+                  </td>
+                </tr>
+                
+              </table>
+            </div>
+          
+        </t>
+      </t>
+    </template>
+
+    
+
+        
+  
+  </data>
+</odoo>

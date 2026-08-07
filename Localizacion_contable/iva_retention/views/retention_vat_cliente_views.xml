@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="vista_from_iva_retention_clien" model="ir.ui.view">
+        <field name="name">vista.from.iva.retention.clien</field>
+        <field name="model">vat.retention</field>
+        <field name="arch" type="xml">
+            <form string="Retenciones IVA a clientes">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done,cancel"/>   
+                    <button name="action_posted" string="Confirmar" class="oe_highlight" type="object" invisible="state !='draft'"/>
+                    <button name="action_draft" string="Borrador" type="object" 
+                        invisible="state =='draft'"/>
+                    <button name="comprobante" string="Imprimir Comprobante" class="oe_highlight" type="object" invisible="state=='draft' or type in ('out_invoice','out_refund','out_receipt')"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_form_label">Nro Comprobante</span>
+                        <h1>
+                            <field name="name" string="Nro Voucher" readonly="state in ('posted','cancel')"/> 
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group name="supplier_data">
+                            <field name="partner_id" string="Empresa" readonly="state in ('posted','cancel')"/>
+                            <field name="rif" string="Rif" readonly="state in ('posted','cancel')"/>
+                            <field name="currency_id" string="Moneda" readonly="1"/>
+                        </group>
+                        <group name="dates">
+                            <!-- Accounting_date is the date when the voucher is created -->
+                            <field name="accouting_date" string="Fecha Contable" readonly="state in ('posted','cancel')"/> 
+                            <field name="voucher_delivery_date" string="Fecha de entrega del comprobante" readonly="state in ('posted','cancel')"/>
+                        </group>
+                    </group>
+
+                    <group col="4">
+                        <field name="invoice_id" domain="[('move_type','!=','entry')]" string="Factura" readonly="state in ('posted','cancel')"/>
+                        <field name="invoice_number_next" string="Nro Factura" readonly="state in ('posted','cancel')"/>
+                        <field name="company_id" string="Compañia" readonly="1"/>
+                        <field name="journal_id" string="Diario" readonly="state in ('posted','cancel')"/>
+                    </group>
+
+                    <group col="4">
+                        <!--field name="is_customer" invisible="1"/>
+                        <field name="is_supplier" invisible="1"/-->
+                        <field name="type" invisible="0" readonly="state in ('posted','cancel')"/>
+                        <field name="asiento_ret_iva_id" string="Asiento Contable" readonly="state in ('posted','cancel')"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Retenciones de IVA">
+                            <field name="retention_line_ids" nolabel="1" readonly="state in ('posted','cancel')">
+                            <!--field name="retention_line_ids" nolabel="1" readonly="True"-->
+                                <list string="VAT Retention Line">
+                                    <field name="retention_id" invisible="1"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="invoice_number" string="Factura"/>
+                                    <field name="amount_vat_ret" string="Importe del impuesto" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="retention_rate" string="Tasa de retención (%)" readonly="False"/>
+                                    <field name="retention_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="tax_id" string="Impuesto"/>
+                                </list>
+                            </field>
+                        </page>
+
+                    </notebook>
+                    <newline/>
+
+                    <group class="oe_right">
+                        <group class="oe_subtotal_footer">
+                            <field name="amount_untaxed" string="Base imponible" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="vat_retentioned" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+
+                </sheet>
+                <!--div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div-->
+            </form>
+        </field>
+    </record>
+
+    <record id="vista_tree_iva_retention_clien" model="ir.ui.view">
+        <field name="name">ista.tree_iva.retention.clien</field>
+        <field name="model">vat.retention</field>
+        <field name="arch" type="xml">
+            <list string="Retenciones de Iva Clientes" >
+                <field name="name" string="Número de Comprobante"></field>
+                <field name="invoice_number_next" string="Factura"/>
+                <field name="partner_id" string="Empresa"></field> 
+                <field name="rif"></field>   
+                <field name="amount_untaxed" string="Importe base"></field>
+                <field name="vat_retentioned" string="Importe Retenido"></field> 
+                <field name="company_id" string="Compañia"/>
+                 <field name="type" invisible="0"/>
+            </list>
+        </field>
+    </record>
+
+<record id="action_iva_clientes_retention" model="ir.actions.act_window">
+        <field name="name">Registro de retenciones IVA Clientes</field>
+        <field name="res_model">vat.retention</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="vista_tree_iva_retention_clien"></field>
+         <field name="domain">[('type','=',('out_invoice','out_refund','out_receipt'))]</field>
+</record>
+
+<menuitem 
+        id="menu_cliente_iva_retention"
+        name="Retenciones IVA Clientes"
+        parent="account.menu_finance_receivables"
+        action="action_iva_clientes_retention"
+        sequence="25"
+    />
+</odoo>

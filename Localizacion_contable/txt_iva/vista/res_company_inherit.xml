@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ruta_txt" model="ir.ui.view">
+        <field name="name">ruta.txt</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="x_ruta_txt_iva" string="Ruta archivo txt I.V.A"/>
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>

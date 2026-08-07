@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="partner_inherit_view_form2" model="ir.ui.view">
+        <field name="name">partner.inherit.view.form2</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='sales_purchases']" position="after">
+                <page name="retentions" string="Retenciones IVA">
+                    <group name="vat_principal">
+                        <group name="vat_retention2" col="2" string="% Retención para aplicar a este proveedor">
+                            <field name="vat_retention_rate" string="Tasa de retención (%)" invisible="aplicar_ret!=True"/>
+                            <field name="account_ret_payable_id" invisible="aplicar_ret!=True"/>
+                            <field name="aplicar_ret" string="La Compañia del sistema es Contribuyente Especial?"/>
+
+                                              
+                        </group>
+
+                        <group name="vat_retention3" col="2" string="Ctas retenciones para clientes">
+                            
+                            <field name="vat_retention_rate_cli" string="% Retención para aplicar por este cliente" invisible="contribuyente=='no'"/>
+                            <field name="account_ret_receivable_id" invisible="contribuyente=='no'"/>
+                               
+                        </group>
+                        <group name="vat_retention4" col="2" string="Diario de Retencion">
+                            <field name="ret_jrl_id"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

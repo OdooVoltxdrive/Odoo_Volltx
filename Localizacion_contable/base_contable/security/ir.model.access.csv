@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+account_payment_method_journal,account.payment.method_journal,model_account_payment_method_journal,base.group_user,1,1,1,1
+account_payment_fact,account.payment.fact,model_account_payment_fact,base.group_user,1,1,1,1
+wizard_payment_fact,wizard.payment.fact,model_wizard_payment_fact,base.group_user,1,1,1,1
+wizard_resumen_igtf,wizard.resumen.igtf,model_wizard_resumen_igtf,base.group_user,1,1,1,1
+resumen_igtf_wizard_pdf,resumen.igtf.wizard.pdf,model_resumen_igtf_wizard_pdf,base.group_user,1,1,1,1

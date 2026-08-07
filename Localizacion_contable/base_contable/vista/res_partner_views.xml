@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_partner_inherit_form" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <!--xpath expr="/form/sheet/group/group[2]/field[@name='function']" position="after">
+                <field name="mobile" widget="phone" options="{'enable_sms': True}"/>
+            </xpath-->
+
+            <xpath expr="/form/sheet/group/group[2]/field[@name='function']" position="after">
+                <label for="mobile"/>
+                <div class="o_row">
+                    <i class="fa fa-mobile-phone fa-lg me-1" title="Celular"/>
+                    <field name="mobile" nolabel="1" placeholder="Ej. +58 412-1234567"/>
+                </div>
+            </xpath>
+
+            <xpath expr="//field[@name='vat']" position="replace" >
+                <field name="doc_tipo" string="Tipo Doc." />
+                <field name="vat_aux" string="Cedula/RIF" />
+                <field name="vat" string="Documento" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='category_id']" position="after" >
+                <field name="contribuyente" string="Es contribuyente especial?" widget="radio" required='True' />
+                <field name="people_type" string="Tipo de Persona" required='True' />
+                <field name="seniat_url" string="Dirección SENIAT" />
+                <field name="partner_type" string="Origen" />
+                <!--field name="mobile" string="Teléfono Celular" /-->
+            </xpath>
+        </field>
+    </record>
+
+    
+
+</odoo>

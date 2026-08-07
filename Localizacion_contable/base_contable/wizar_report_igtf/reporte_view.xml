@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>    
+    <record id="paperformat_resumen_igtf" model="report.paperformat">
+
+      <field name="default" eval="True"/>
+        <field name="name">A4 Formato resumen IGTF</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">210</field>
+        <field name="page_width">297</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">50</field>
+        <field name="margin_bottom">30</field>
+        <field name="margin_left">1</field>
+        <field name="margin_right">1</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">92</field>
+    </record>
+
+
+    <record id="action_libro_resumen_igtf" model="ir.actions.report">
+            <field name="name">Resumen de IGTF</field>
+            <field name="model">wizard.resumen.igtf</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">base_contable.libro_resumen_igtf</field>
+            <field name="report_file">base_contable.libro_resumen_igtf</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="base_contable.paperformat_resumen_igtf"/>
+    </record>
+
+    <template id="libro_resumen_igtf">
+
+       <t t-call="web.html_container" ><!-- realiza llamados a template propio de odoo -->
+         <t t-call="web.basic_layout" ><!-- realiza llamados a template propio de odoo -->
+          <t t-set="pag" t-value="0"/>
+          <t t-foreach="docs" t-as="o">
+            <t t-set="pag" t-value="pag+1"/>
+            <!-- CABECERA -->
+            <div class="header">
+              <table width="100%" class="table table-borderless">
+                <tr>
+                  <td><span t-esc="o.company_id.name"/></td>
+                </tr>
+                <tr>
+                  <td>RIF: <!--span t-esc="o.company_id.partner_id.doc_type"/-->-<span t-esc="o.company_id.partner_id.vat"/></td>
+                </tr>
+                <tr>
+                  <td align="center">REPORTE DE RETENCIONES IGTF <span t-esc="o.tipo(o.tipo_empresa)"/></td>
+                </tr>
+                <tr>
+                  <td align="center">PERIODO DEL: <span t-esc="o.formato_fecha(o.date_from)"/> AL <span t-esc="o.formato_fecha(o.date_to)"/></td>
+                </tr>
+              </table>
+            </div>
+            <!-- CUERPO DEL DOCUMENTO -->
+            <div class="page">
+              <table class="table table-sm table-bordered" style="font-size:13px;">
+                      <tr style="background-color:#CCCCCC">
+                        <td>Nro OPER.</td>
+                        <td>FECHA FACTURA</td>
+                        <td>RIF</td>
+                        <td>NOMBRE O <br/>RAZON SOCIAL</td>
+                        <td>NRO FACTURA</td>
+                        <td >NRO CONTROL</td>
+                        <td >TIPO TRANSACCIÓN</td>
+                        <td >TASA <br/>(Bs.)</td>
+                        <td>IMPORTE EN DIVISAS</td>
+                        <td>BASE IMPONIBLE <br/>IGTF Bs.</td>
+                        <td>ALICUOTA IGTF %</td>
+                        <td>MONTO IGTF RETENIDO <br/>EN BS</td>
+                      </tr>
+                      <t t-set="cont" t-value="1"/>
+                      <t t-set="acum_div" t-value="0"/>
+                      <t t-set="acum_bs" t-value="0"/>
+                      <t t-set="acum_ret" t-value="0"/>
+                      <t t-foreach="o.line_igtf.sorted(key=lambda x: (x.move_id.invoice_date),reverse=False)" t-as="line" >
+                        <tr>
+                          <td><t t-esc="cont"/><t t-set="cont" t-value="cont+1"/></td>
+                          <td><span t-esc="line.formato_fecha(line.move_id.invoice_date)"/></td>
+                          <td><span t-esc="line.move_id.partner_id.doc_tipo"/>-<span t-esc="line.move_id.partner_id.vat"/></td>
+                          <td><span t-esc="line.move_id.partner_id.name"/></td>
+                          <td><span t-esc="line.move_id.invoice_number_next"/></td>
+                          <td><span t-esc="line.move_id.invoice_number_control"/></td>
+                          <td><span t-esc="line.metodo_pago.name"/></td>
+                          <td><span t-esc="line.float_format2(line.tasa)"/></td>
+                          <td align="right">$ <span t-esc="line.float_format2(line.monto_base_usd)"/></td>
+                          <td align="right"><span t-esc="line.float_format2(line.monto_base)"/> Bs.</td>
+                          <td><span t-esc="line.float_format2(line.porcentaje)"/></td>
+                          <td align="right"><span t-esc="line.float_format2(line.monto_ret)"/> Bs.</td>
+                        </tr>
+                         <t t-set="acum_div" t-value="acum_div+line.monto_base_usd"/>
+                         <t t-set="acum_bs" t-value="acum_bs+line.monto_base"/>
+                         <t t-set="acum_ret" t-value="acum_ret+line.monto_ret"/>
+                      </t>
+                      <tr style="background-color:#CCCCCC">
+                        <td colspan="8" align="center">TOTALES</td>
+                        <td align="right">$ <span t-esc="o.float_format2(acum_div)"/></td>
+                        <td align="right"><span t-esc="o.float_format2(acum_bs)"/> Bs.</td>
+                        <td></td>
+                        <td align="right"><span t-esc="o.float_format2(acum_ret)"/> Bs.</td>
+                      </tr>
+              </table>
+            </div>
+            <div class="footer">
+              <table width="100%" class="table table-borderless">
+                <tr>
+                  <td align="right">Cantidad Total de Operaciones Sujetas a IGTF</td>
+                  <td align="right"><t t-esc="cont-1"/></td>
+                </tr>
+                <tr>
+                  <td align="right">Monto Total de la Base Imponible (Bs.)</td>
+                  <td align="right"><t t-esc="o.float_format2(acum_bs)"/></td>
+                </tr>
+                <tr>
+                  <td align="right">Monto Total a Pagar por Concepto de IGTF Retenido (Bs.)</td>
+                  <td align="right"><t t-esc="o.float_format2(acum_ret)"/></td>
+                </tr>
+              </table>
+            </div>
+          </t>
+         </t>
+       </t>
+
+     </template>
+  
+  </data>
+</odoo>

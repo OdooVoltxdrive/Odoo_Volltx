@@ -1,0 +1,17 @@
+<odoo>
+  <data>
+
+     <record id="wizard_nota_credito" model="ir.ui.view">
+        <field name="name">wizard.nota.credito</field>
+        <field name="model">account.move.reversal</field>
+        <field name="inherit_id" ref="account.view_account_move_reversal"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date']" position="replace">
+                <field name="date" string="Fecha Factura afectada"/>
+                <field name="date_nota" string="Fecha Nota Credito"/>
+            </xpath>
+        </field>
+    </record>     	 
+
+  </data>
+</odoo>

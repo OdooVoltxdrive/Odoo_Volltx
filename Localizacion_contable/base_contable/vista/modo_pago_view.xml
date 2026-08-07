@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="modo_pagos_view_view" model="ir.ui.view">
+            <field name="name">Modo de Pagos tree</field>
+            <field name="model">account.payment.method</field>           
+            <field name="arch" type="xml">
+                <list string="Tree Name">
+                    <field name="name" />
+                    <field name="payment_type" />                                     
+                </list>
+            </field>
+    </record>
+
+    <record id="modo_pagos_view_form" model="ir.ui.view">
+      <field name="name">Modo de Pagos Form</field>
+      <field name="model" >account.payment.method</field>
+      <field name="arch" type="xml">
+      <form string="Form View Name">
+                <header>
+
+                    <button name="asociar" string="Asociar Diarios con metodos" type="object"/>
+                    <button name="limpia" string="Limpia Lista Diarios" type="object"/>
+                </header>
+
+                <sheet>
+                  <group>
+                    <group>
+                       <field name="name" />   
+                       <field name="company_id" string="Compañia" />  
+                       <!--field name="calculo_igtf" string="Retención Automatica de IGTF?" /-->                                
+                    </group>
+                    <group>
+                      <field name="payment_type" />
+                      <field name="code" />
+                    </group>                                       
+                  </group> 
+                  <notebook>
+
+                <page string="Diarios asociados">
+                    <field name="journal_ids" nolabel="1" readonly="False">
+                          <list string="Registro de Diarios">
+                            <field name="payment_method_id" invisible="1"/>
+                            <field name="journal_id" string="Diario" domain="[('type', 'in', ('bank','cash'))]"/>
+                            <field name="company_org_journal_id" string="Compañia Origen"/>
+                            <field name="status" string="Status" readonly="1"/>
+                          </list>
+                    </field>
+                </page>
+              </notebook>
+              <newline/>   
+                </sheet>                      
+      </form>
+      </field>      
+  </record>
+  
+    <record id="modo_pagos_action" model="ir.actions.act_window">
+        <field name="name">Modo de Pagos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model" >account.payment.method</field>
+        <!--field name="view_mode">kanban,tree,form,activity</field-->
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_modo_pago"
+        parent="account.menu_finance_configuration"
+        name="Modos de Pago"
+        action="modo_pagos_action"
+        sequence="-1"
+        />
+
+</odoo>
