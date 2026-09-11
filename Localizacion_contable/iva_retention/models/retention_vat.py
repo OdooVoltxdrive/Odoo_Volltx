@@ -67,7 +67,8 @@ class RetentionVat(models.Model):
             self.create_conciliacion_ret_iva()
 
     def _compute_rif(self):
-        self.rif= self.partner_id.vat
+    	for record in self:
+        	record.rif= record.partner_id.vat if record.partner_id else False
 
 
     def create_asiento(self):

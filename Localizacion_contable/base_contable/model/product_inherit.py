@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+import inspect
 
 class Productos(models.Model):
     _inherit = 'product.template'
@@ -38,40 +39,23 @@ class Productos(models.Model):
 
     
 
-    @api.constrains('taxes_id')
+    """@api.constrains('taxes_id')
     def _check_single_tax(self):
-        """ Valida que solo haya un impuesto en la lista al guardar. """
-        # Odoo salta la validación si se está instalando/configurando la contabilidad o módulos en segundo plano
-        """if self.env.context.get('install_mode') or self.env.context.get('skip_check_tax'):
-            return"""
-
         for record in self:
-            # len(record.taxes_id) cuenta el número de registros en el Many2many
-            if len(record.taxes_id) > 1:
-                # ❌ Lanza un error de validación, que automáticamente revierte (rollback)
-                #    cualquier cambio y previene el commit de datos incorrectos.
-                """raise ValidationError(
-                    _('Error de Validación: Solo se puede asignar una alícuota de ventas a este producto. Deje uno y guarde'))"""
-                self._log_and_raise_fiscal_error("🛑 Error de Validación: Solo se puede asignar una alícuota de ventas a este producto. Deje uno y guarde")
+            if record.env.company.validate_multi_tax_product==True:
+                if len(record.taxes_id) > 1:
+                    self._log_and_raise_fiscal_error("🛑 Error de Validación: Solo se puede asignar una alícuota de ventas a este producto. Deje uno y guarde")"""
 
-    @api.constrains('supplier_taxes_id')
+
+    """@api.constrains('supplier_taxes_id')
     def _check_single_tax_compras(self):
-        """ Valida que solo haya un impuesto en la lista al guardar. """
-        # Odoo salta la validación si se está instalando/configurando la contabilidad o módulos en segundo plano
-        #if self.env.context.get('install_mode') or self.env.context.get('skip_check_tax'):
-            #return
-
+        
         for record in self:
-            # len(record.taxes_id) cuenta el número de registros en el Many2many
-            if len(record.supplier_taxes_id) > 1:
-                # ❌ Lanza un error de validación, que automáticamente revierte (rollback)
-                #    cualquier cambio y previene el commit de datos incorrectos.
-                """raise ValidationError(
-                    _('Error de Validación: Solo se puede asignar una alícuota de compras a este producto. Deje uno y guarde'))"""
-                record._log_and_raise_fiscal_error("🛑 Error de Validación: Solo se puede asignar una alícuota de compras a este producto. Deje uno y guarde")
+            if record.env.company.validate_multi_tax_product==True:
+                if len(record.supplier_taxes_id) > 1:
+                    record._log_and_raise_fiscal_error("🛑 Error de Validación: Solo se puede asignar una alícuota de compras a este producto. Deje uno y guarde")"""
 
-
-
+    
     def _compute_tasa(self):
         lista=self.env['res.currency.rate'].search([('currency_id','=',self.env.company.currency_sec_id.id)],limit=1,order='name desc')
         if lista:
