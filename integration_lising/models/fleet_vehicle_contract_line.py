@@ -1,6 +1,8 @@
 # See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
+from odoo import Command
 
 class FleetVehicleContractLine(models.Model):
     _name = "fleet.vehicle.contract.line"
@@ -79,3 +81,80 @@ class AccountMove(models.Model):
             if line.state in ('draft', 'overdue'):
                 line.state = 'posted'
         return res
+
+    def action_transformar_moneda(self):
+        """Convierte el borrador de una factura del leasing entre Bs y USD
+        (misma factura, misma línea: los importes se reescriben con la tasa
+        del comprobante).
+
+        - Bs -> USD: reconstruye canon + servicio SIN IVA ni IGTF; si el
+          contexto trae 'efectivo' agrega una línea IGTF 3% del total.
+        - USD -> Bs: reconstruye canon + servicio con el IVA 16% y actualiza
+          el bloque de Bs exactos.
+        """
+        self.ensure_one()
+        if self.state != 'draft' or self.move_type != 'out_invoice' or not self.contract_line_id:
+            raise UserError('Solo facturas borrador de cliente ligadas a un canon del leasing.')
+
+        compania = self.company_id.currency_id
+        es_bs = self.currency_id == compania
+        tasa = self.tasa or self.invoice_currency_rate
+        if not tasa or tasa <= 0:
+            raise UserError('Sin tasa del comprobante: no se puede convertir la factura.')
+
+        canon = self.invoice_line_ids.filtered(
+            lambda l: l.display_type == 'product' and 'Canon' in (l.name or ''))
+        servicio = self.invoice_line_ids.filtered(
+            lambda l: l.display_type == 'product' and 'servicios' in (l.name or '').lower())
+        if not canon or not servicio:
+            raise UserError('La factura no tiene las líneas de Canon y Cargo por servicios.')
+        canon, servicio = canon[0], servicio[0]
+
+        if es_bs:
+            # Bs -> USD: sin IVA ni IGTF (opción Efectivo agrega IGTF 3%)
+            canon_usd = round(canon.price_unit / tasa, 2)
+            servicio_usd = round(servicio.price_unit / tasa, 2)
+            lineas = [
+                Command.create({
+                    'name': 'Canon de arrendamiento operativo de vehículo',
+                    'product_id': canon.product_id.id, 'account_id': canon.account_id.id,
+                    'quantity': 1, 'price_unit': canon_usd, 'tax_ids': [],
+                }),
+                Command.create({
+                    'name': 'Cargo por servicios',
+                    'quantity': 1, 'price_unit': servicio_usd, 'tax_ids': [],
+                }),
+            ]
+            if self.env.context.get('efectivo'):
+                igtf = round((canon_usd + servicio_usd) * 0.03, 2)
+                lineas.append(Command.create({
+                    'name': 'IGTF 3% (pago en efectivo)',
+                    'quantity': 1, 'price_unit': igtf, 'tax_ids': [],
+                }))
+            self.write({'currency_id': self.env.ref('base.USD').id, 'invoice_line_ids': [Command.clear()] + lineas})
+        else:
+            # USD -> Bs: canon + servicio con IVA 16%; el bloque de Bs se reescribe
+            canon_bs = round(canon.price_unit * tasa, 2)
+            servicio_bs = round(servicio.price_unit * tasa, 2)
+            tax16 = self.env['account.tax'].search(
+                [('type_tax_use', '=', 'sale'), ('amount', '=', 16)], limit=1)
+            lineas = [
+                Command.create({
+                    'name': 'Canon de arrendamiento operativo de vehículo',
+                    'product_id': canon.product_id.id, 'account_id': canon.account_id.id,
+                    'quantity': 1, 'price_unit': canon_bs,
+                    'tax_ids': [(6, 0, tax16.ids)] if tax16 else [],
+                }),
+                Command.create({
+                    'name': 'Cargo por servicios',
+                    'quantity': 1, 'price_unit': servicio_bs,
+                    'tax_ids': [(6, 0, tax16.ids)] if tax16 else [],
+                }),
+            ]
+            self.write({'currency_id': compania.id, 'invoice_line_ids': [Command.clear()] + lineas})
+            self.write({
+                'monto_bs': canon_bs,
+                'servicio_bs': servicio_bs,
+                'total_bs': round((canon_bs + servicio_bs) * 1.16, 2),
+            })
+        return True

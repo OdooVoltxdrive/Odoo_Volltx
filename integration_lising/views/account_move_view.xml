@@ -8,6 +8,20 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
+            <!-- Botón administrativo: transforma el borrador entre Bs y USD
+                 (Efectivo agrega IGTF 3% al total al pasar a USD). -->
+            <xpath expr="//header" position="inside">
+                <button name="action_transformar_moneda" type="object"
+                        string="Transformar a USD"
+                        invisible="state != 'draft' or not contract_line_id or currency_id != company_currency_id"/>
+                <button name="action_transformar_moneda" type="object"
+                        string="Transformar a USD (Efectivo +3% IGTF)"
+                        context="{'efectivo': True}"
+                        invisible="state != 'draft' or not contract_line_id or currency_id != company_currency_id"/>
+                <button name="action_transformar_moneda" type="object"
+                        string="Transformar a Bs"
+                        invisible="state != 'draft' or not contract_line_id or currency_id == company_currency_id"/>
+            </xpath>
             <xpath expr="//group[@class='oe_subtotal_footer']" position="after">
                 <group class="oe_subtotal_footer" string="Cobrado en Bs" invisible="not contract_line_id">
                     <field name="monto_bs" string="Canon exacto (Bs)" readonly="1"/>
