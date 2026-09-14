@@ -2,7 +2,7 @@
 <odoo>
     <!-- Bloque "Cobrado en Bs" en la factura: los Bs exactos del comprobante
          (los escribe el backend al crear el borrador). Solo visible en facturas
-         de cliente ligadas a una cuota del plan de leasing. -->
+         de cliente ligadas a un canon del plan de leasing. -->
     <record id='account_move_form_bs_voltx' model='ir.ui.view'>
         <field name="name">account.move.form.bs.voltx</field>
         <field name="model">account.move</field>

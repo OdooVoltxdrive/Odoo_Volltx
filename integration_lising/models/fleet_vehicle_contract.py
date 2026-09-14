@@ -8,8 +8,8 @@ class FleetVehicleLogContract(models.Model):
     _inherit = "fleet.vehicle.log.contract"
 
     # 1. Asegúrate de que los campos estén declarados exactamente con estos nombres
-    total_cuotas = fields.Integer(string="Total de Cuotas")
-    precio_cuota = fields.Float(string="Precio de cada Cuota ($)")
+    total_cuotas = fields.Integer(string="Total de Canones")
+    precio_cuota = fields.Float(string="Precio de cada Canon ($)")
     
     monto_total_contrato = fields.Float(
         string="Monto Total ($)", 
@@ -19,7 +19,7 @@ class FleetVehicleLogContract(models.Model):
 
     # Nueva pestaña de trazabilidad
     contract_line_ids = fields.One2many(
-        "fleet.vehicle.contract.line", "contract_id", string="Plan de Cuotas"
+        "fleet.vehicle.contract.line", "contract_id", string="Plan de Canones"
     )
 
     # Chips de facturas del contrato (borradores y confirmadas, incluidos abonos).

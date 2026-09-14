@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <!-- Columnas de montos cobrados + chips de facturas en el plan de cuotas
+    <!-- Columnas de montos cobrados + chips de facturas en el plan de canones
          (reemplaza a la vista Studio #2605) -->
     <record id='fleet_vehicle_log_contract_form_inherit_montos' model='ir.ui.view'>
         <field name="name">fleet.vehicle.log.form.inherit.montos</field>
@@ -18,14 +18,14 @@
         </field>
     </record>
 
-    <!-- Form detallado de una cuota, abre desde el plan de cuotas
+    <!-- Form detallado de un canon, abre desde el plan de canones
          (reemplaza a la vista Studio #2610) -->
     <record id='fleet_vehicle_contract_line_form_voltx' model='ir.ui.view'>
         <field name="name">fleet.vehicle.contract.line.form.voltx</field>
         <field name="model">fleet.vehicle.contract.line</field>
         <field eval="100" name="priority"/>
         <field name="arch" type="xml">
-            <form string="Cuota del Plan de Cuotas">
+            <form string="Canon del Plan de Canones">
                 <sheet>
                     <group>
                         <group>
@@ -33,7 +33,7 @@
                             <field name="contract_id" string="Contrato" readonly="1"/>
                             <field name="fecha_vencimiento" string="Fecha de Vencimiento" readonly="1"/>
                             <field name="monto" string="Monto a Pagar ($)"/>
-                            <field name="state" string="Estado de la Cuota" readonly="1" widget="badge"
+                            <field name="state" string="Estado del Canon" readonly="1" widget="badge"
                                    decoration-success="state == 'paid'"
                                    decoration-danger="state == 'overdue'"/>
                         </group>

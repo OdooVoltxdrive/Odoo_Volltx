@@ -10,7 +10,7 @@
 
         <xpath expr="//header" position="inside">
             <button name="action_generar_plan_cuotas" 
-                    string="Generar Plan de Cuotas" 
+                    string="Generar Plan de Canones" 
                     type="object" 
                     class="oe_highlight"
                     invisible="total_cuotas == 0 or precio_cuota == 0"/>
@@ -23,8 +23,8 @@
 
           <xpath expr="//field[@name='date']/.." position="after">
                 <group >
-                    <field name="total_cuotas" string="Cantidad de Cuotas"/>
-                    <field name="precio_cuota" string="Monto de la Cuota ($)" widget="monetary" options="{'currency_field': 'currency_usd_id'}"/>
+                    <field name="total_cuotas" string="Cantidad de Canones"/>
+                    <field name="precio_cuota" string="Monto del Canon ($)" widget="monetary" options="{'currency_field': 'currency_usd_id'}"/>
                     <field name="monto_total_contrato" string="Monto Total Contrato" widget="monetary" options="{'currency_field': 'currency_usd_id'}" readonly="1"/>
                     <field name="currency_usd_id" invisible="1"/>
                     <field name="tasa_cambio" string="Tasa de Cambio (Bs por $)" readonly="1"/>
@@ -33,7 +33,7 @@
 
         <xpath expr="//sheet" position="inside">
             <notebook>
-                <page string="Trazabilidad de Cuotas" name="plan_cuotas">
+                <page string="Trazabilidad de Canones" name="plan_cuotas">
                     <field name="contract_line_ids" readonly="1">
                         <list decoration-success="state == 'paid'" 
                               decoration-danger="state == 'overdue'" 

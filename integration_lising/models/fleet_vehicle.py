@@ -9,7 +9,7 @@ class FleetVehicle(models.Model):
 
     device = fields.Char("Dispositivo")
     api_contract_date = fields.Date(string="Fecha del Contrato (API)", copy=False)
-    api_cuotas_totales = fields.Integer(string="Cantidad de Cuotas (API)", copy=False)
+    api_cuotas_totales = fields.Integer(string="Cantidad de Canones (API)", copy=False)
     api_monto_recurrente = fields.Float(string="Monto Recurrente (API)", copy=False)
 
     @api.model_create_multi
