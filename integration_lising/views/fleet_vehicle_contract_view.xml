@@ -14,14 +14,20 @@
                     type="object" 
                     class="oe_highlight"
                     invisible="total_cuotas == 0 or precio_cuota == 0"/>
+           <button name="action_ver_facturas"
+                    string="Ver Facturas"
+                    type="object"
+                    invisible="not invoice_ids"/>
         </xpath>
           
 
           <xpath expr="//field[@name='date']/.." position="after">
                 <group >
                     <field name="total_cuotas" string="Cantidad de Cuotas"/>
-                    <field name="precio_cuota" string="Monto de la Cuota ($)" widget="monetary"/>
-                    <field name="monto_total_contrato" string="Monto Total Contrato" widget="monetary" readonly="1"/>
+                    <field name="precio_cuota" string="Monto de la Cuota ($)" widget="monetary" options="{'currency_field': 'currency_usd_id'}"/>
+                    <field name="monto_total_contrato" string="Monto Total Contrato" widget="monetary" options="{'currency_field': 'currency_usd_id'}" readonly="1"/>
+                    <field name="currency_usd_id" invisible="1"/>
+                    <field name="tasa_cambio" string="Tasa de Cambio (Bs por $)" readonly="1"/>
                 </group>
             </xpath>
 
@@ -36,13 +42,18 @@
                             <field name="numero_cuota"/>
                             <field name="fecha_vencimiento"/>
                             <field name="monto" sum="Total Plan"/>
-                            <field name="invoice_id" string="Factura Odoo"/>
+                            <field name="invoice_ids" widget="many2many_tags" string="Factura Odoo"/>
                             <field name="state" widget="badge" 
                                    decoration-success="state == 'paid'" 
                                    decoration-danger="state == 'overdue'" 
                                    decoration-warning="state == 'posted'"/>
                         </list>
                     </field>
+
+                    <group class="oe_subtotal_footer">
+                        <field name="tasa_cambio" string="Tasa de Cambio (Bs por $)" readonly="1"/>
+                        <field name="invoice_ids" widget="many2many_tags" string="Facturas" placeholder="Facturas del contrato"/>
+                    </group>
                 </page>
             </notebook>
         </xpath> 

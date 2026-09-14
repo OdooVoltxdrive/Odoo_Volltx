@@ -22,6 +22,22 @@ class FleetVehicleLogContract(models.Model):
         "fleet.vehicle.contract.line", "contract_id", string="Plan de Cuotas"
     )
 
+    # Chips de facturas del contrato (borradores y confirmadas, incluidos abonos).
+    # Los borradores los enlaza el backend; las confirmadas las agrega
+    # account.move.action_post() vía contract_line_id.
+    invoice_ids = fields.Many2many(
+        "account.move", relation="fleet_vehicle_log_contract_invoice_rel",
+        column1="contract_id", column2="move_id", string="Facturas"
+    )
+
+    # Tasa Bs/$ usada para las columnas en Bs del plan (la escribe el backend
+    # con la tasa real del pago).
+    tasa_cambio = fields.Float(string="Tasa de Cambio (Bs por $)")
+
+    # Moneda de visualización ($) del formulario: solo cambia el símbolo
+    # mostrado en los widgets monetary; la moneda contable queda intacta.
+    currency_usd_id = fields.Many2one("res.currency", string="Moneda de visualización ($)")
+
     @api.depends("total_cuotas", "precio_cuota","contract_line_ids.monto")
     def _compute_monto_total(self):
         """Calcula el valor total: Tarifa Diaria x 30 días x N° de Meses"""
@@ -60,3 +76,16 @@ class FleetVehicleLogContract(models.Model):
         self.write({'contract_line_ids': lineas})
         
         return True
+
+    def action_ver_facturas(self):
+        """Abre las facturas (borradores y confirmadas) ligadas a este contrato."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Facturas del contrato',
+            'res_model': 'account.move',
+            'domain': [('contract_line_id.contract_id', '=', self.id)],
+            'context': {'default_move_type': 'out_invoice'},
+            'views': [(False, 'list'), (False, 'form')],
+            'target': 'current',
+        }

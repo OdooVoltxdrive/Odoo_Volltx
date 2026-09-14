@@ -2,7 +2,7 @@
     # Module Information
     "name": "Fleet_vehicle_leasing",
     "category": "Fleet leasing",
-    "version": "19.0.0",
+    "version": "19.0.1.0",
     #"license": "LGPL-3",
     "summary": """Sistema de gestion de leasing""",
     "sequence": 1,
@@ -14,6 +14,7 @@
         "views/res_partner_view.xml",
         "views/fleet_vehicle_view.xml",
         "views/fleet_vehicle_contract_view.xml",
+        "views/fleet_vehicle_contract_line_view.xml",
     ],
     "images": ["static/description/icon.jpg"],
 
