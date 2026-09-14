@@ -111,18 +111,24 @@ class AccountMove(models.Model):
         canon, servicio = canon[0], servicio[0]
 
         if es_bs:
-            # Bs -> USD: sin IVA ni IGTF (opción Efectivo agrega IGTF 3%)
+            # Bs -> USD: sin IVA ni IGTF (opción Efectivo agrega IGTF 3%).
+            # Las líneas llevan el impuesto EXENTO (0%): el desglose venezolano
+            # del footer las clasifica como exentas y el Sub-Total sale bien.
+            tax_exento = self.env['account.tax'].search(
+                [('type_tax_use', '=', 'sale'), ('amount', '=', 0)], limit=1)
             canon_usd = round(canon.price_unit / tasa, 2)
             servicio_usd = round(servicio.price_unit / tasa, 2)
             lineas = [
                 Command.create({
                     'name': 'Canon de arrendamiento operativo de vehículo',
                     'product_id': canon.product_id.id, 'account_id': canon.account_id.id,
-                    'quantity': 1, 'price_unit': canon_usd, 'tax_ids': [],
+                    'quantity': 1, 'price_unit': canon_usd,
+                    'tax_ids': [(6, 0, tax_exento.ids)] if tax_exento else [],
                 }),
                 Command.create({
                     'name': 'Cargo por servicios',
-                    'quantity': 1, 'price_unit': servicio_usd, 'tax_ids': [],
+                    'quantity': 1, 'price_unit': servicio_usd,
+                    'tax_ids': [(6, 0, tax_exento.ids)] if tax_exento else [],
                 }),
             ]
             if self.env.context.get('efectivo'):
