@@ -27,7 +27,7 @@ class FleetVehicle(models.Model):
                     "vehicle_id": vehicle.id,
                     "driver_id": vehicle.driver_id.id if vehicle.driver_id else False,
                     "date": fecha_contrato,
-                    "date_start": fecha_contrato,
+                    "start_date": fecha_contrato,
                     
                     # AQUÍ: Mapeamos los campos 'api_' a los campos reales del contrato corregido
                     "total_cuotas": vehicle.api_cuotas_totales,
