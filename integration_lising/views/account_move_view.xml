@@ -8,6 +8,9 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
+            <!-- contract_line_id se usa en los modifiers de los botones y del
+                 bloque: debe estar declarado en la vista. -->
+            <field name="contract_line_id" invisible="1"/>
             <!-- Botón administrativo: transforma el borrador entre Bs y USD
                  (Efectivo agrega IGTF 3% al total al pasar a USD). -->
             <xpath expr="//header" position="inside">
