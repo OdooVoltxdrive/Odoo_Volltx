@@ -22,17 +22,6 @@
                         string="Transformar a Bs"
                         invisible="state != 'draft' or not contract_line_id or currency_id == company_currency_id"/>
             </xpath>
-            <!-- El grupo original oe_subtotal_footer es reemplazado por la vista
-                 de localizacion contable (footer IGTF); anclamos a la página
-                 nativa de líneas, que nadie modifica. -->
-            <xpath expr="//page[@id='invoice_tab']" position="inside">
-                <group class="oe_subtotal_footer" string="Cobrado en Bs" invisible="not contract_line_id">
-                    <field name="contract_line_id" invisible="1"/>
-                    <field name="monto_bs" string="Canon exacto (Bs)" readonly="1"/>
-                    <field name="servicio_bs" string="Cargo por servicios (Bs)" readonly="1"/>
-                    <field name="total_bs" string="Total cobrado (Bs)" readonly="1" class="oe_subtotal_footer_separator"/>
-                </group>
-            </xpath>
         </field>
     </record>
 </odoo>
