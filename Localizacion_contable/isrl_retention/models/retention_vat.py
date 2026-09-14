@@ -24,6 +24,7 @@ class InvoiceLineInherit(models.Model):
 class VatRetentionInvoiceLine(models.Model):
     """This model is for a line invoices withholed."""
     _name = 'isrl.retention.invoice.line'
+    _description = "Línea de retención ISLR"
 
     name = fields.Many2one('islr.concept', string='ISLR Concept')
     code = fields.Char( string='Código')
@@ -37,6 +38,7 @@ class VatRetentionInvoiceLine(models.Model):
 class RetentionVat(models.Model):
     """This is a main model for rentetion vat control."""
     _name = 'isrl.retention'
+    _description = "Comprobante de retención ISLR"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
 

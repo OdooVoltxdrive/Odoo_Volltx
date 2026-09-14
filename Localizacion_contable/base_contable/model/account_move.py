@@ -678,7 +678,7 @@ class  AccountMoveLine(models.Model):
     #balance_aux=fields.Float(compute='_compute_balance_conversion')
     credit_div=fields.Float(compute='_compute_contravalor_credit')
     debit_div=fields.Float(compute='_compute_contravalor_debit')
-    price_unit_ref = fields.Float(compute='_compute_price_unit_ref',store=True, readonly=0,digits=(12, 4))
+    price_unit_ref = fields.Float(compute='_compute_price_unit_ref',store=True, readonly=False,digits=(12, 4))
     linea_exenta = fields.Boolean(default=False)
 
 

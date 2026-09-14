@@ -21,6 +21,7 @@ import xml.etree.ElementTree as ET
 
 class ResumenIslrModelo(models.Model):
     _name = "resumen.igtf.wizard.pdf"
+    _description = "Asistente PDF Resumen IGTF"
 
     move_id = fields.Many2one('account.move')
     tipo_igtf_prov=fields.Char()

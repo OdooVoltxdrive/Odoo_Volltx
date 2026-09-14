@@ -19,6 +19,7 @@ _logger = logging.getLogger(__name__)
 
 class LibroVentasModelo(models.Model):
     _name = "account.wizard.pdf.compras" 
+    _description = "Asistente PDF Libro de Compras"
 
     name = fields.Date(string='Fecha')
     document = fields.Char(string='Rif')
@@ -126,6 +127,7 @@ class LibroVentasModelo(models.Model):
 
 class libro_ventas(models.TransientModel):
     _name = "account.wizard.libro.compras" ## = nombre de la carpeta.nombre del archivo deparado con puntos
+    _description = "Asistente Libro de Compras"
 
     facturas_ids = fields.Many2many('account.move', string='Facturas', store=True) ##Relacion con el modelo de la vista de la creacion de facturas
     retiva_ids = 0 ## Malo

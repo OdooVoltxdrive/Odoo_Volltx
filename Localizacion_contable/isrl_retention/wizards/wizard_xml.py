@@ -20,6 +20,7 @@ _logger = logging.getLogger(__name__)
 
 class WiizarXml(models.TransientModel):
     _name = "account.xml.wizard"
+    _description = "Asistente XML ISLR"
 
     date_from = fields.Date(string='Date From', default=lambda *a:datetime.now().strftime('%Y-%m-%d'))
     date_to = fields.Date('Date To', default=lambda *a:(datetime.now() + timedelta(days=(1))).strftime('%Y-%m-%d'))
@@ -99,11 +100,12 @@ class WiizarXml(models.TransientModel):
 
 class WiizarXmlDescargar(models.TransientModel):
     _name = "account.xml.wizard.descargar"
+    _description = "Asistente de descarga XML ISLR"
     
     def _set_name_value(self):
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         url = base_url + '/isrl_retention/static/doc/isrl_odoo.xml'
         return url
 
-    name = fields.Char(string='Link',default=_set_name_value,readonly="True",)
+    name = fields.Char(string='Link',default=_set_name_value,readonly=True,)
     report = fields.Binary('Prepared file', filters='.xls', readonly=True)

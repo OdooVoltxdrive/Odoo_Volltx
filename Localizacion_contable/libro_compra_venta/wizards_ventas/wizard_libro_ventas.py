@@ -24,6 +24,7 @@ class AccountMove(models.Model):
 
 class LibroVentasModelo(models.Model):
     _name = "account.wizard.pdf.ventas" 
+    _description = "Asistente PDF Libro de Ventas"
 
     name = fields.Date(string='Fecha')
     document = fields.Char(string='Rif')
@@ -95,6 +96,7 @@ class LibroVentasModelo(models.Model):
 
 class libro_ventas(models.TransientModel):
     _name = "account.wizard.libro.ventas" ## = nombre de la carpeta.nombre del archivo deparado con puntos
+    _description = "Asistente Libro de Ventas"
 
     facturas_ids = fields.Many2many('account.move', string='Facturas', store=True) ##Relacion con el modelo de la vista de la creacion de facturas
     retiva_ids = 0 ## Malo

@@ -20,6 +20,7 @@ _logger = logging.getLogger(__name__)
 
 class XmlDetails(models.Model):
     _name = "account.xml.detalle.line"
+    _description = "Línea de detalle XML"
 
     rif_retenido = fields.Char(string='RIF Retenido')
     numero_factura = fields.Char(string='Número de Factura')
@@ -33,6 +34,7 @@ class XmlDetails(models.Model):
 
 class XmlLines(models.Model):
     _name = "account.xml.detalle"
+    _description = "Detalle XML ISLR"
 
     date_from = fields.Date(string='Desde', default=lambda *a:datetime.now().strftime('%Y-%m-%d'))
     date_to = fields.Date('Hasta', default=lambda *a:(datetime.now() + timedelta(days=(1))).strftime('%Y-%m-%d'))

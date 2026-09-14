@@ -20,6 +20,7 @@ _logger = logging.getLogger(__name__)
 
 class WiizarXml(models.TransientModel):
     _name = "account.arc.wizard"
+    _description = "Asistente ARC"
 
     name  = fields.Many2one(comodel_name='res.partner', string='Empresa')
     date_from = fields.Date(string='Date From', default=lambda *a:datetime.now().strftime('%Y-%m-%d'))

@@ -23,6 +23,7 @@ DOMAINS = {
 
 class ResumenAlicuota(models.Model):
     _name = 'account.move.line.resumen'
+    _description = "Resumen de alícuotas de la factura"
 
     invoice_id = fields.Many2one('account.move', ondelete='cascade')
     move_type = fields.Char()

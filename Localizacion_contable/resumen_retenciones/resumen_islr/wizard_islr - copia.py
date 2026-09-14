@@ -18,6 +18,7 @@ import xml.etree.ElementTree as ET
 
 class TablaTypePeople(models.Model):
     _name = "resumen.islr.wizard.type.people"
+    _description = "Asistente Tipo de Persona ISLR"
 
     name=fields.Char(string='Tipo de persona')
     line_code  = fields.Many2many(comodel_name='resumen.islr.wizard.code', string='Lineas')
@@ -36,6 +37,7 @@ class TablaTypePeople(models.Model):
 
 class TablaCodigo(models.Model):
     _name = 'resumen.islr.wizard.code'
+    _description = "Asistente de Código ISLR"
 
     code= fields.Char(string='Codico')
     islr_concept_id = fields.Many2one('islr.concept')
@@ -45,6 +47,7 @@ class TablaCodigo(models.Model):
 
 class ResumenIslrModelo(models.Model):
     _name = "resumen.islr.wizard.pdf"
+    _description = "Asistente PDF Resumen ISLR"
 
     fecha_comprobante = fields.Date(string='Fecha Comprobante')
     #fecha_doc = fields.Date(string='Fecha Documento')
