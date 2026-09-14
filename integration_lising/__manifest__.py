@@ -15,6 +15,7 @@
         "views/fleet_vehicle_view.xml",
         "views/fleet_vehicle_contract_view.xml",
         "views/fleet_vehicle_contract_line_view.xml",
+        "views/account_move_view.xml",
     ],
     "images": ["static/description/icon.jpg"],
 
