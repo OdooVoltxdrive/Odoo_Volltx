@@ -819,6 +819,7 @@ class  AccountMoveLine(models.Model):
 
 class AccountPagosFacturas(models.Model):
     _name = 'account.payment.fact'
+    _description = 'Cobros IGTF de la factura'
 
     move_id = fields.Many2one('account.move')#
     tasa = fields.Float(digits=(12, 4))#

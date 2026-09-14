@@ -112,7 +112,7 @@ class libro_ventas(models.TransientModel):
 
     # fields for download xls
     state = fields.Selection([('choose', 'choose'), ('get', 'get')],default='choose') ##Genera los botones de exportar xls y pdf como tambien el de cancelar
-    report = fields.Binary('Prepared file', filters='.xls', readonly=True)
+    report = fields.Binary('Prepared file', readonly=True)
     name = fields.Char('File Name', size=32)
     company_id = fields.Many2one('res.company','Company',default=lambda self: self.env.company.id)
 

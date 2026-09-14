@@ -25,7 +25,7 @@ class WiizarXml(models.TransientModel):
     date_from = fields.Date(string='Date From', default=lambda *a:datetime.now().strftime('%Y-%m-%d'))
     date_to = fields.Date('Date To', default=lambda *a:(datetime.now() + timedelta(days=(1))).strftime('%Y-%m-%d'))
     state = fields.Selection([('choose', 'choose'), ('get', 'get')],default='choose')
-    report = fields.Binary('Prepared file', filters='.xls', readonly=True)
+    report = fields.Binary('Prepared file', readonly=True)
     name =  fields.Char('File Name', size=32)
     company_id = fields.Many2one('res.company','Company',default=lambda self: self.env.company.id, readonly=True)
     
@@ -108,4 +108,4 @@ class WiizarXmlDescargar(models.TransientModel):
         return url
 
     name = fields.Char(string='Link',default=_set_name_value,readonly=True,)
-    report = fields.Binary('Prepared file', filters='.xls', readonly=True)
+    report = fields.Binary('Prepared file', readonly=True)

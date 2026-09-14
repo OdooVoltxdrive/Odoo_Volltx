@@ -39,7 +39,7 @@ class XmlLines(models.Model):
     date_from = fields.Date(string='Desde', default=lambda *a:datetime.now().strftime('%Y-%m-%d'))
     date_to = fields.Date('Hasta', default=lambda *a:(datetime.now() + timedelta(days=(1))).strftime('%Y-%m-%d'))
     state = fields.Selection([('por_generar', 'Por Generar'),('generada','Generada')],default='por_generar')
-    report = fields.Binary('XML', filters='.xls', readonly=True)
+    report = fields.Binary('XML', readonly=True)
     name =  fields.Char('File Name', size=32)
     company_id = fields.Many2one('res.company','Company',default=lambda self: self.env.company.id, readonly=True)
     line_id    = fields.One2many(comodel_name='account.xml.detalle.line', inverse_name='detalle_id', string='Lineas')
