@@ -5,7 +5,7 @@
         'name': 'Factura Digital Unidigital',
         'version': '19.0.1.0',
         'author': 'Ing. Darrell Sojo',
-        'contribuitors': "Darrell Sojo <dsojo.tanfe@gmail.com>",
+        'contribuitors': "Silicon valley Latam",
         'summary': '',
         'description': """""",
         'category': 'Customizations',
