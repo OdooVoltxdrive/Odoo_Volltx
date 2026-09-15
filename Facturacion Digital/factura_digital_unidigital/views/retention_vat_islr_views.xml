@@ -6,7 +6,19 @@
         <field name="inherit_id" ref="isrl_retention.isrl_retention_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="/form//button[@name='comprobante']" position="after">
-                <button name="envia_comp_ret_islr" string="simular" type="object"/>
+                <button name="envia_comp_ret_islr" string="Enviar o Sincronizar" type="object" invisible="state!='done'"/>
+            </xpath>
+
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="statusbar_visible">draft,done,sent</attribute>
+            </xpath>
+
+            <xpath expr="/form//button[@name='comprobante']" position="attributes">
+                <attribute name="invisible">state in ('draft','sent') or type in ('out_invoice','out_refund','out_receipt')</attribute>
+            </xpath>
+
+            <xpath expr="/form//button[@name='comprobante']" position="after">
+                <button name="comprobante_sv" string="Imprimir Comprobante" class="btn-success" type="object" invisible="state!='sent'"/>
             </xpath>
 
             <xpath expr="/form/sheet/notebook/page" position="after">

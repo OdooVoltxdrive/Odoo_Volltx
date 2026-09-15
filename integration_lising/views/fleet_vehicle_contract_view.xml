@@ -50,10 +50,10 @@
                         </list>
                     </field>
 
-                    <group class="oe_subtotal_footer">
+                    <!--group class="oe_subtotal_footer">
                         <field name="tasa_cambio" string="Tasa de Cambio (Bs por $)" readonly="1"/>
                         <field name="invoice_ids" widget="many2many_tags" string="Facturas" placeholder="Facturas del contrato"/>
-                    </group>
+                    </group-->
                 </page>
             </notebook>
         </xpath> 

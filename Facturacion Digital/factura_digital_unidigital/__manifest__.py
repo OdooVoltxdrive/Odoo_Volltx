@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 
 {
@@ -18,7 +19,7 @@
         ],
         'license': 'LGPL-3',
         'installable': True,
-        'application': True, # Cámbialo a True solo si quieres que aparezca como "App" principal en los filtros
+        'application': False, # Cámbialo a True solo si quieres que aparezca como "App" principal en los filtros
         'auto_install': False,
                       
 }
