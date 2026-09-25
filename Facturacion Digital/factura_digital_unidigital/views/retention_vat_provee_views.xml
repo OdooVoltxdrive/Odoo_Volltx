@@ -5,6 +5,19 @@
         <field name="model">vat.retention</field>
         <field name="inherit_id" ref="iva_retention.vista_from_iva_retention_clien"/>
         <field name="arch" type="xml">
+
+            <xpath expr="/form//button[@name='comprobante']" position="after">
+                <button name="comprobante_sv" string="Imprimir Comprobante" class="btn-success" type="object" invisible="state!='sent'"/>
+            </xpath>
+
+            <xpath expr="/form//button[@name='comprobante']" position="attributes">
+                <attribute name="invisible">state in ('draft','sent') or type in ('out_invoice','out_refund','out_receipt')</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="statusbar_visible">draft,posted,sent,cancel</attribute>
+            </xpath>
+
             <xpath expr="/form/sheet/notebook/page" position="after">
                 <page string="Respuesta json " name="studio_page_1s6_1juo5h96h">
                   <group name="studio_group_1s6">
@@ -25,7 +38,8 @@
 
 
             <xpath expr="/form//button[@name='comprobante']" position="after">
-                <button name="envia_comp_ret_iva" string="simular" type="object"/>
+                <button name="envia_comp_ret_iva" string="Enviar o Sincronizar" type="object" invisible="state!='posted'"/>
+                <!--button name="envia_comp_ret_iva" string="Enviar o Sincronizar" type="object" /-->
             </xpath>
 
         </field>

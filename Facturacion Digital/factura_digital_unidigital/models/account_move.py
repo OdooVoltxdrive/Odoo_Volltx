@@ -6,6 +6,7 @@ import requests
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.tools import html2plaintext
 
 _logger = logging.getLogger(__name__)
 
@@ -130,9 +131,19 @@ class AccountMove(models.Model):
 
             # 3. Datos del Cliente / RIF
             partner = move.partner_id
-            vat_clean = (partner.vat or '').replace('-', '').strip().upper()
+            vat_clean = (partner.vat or '').replace('-', '').replace(' ', '').strip().upper()
             fiscal_code = vat_clean[0] if vat_clean and vat_clean[0].isalpha() else 'J'
-            fiscal_registry = vat_clean[1:] if vat_clean and vat_clean[0].isalpha() else vat_clean
+            raw_number = vat_clean[1:] if vat_clean and vat_clean[0].isalpha() else vat_clean
+            
+            # Solo extraer dígitos numéricos
+            digits_only = ''.join(filter(str.isdigit, raw_number))
+
+            # Para Jurídicos (J, G, C, E, etc.) la API exige exactamente 9 dígitos.
+            # Se aplican ceros a la izquierda (.zfill(9)).
+            if fiscal_code in ('J', 'G', 'C', 'E'):
+                fiscal_registry = digits_only.zfill(9)
+            else:
+                fiscal_registry = digits_only
 
             # 4. Tasa y Fecha
             exchange_rate = getattr(move, 'tasa', 1.0) or 1.0
@@ -269,6 +280,11 @@ class AccountMove(models.Model):
                 igtf_amount_conv = round(igtf_amount_main * exchange_rate, 2)
                 grand_total_conv = round(grand_total * exchange_rate, 2)
 
+            # Limpiar HTML del campo narration para Note1
+            note1_clean = ""
+            if move.narration:
+                note1_clean = html2plaintext(move.narration).strip()
+
             # 6. Payload Final hacia Unidigital
             payload = {
                 "SerieStrongId": company.seriestrongid,
@@ -335,7 +351,9 @@ class AccountMove(models.Model):
 
                 "ExchangeRate": exchange_rate,
                 "SystemReference": move.name or "",
-                "Note1": f"Documento emitido desde Odoo: {move.name}",
+                # El backend Voltx escribe MARCA/PLACA/VIN (≤35) en Términos y
+                # Condiciones (narration); va sin el prefijo "NOTA: " y Note2 no se usa.
+                "Note1": note1_clean,
                 "Note2": "",
                 "Note3": "",
                 "Extra": {},

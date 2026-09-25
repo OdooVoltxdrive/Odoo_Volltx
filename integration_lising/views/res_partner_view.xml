@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Inherited partner form view -->
+    <record id='view_rent_res_partner_form' model='ir.ui.view'>
+        <field name="name">view.rent.res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="is_driver" string="Is Driver" invisible="is_company"/>
+                <field name="birth_date_drive" invisible="is_company or not is_driver"/>
+                <!-- Lugar de trabajo del conductor (lo manda el backend desde la
+                     referencia laboral del candidato). Campo nativo function. -->
+                <field name="function" string="Dónde trabaja (si aplica)" invisible="is_company"/>
+            </xpath>
+          
+        </field>
+    </record>
+</odoo>
