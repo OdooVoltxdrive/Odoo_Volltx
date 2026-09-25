@@ -26,6 +26,7 @@
                 <field name="account_igtf_id" string="Cuenta IGTF para Clientes:"/>
                 <field name="account_igtf_p_id" string="Cuenta IGTF para Proveedores:"/>
                 <field name="price_ref_div_product"/>
+                <field name="validate_multi_tax_product"/>
             </xpath>
             
         </field>

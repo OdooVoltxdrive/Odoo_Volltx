@@ -3,6 +3,7 @@
 {
         'name': 'Retenciones de IVA para Venezuela v19',
         'version': '0.1',
+    'license': 'LGPL-3',
         'author': 'Ing. Darrell Sojo / Silicon Valley',
         'summary': 'Retenciones de IVA para Venezuela v19',
         'description': """Retenciones de IVA para Venezuela v19.""",

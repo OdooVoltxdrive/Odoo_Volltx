@@ -8,7 +8,8 @@
        Extencion correccion nota de debito
        Colaborador: Ing. Darrell Sojo
     """,
-    'version': '1.0',
+    'version': '1.0',    'license': 'LGPL-3',
+
     'author': 'INM&LDR Soluciones Tecnologicas',
     'category': 'Extencion correccion nota de debito',
 

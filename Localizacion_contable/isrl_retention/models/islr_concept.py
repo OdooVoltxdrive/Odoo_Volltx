@@ -7,6 +7,7 @@ from odoo import api, fields, models, _
 class IsrlConcepts(models.Model):
         """ We can create concept for ISLR Venezuela."""
         _name = 'islr.concept'
+        _description = "Conceptos ISLR"
 
 
         name = fields.Char(string='Retention concept', required=True, help="Name of Retention Concept, Example: Profesional fees")
