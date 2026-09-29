@@ -13,7 +13,6 @@ _logger = logging.getLogger('__name__')
 class RetentionVat(models.Model):
     """This is a main model for rentetion vat control."""
     _name = 'vat.retention'
-    _description = "Comprobante de retención IVA"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     journal_id=fields.Many2one('account.journal')
@@ -346,7 +345,6 @@ class RetentionVat(models.Model):
 class VatRetentionInvoiceLine(models.Model):
     """This model is for a line invoices withholed."""
     _name = 'vat.retention.invoice.line'
-    _description = "Línea de retención IVA"
 
     name = fields.Char(string='Description')
     retention_id = fields.Many2one('vat.retention', string='Retención de IVA',ondelete="cascade")

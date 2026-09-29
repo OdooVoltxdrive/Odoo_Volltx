@@ -3,7 +3,6 @@
 {
         'name': 'ISLR Retencion para  Venezuela odoo v19',
         'version': '0.1',
-    'license': 'LGPL-3',
         'author': 'Darrell Sojo',
         'summary': 'Retenciones ISLR Odoo v19',
         'description': """This model do the retention about taxes in Venezuela.""",
@@ -22,6 +21,7 @@
             'security/ir.model.access.csv',
             'security2/ir.model.access.csv',
             'views/islr_concept_views.xml',
+            'views/res_company_inherit.xml',
             #'data/islr_concept_data.xml',
             #'data/islr_retention_rate.xml',
             'data/vat_retention_data.xml',
