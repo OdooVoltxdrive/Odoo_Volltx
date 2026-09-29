@@ -276,8 +276,18 @@ class AccountMove(models.Model):
                 tax_amount_red_conv = round(tax_amount_reduced * exchange_rate, 2)
                 total_conv = round(total_doc * exchange_rate, 2)
 
-                igtf_base_conv = round(igtf_base_main * exchange_rate, 2)
-                igtf_amount_conv = round(igtf_amount_main * exchange_rate, 2)
+                #igtf_base_conv = round(igtf_base_main * exchange_rate, 2)
+                #igtf_amount_conv = round(igtf_amount_main * exchange_rate, 2)
+
+                # CORRECCIÓN AQUÍ:
+                # La base del IGTF en VES debe ser el Total del documento en VES
+                if cond_fact == 'cred':
+                    igtf_base_conv = total_conv
+                    igtf_amount_conv = round(igtf_base_conv * 0.03, 2)
+                else:
+                    igtf_base_conv = round(igtf_base_main * exchange_rate, 2)
+                    igtf_amount_conv = round(igtf_base_conv * 0.03, 2)
+                
                 grand_total_conv = round(grand_total * exchange_rate, 2)
 
             # Limpiar HTML del campo narration para Note1
