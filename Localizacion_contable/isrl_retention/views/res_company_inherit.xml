@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="cuentas_retenciones_islr" model="ir.ui.view">
+        <field name="name">cuentas.retenciones.islr</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='confg_cuentas']/group[1]" position="inside">
+                
+                <group name="grupo_23" string="Cuentas Ret. ISLR">
+                    <!--field name="aplicar_ret_islr" string="Aplicar Ret. al Proveedor" invisible='0'/-->
+                    <field name="account_ret_islr_payable_aux_id" string="Cuenta Ret. por Proveedor" invisible='0'/>
+                    <field name="account_ret_islr_receivable_aux_id" string="Cuenta Ret. Cliente" invisible='0'/>
+                    <field name="journal_ret_islr_aux_id" string="Diario de retenciones" invisible='0'/>
+                </group>
+
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>

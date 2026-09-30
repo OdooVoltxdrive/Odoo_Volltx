@@ -678,7 +678,7 @@ class  AccountMoveLine(models.Model):
     #balance_aux=fields.Float(compute='_compute_balance_conversion')
     credit_div=fields.Float(compute='_compute_contravalor_credit')
     debit_div=fields.Float(compute='_compute_contravalor_debit')
-    price_unit_ref = fields.Float(compute='_compute_price_unit_ref',store=True, readonly=0,digits=(12, 4))
+    price_unit_ref = fields.Float(compute='_compute_price_unit_ref',store=True, readonly=False,digits=(12, 4))
     linea_exenta = fields.Boolean(default=False)
 
 
@@ -819,6 +819,7 @@ class  AccountMoveLine(models.Model):
 
 class AccountPagosFacturas(models.Model):
     _name = 'account.payment.fact'
+    _description = 'Cobros IGTF de la factura'
 
     move_id = fields.Many2one('account.move')#
     tasa = fields.Float(digits=(12, 4))#

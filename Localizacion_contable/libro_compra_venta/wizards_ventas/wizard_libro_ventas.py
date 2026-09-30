@@ -24,6 +24,7 @@ class AccountMove(models.Model):
 
 class LibroVentasModelo(models.Model):
     _name = "account.wizard.pdf.ventas" 
+    _description = "Asistente PDF Libro de Ventas"
 
     name = fields.Date(string='Fecha')
     document = fields.Char(string='Rif')
@@ -95,6 +96,7 @@ class LibroVentasModelo(models.Model):
 
 class libro_ventas(models.TransientModel):
     _name = "account.wizard.libro.ventas" ## = nombre de la carpeta.nombre del archivo deparado con puntos
+    _description = "Asistente Libro de Ventas"
 
     facturas_ids = fields.Many2many('account.move', string='Facturas', store=True) ##Relacion con el modelo de la vista de la creacion de facturas
     retiva_ids = 0 ## Malo
@@ -110,7 +112,7 @@ class libro_ventas(models.TransientModel):
 
     # fields for download xls
     state = fields.Selection([('choose', 'choose'), ('get', 'get')],default='choose') ##Genera los botones de exportar xls y pdf como tambien el de cancelar
-    report = fields.Binary('Prepared file', filters='.xls', readonly=True)
+    report = fields.Binary('Prepared file', readonly=True)
     name = fields.Char('File Name', size=32)
     company_id = fields.Many2one('res.company','Company',default=lambda self: self.env.company.id)
 

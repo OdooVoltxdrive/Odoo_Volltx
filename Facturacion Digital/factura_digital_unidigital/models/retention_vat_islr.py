@@ -21,6 +21,47 @@ class RetentionVatIslr(models.Model):
     json_enviado = fields.Text(string="JSON Enviado", copy=False)
     code = fields.Char(copy=False, string="Código de respuesta servidor API")
     message = fields.Text(copy=False)
+    state = fields.Selection(
+        selection_add=[
+            ('sent', 'Publicado y enviado'),
+        ],
+        ondelete={'sent': 'set default'}
+    )
+
+    def comprobante_sv(self):
+        """
+        Abre en una nueva pestaña la URL de consulta de la factura digital 
+        construida a partir de la respuesta de Unidigital guardada en 'result'.
+        """
+        self.ensure_one()
+
+        if not self.company_id.usar_fact_digi:
+            raise UserError(_("Esta compañía no tiene habilitada la factura digital."))
+
+        if not self.result:
+            raise UserError(_("No hay un identificador de documento fiscal recibido de la imprenta digital."))
+
+        # Limpia comillas dobles o espacios adicionales del valor guardado en self.result
+        clean_result = str(self.result).strip('"\'' ).strip()
+
+        if not clean_result:
+            raise UserError(_("El código de documento fiscal no es válido."))
+
+        # Construir la URL concatenando la compañía, el endpoint y el UUID limpio
+        base_url = (self.company_id.url or '').strip()
+        endpoint = (self.company_id.endpoint_pdf_doc or '').strip()
+        
+        # Asegura que las barras diagonales (/) no se dupliquen o falten
+        if not base_url.endswith('/') and not endpoint.startswith('/'):
+            target_url = f"{base_url}/{endpoint}/{clean_result}"
+        else:
+            target_url = f"{base_url}{endpoint}/{clean_result}"
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': target_url,
+            'target': 'new',
+        }
 
     def _prepare_unidigital_islr_json(self):
         """Construye el Payload plano para ISLR compatible con /createretention de Unidigital."""
@@ -203,6 +244,8 @@ class RetentionVatIslr(models.Model):
                 else:
                     rec.information = json.dumps(res_json, indent=2, ensure_ascii=False)
                     rec.errorMessage = str(api_msg)
+                    rec.result = json.dumps(res_json.get("result", {}))
+                    rec.state='sent'
 
                 # 5. Respuesta e interacción con la UI de Odoo
                 if http_status in (200, 201) and not res_json.get("hasErrors"):

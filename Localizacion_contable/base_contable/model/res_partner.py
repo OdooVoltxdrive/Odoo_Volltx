@@ -14,7 +14,7 @@ class Partner(models.Model):
         ('non_resit_nat_people', 'PNNR Persona Natural no Residente'),
         ('domi_ledal_entity', 'PJDO Persona Jurídica Domiciliada'),
         ('legal_ent_not_domicilied', 'PJND Persona Jurídica no Domiciliada'),
-    ], required=True)
+    ])
     seniat_url = fields.Char(string='Dirección SENIAT', readonly=True, default="http://contribuyente.seniat.gob.ve/BuscaRif/BuscaRif.jsp")
     doc_tipo = fields.Selection([
         ('V', 'V'),

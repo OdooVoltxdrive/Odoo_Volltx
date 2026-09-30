@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Columnas de montos cobrados + chips de facturas en el plan de canones
+         (reemplaza a la vista Studio #2605) -->
+    <record id='fleet_vehicle_log_contract_form_inherit_montos' model='ir.ui.view'>
+        <field name="name">fleet.vehicle.log.form.inherit.montos</field>
+        <field name="model">fleet.vehicle.log.contract</field>
+        <field name="inherit_id" ref="fleet_vehicle_log_contract_form_inherit"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='contract_line_ids']/list" position="inside">
+                    <field name="monto_pagado" string="Pagado ($)"/>
+                    <field name="monto_restante" string="Restante ($)"/>
+                    <field name="monto_pagado_bs" string="Pagado (Bs)"/>
+                    <field name="monto_restante_bs" string="Restante (Bs)"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <!-- Form detallado de un canon, abre desde el plan de canones
+         (reemplaza a la vista Studio #2610) -->
+    <record id='fleet_vehicle_contract_line_form_voltx' model='ir.ui.view'>
+        <field name="name">fleet.vehicle.contract.line.form.voltx</field>
+        <field name="model">fleet.vehicle.contract.line</field>
+        <field eval="100" name="priority"/>
+        <field name="arch" type="xml">
+            <form string="Canon del Plan de Canones">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="numero_cuota" string="N° Cuota" readonly="1"/>
+                            <field name="contract_id" string="Contrato" readonly="1"/>
+                            <field name="fecha_vencimiento" string="Fecha de Vencimiento" readonly="1"/>
+                            <field name="monto" string="Monto a Pagar ($)"/>
+                            <field name="state" string="Estado del Canon" readonly="1" widget="badge"
+                                   decoration-success="state == 'paid'"
+                                   decoration-danger="state == 'overdue'"/>
+                        </group>
+                        <group>
+                            <field name="monto_pagado" string="Monto Pagado ($)" readonly="1"/>
+                            <field name="monto_restante" string="Monto Restante ($)" readonly="1"/>
+                            <field name="monto_pagado_bs" string="Pagado (Bs)" readonly="1"/>
+                            <field name="monto_restante_bs" string="Restante (Bs)" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Facturas">
+                        <field name="invoice_ids" nolabel="1" readonly="1">
+                            <list>
+                                <field name="name" string="Número"/>
+                                <field name="ref" string="Referencia"/>
+                                <field name="invoice_date_due" string="Fecha de vencimiento"/>
+                                <field name="amount_tax" string="IVA"/>
+                                <field name="amount_total" string="Total"/>
+                                <field name="amount_total_signed_div" string="Total ($)"/>
+                                <field name="state" string="Estado" widget="badge" decoration-success="state == 'posted'"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

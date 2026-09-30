@@ -18,6 +18,7 @@ import xml.etree.ElementTree as ET
 
 class ResumenMunicipalModelo(models.Model):
     _name = "resumen.municipal.wizard.pdf"
+    _description = "Asistente PDF Resumen Municipal"
 
     fecha_comprobante = fields.Date(string='Fecha')
     partner_id  = fields.Many2one(comodel_name='res.partner', string='Partner')

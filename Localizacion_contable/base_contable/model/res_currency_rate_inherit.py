@@ -15,7 +15,7 @@ class CurrencyRate(models.Model):
     _inherit = "res.currency.rate"
 
     # _sql_constraints = [('unique_name', 'CHECK(1=1)', 'Only one currency rate per day allowed!')]
-    _sql_constraints = [('unique_name', 'CHECK(1=1)', 'Only one currency rate per day allowed!')]
+    # ponytail: constraint vacío (CHECK 1=1) sin efecto; _sql_constraints ya no existe en Odoo 19
     # currency_id = fields.Many2one('res.currency',readonly=False,copied=False)
 
 

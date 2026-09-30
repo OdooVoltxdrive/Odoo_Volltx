@@ -10,6 +10,7 @@ from contextlib import ExitStack, contextmanager
 
 class WizardPagosFacturas(models.TransientModel):
     _name = 'wizard.payment.fact'
+    _description = "Asistente de pagos de facturas"
 
     move_id = fields.Many2one('account.move')#
     tasa = fields.Float(digits=(12, 4))#

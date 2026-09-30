@@ -17,6 +17,7 @@ import xml.etree.ElementTree as ET
 
 class LibroComprasModelo(models.Model):
     _name = "resumen.iva.wizard.pdf"
+    _description = "Asistente PDF Resumen IVA"
 
     name = fields.Date(string='Fecha')
     document = fields.Char(string='Rif')

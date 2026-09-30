@@ -85,7 +85,7 @@ class BsoftContratoReport2(models.TransientModel):
     quotechar = "'"
     date_from = fields.Date(string='Fecha de Llegada', default=lambda *a:datetime.now().strftime('%Y-%m-%d'))
     date_to = fields.Date(string='Fecha de Salida', default=lambda *a:(datetime.now() + timedelta(days=(1))).strftime('%Y-%m-%d'))
-    file_data = fields.Binary('Archivo TXT', filters=None, help="")
+    file_data = fields.Binary('Archivo TXT', help="")
     file_name = fields.Char('txt_generacion.txt', size=256, required=False, help="",)
 
     def show_view(self, name, model, id_xml, res_id=None, view_mode='tree,form', nodestroy=True, target='new'):

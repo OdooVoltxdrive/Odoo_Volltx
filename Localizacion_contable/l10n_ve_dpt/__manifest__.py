@@ -23,6 +23,7 @@
 {
     "name": "Localización Venezolana: Municipios y Parroquias",
     "version": "18.0",
+    'license': 'LGPL-3',
     "author": "Grupo Angendar",
     "category": "Localization",
     "description":
