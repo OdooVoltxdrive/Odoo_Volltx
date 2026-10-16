@@ -7,8 +7,7 @@ from odoo.exceptions import ValidationError
 class FleetVehicle(models.Model):
     _inherit = "fleet.vehicle"
 
-    driver_slot_ids = fields.One2many(
-        'res.partner',
+    driver_slot_ids = fields.One2many('res.partner',
         string='Conductores por Turno'
     )
 
