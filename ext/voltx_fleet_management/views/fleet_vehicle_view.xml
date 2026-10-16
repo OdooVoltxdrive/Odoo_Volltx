@@ -9,11 +9,13 @@
         <field name="arch" type="xml">
           
 
-        <xpath expr="//field[@name='driver_id']" position="after">
-                <field name="driver_slot_ids"/>
-                <attribute name="domain">['|', ('company_id', '=', False), ('company_id', '=', company_id), ('is_driver', '=', True)]</attribute>
-
-                <attribute name="options">{"no_create": true, "no_edit": true, "no_open": true}</attribute>
+       <xpath expr="//field[@name='driver_id']" position="after">
+                <field 
+                    name="driver_slot_ids" 
+                    widget="many2many_tags_avatar" 
+                    placeholder="Seleccionar conductores..."
+                    options="{'no_create_edit': True}"
+                />
         </xpath>
 
         </field>
