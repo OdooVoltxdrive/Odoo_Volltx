@@ -44,14 +44,14 @@
                     <notebook>
                         <page string="Daily Logs">
                             <field name="daily_log_ids">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="check_in"/>
                                     <field name="check_out"/>
                                     <field name="hours_worked"/>
                                     <field name="worked" widget="boolean_toggle"/>
                                     <field name="state"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -60,12 +60,12 @@
         </field>
     </record>
 
-    <!-- Tree View -->
-    <record id="view_fleet_weekly_liquidation_tree" model="ir.ui.view">
-        <field name="name">fleet.weekly.liquidation.tree</field>
+    <!-- list View -->
+    <record id="view_fleet_weekly_liquidation_list" model="ir.ui.view">
+        <field name="name">fleet.weekly.liquidation.list</field>
         <field name="model">fleet.weekly.liquidation</field>
         <field name="arch" type="xml">
-            <tree string="Weekly Liquidations">
+            <list string="Weekly Liquidations">
                 <field name="name"/>
                 <field name="contract_id"/>
                 <field name="driver_id"/>
@@ -73,7 +73,7 @@
                 <field name="days_worked"/>
                 <field name="amount_total"/>
                 <field name="state"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -81,7 +81,7 @@
     <record id="action_fleet_weekly_liquidation" model="ir.actions.act_window">
         <field name="name">Weekly Liquidations</field>
         <field name="res_model">fleet.weekly.liquidation</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
 </odoo>

@@ -10,12 +10,12 @@
             <xpath expr="//notebook" position="inside">
                 <page string="Driver Slots" name="driver_slots">
                     <field name="driver_slot_ids">
-                        <tree editable="bottom">
+                        <list editable="bottom">
                             <field name="driver_id"/>
                             <field name="shift_id"/>
                             <field name="contract_id"/>
                             <field name="is_active_shift" readonly="1" decoration-success="is_active_shift == True" />
-                        </tree>
+                        </list>
                     </field>
                 </page>
             </xpath>
