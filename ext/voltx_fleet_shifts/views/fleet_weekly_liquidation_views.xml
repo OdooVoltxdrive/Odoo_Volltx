@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sequence for Weekly Liquidation -->
+    <data noupdate="1">
+        <record id="seq_fleet_weekly_liquidation" model="ir.sequence">
+            <field name="name">Weekly Liquidation</field>
+            <field name="code">fleet.weekly.liquidation</field>
+            <field name="prefix">LIQ/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+
+    <!-- Form View -->
+    <record id="view_fleet_weekly_liquidation_form" model="ir.ui.view">
+        <field name="name">fleet.weekly.liquidation.form</field>
+        <field name="model">fleet.weekly.liquidation</field>
+        <field name="arch" type="xml">
+            <form string="Weekly Liquidation">
+                <header>
+                    <button name="action_generate_invoice" type="object" string="Generate Invoice/Bill" class="oe_highlight" invisible="invoice_id != False"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="contract_id"/>
+                            <field name="driver_id"/>
+                            <field name="week_of_year"/>
+                        </group>
+                        <group>
+                            <field name="days_worked"/>
+                            <field name="total_hours"/>
+                            <field name="amount_total"/>
+                            <field name="invoice_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Daily Logs">
+                            <field name="daily_log_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="check_in"/>
+                                    <field name="check_out"/>
+                                    <field name="hours_worked"/>
+                                    <field name="worked" widget="boolean_toggle"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_fleet_weekly_liquidation_tree" model="ir.ui.view">
+        <field name="name">fleet.weekly.liquidation.tree</field>
+        <field name="model">fleet.weekly.liquidation</field>
+        <field name="arch" type="xml">
+            <tree string="Weekly Liquidations">
+                <field name="name"/>
+                <field name="contract_id"/>
+                <field name="driver_id"/>
+                <field name="week_of_year"/>
+                <field name="days_worked"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_fleet_weekly_liquidation" model="ir.actions.act_window">
+        <field name="name">Weekly Liquidations</field>
+        <field name="res_model">fleet.weekly.liquidation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

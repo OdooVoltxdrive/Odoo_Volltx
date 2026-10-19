@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_fleet_work_shift_form" model="ir.ui.view">
+        <field name="name">fleet.work.shift.form</field>
+        <field name="model">fleet.work.shift</field>
+        <field name="arch" type="xml">
+            <form string="Work Shift">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="hours_per_day"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_fleet_work_shift_tree" model="ir.ui.view">
+        <field name="name">fleet.work.shift.tree</field>
+        <field name="model">fleet.work.shift</field>
+        <field name="arch" type="xml">
+            <tree string="Work Shifts">
+                <field name="name"/>
+                <field name="hours_per_day"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_fleet_work_shift" model="ir.actions.act_window">
+        <field name="name">Work Shifts</field>
+        <field name="res_model">fleet.work.shift</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
