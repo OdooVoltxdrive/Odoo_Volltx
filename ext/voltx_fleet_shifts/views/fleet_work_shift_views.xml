@@ -6,7 +6,7 @@
         <field name="name">fleet.work.shift.form</field>
         <field name="model">fleet.work.shift</field>
         <field name="arch" type="xml">
-            <form string="Work Shift">
+            <form string="Turnos de trabajo">
                 <sheet>
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
                     <group>
@@ -26,7 +26,7 @@
         <field name="name">fleet.work.shift.tree</field>
         <field name="model">fleet.work.shift</field>
         <field name="arch" type="xml">
-            <list string="Work Shifts">
+            <list string="Turnos de trabajo">
                 <field name="name"/>
                 <field name="hours_per_day"/>
             </list>
@@ -35,7 +35,7 @@
 
     <!-- Action -->
     <record id="action_fleet_work_shift" model="ir.actions.act_window">
-        <field name="name">Work Shifts</field>
+        <field name="name">Turnos de trabajo</field>
         <field name="res_model">fleet.work.shift</field>
         <field name="view_mode">list,form</field>
     </record>

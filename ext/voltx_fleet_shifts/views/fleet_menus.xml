@@ -2,12 +2,12 @@
 <odoo>
 
     <!-- Menu Items under Fleet app -->
-    <menuitem id="menu_fleet_shifts_root" name="Shifts &amp; Logs" parent="fleet.menu_root" sequence="15"/>
+    <menuitem id="menu_fleet_shifts_root" name="Turnos /registros" parent="fleet.menu_root" sequence="15"/>
 
-    <menuitem id="menu_fleet_driver_daily_log" name="Daily Logs" parent="menu_fleet_shifts_root" action="action_fleet_driver_daily_log" sequence="10"/>
-    <menuitem id="menu_fleet_weekly_liquidation" name="Weekly Liquidations" parent="menu_fleet_shifts_root" action="action_fleet_weekly_liquidation" sequence="20"/>
+    <menuitem id="menu_fleet_driver_daily_log" name="Registros diarios" parent="menu_fleet_shifts_root" action="action_fleet_driver_daily_log" sequence="10"/>
+    <menuitem id="menu_fleet_weekly_liquidation" name="Liquidaciones semanales" parent="menu_fleet_shifts_root" action="action_fleet_weekly_liquidation" sequence="20"/>
 
     <!-- Configuration Menu -->
-    <menuitem id="menu_fleet_work_shift" name="Work Shifts" parent="fleet.fleet_configuration" action="action_fleet_work_shift" sequence="110"/>
+    <menuitem id="menu_fleet_work_shift" name="Turnos de trabajo" parent="fleet.fleet_configuration" action="action_fleet_work_shift" sequence="110"/>
 
 </odoo>

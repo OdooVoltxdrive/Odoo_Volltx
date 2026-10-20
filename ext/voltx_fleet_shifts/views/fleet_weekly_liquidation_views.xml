@@ -42,7 +42,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Daily Logs">
+                        <page string="Registros diarios">
                             <field name="daily_log_ids">
                                 <list>
                                     <field name="name"/>
@@ -65,7 +65,7 @@
         <field name="name">fleet.weekly.liquidation.tree</field>
         <field name="model">fleet.weekly.liquidation</field>
         <field name="arch" type="xml">
-            <list string="Weekly Liquidations">
+            <list string="Liquidaciones semanales">
                 <field name="name"/>
                 <field name="contract_id"/>
                 <field name="driver_id"/>
@@ -79,7 +79,7 @@
 
     <!-- Action -->
     <record id="action_fleet_weekly_liquidation" model="ir.actions.act_window">
-        <field name="name">Weekly Liquidations</field>
+        <field name="name">Liquidaciones semanales</field>
         <field name="res_model">fleet.weekly.liquidation</field>
         <field name="view_mode">list,form</field>
     </record>

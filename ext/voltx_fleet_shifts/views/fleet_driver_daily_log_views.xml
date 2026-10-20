@@ -19,8 +19,8 @@
         <field name="arch" type="xml">
             <form string="Daily Log">
                 <header>
-                    <button name="action_start_shift" type="object" string="Start Shift" class="oe_highlight" invisible="state != 'draft'"/>
-                    <button name="action_end_shift" type="object" string="End Shift" class="oe_highlight" invisible="state != 'active'"/>
+                    <button name="action_start_shift" type="object" string="Iniciar turno" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_end_shift" type="object" string="Finalizar turno" class="oe_highlight" invisible="state != 'active'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,active,done,paid"/>
                 </header>
                 <sheet>
@@ -50,9 +50,9 @@
         </field>
     </record>
 
-    <!-- Tree/List View -->
-    <record id="view_fleet_driver_daily_log_tree" model="ir.ui.view">
-        <field name="name">fleet.driver.daily.log.tree</field>
+    <!-- List View -->
+    <record id="view_fleet_driver_daily_log_list" model="ir.ui.view">
+        <field name="name">fleet.driver.daily.log.list</field>
         <field name="model">fleet.driver.daily.log</field>
         <field name="arch" type="xml">
             <list string="Daily Logs" decoration-success="worked == True" decoration-danger="worked == False and state == 'done'">
@@ -73,7 +73,7 @@
         <field name="name">fleet.driver.daily.log.calendar</field>
         <field name="model">fleet.driver.daily.log</field>
         <field name="arch" type="xml">
-            <calendar string="Daily Logs" date_start="check_in" date_stop="check_out" color="driver_id">
+            <calendar string="Registros diarios" date_start="check_in" date_stop="check_out" color="driver_id">
                 <field name="vehicle_id"/>
                 <field name="driver_id"/>
                 <field name="hours_worked"/>

@@ -10,10 +10,10 @@
 
             <xpath expr="//sheet" position="inside">
                 <button name="action_view_daily_logs" type="object" class="oe_stat_button" icon="fa-calendar">
-                    <field name="daily_logs_count" widget="statinfo" string="Daily Logs"/>
+                    <field name="daily_logs_count" widget="statinfo" string="Registros diarios"/>
                 </button>
                 <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
-                    <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                    <field name="invoice_count" widget="statinfo" string="Factura"/>
                 </button>
             </xpath>
 
@@ -23,7 +23,7 @@
 
             <xpath expr="//sheet" position="inside">
                 <notebook>
-                    <page string="Weekly Liquidations" name="weekly_liquidations">
+                    <page string="Liquidaciones semanales" name="weekly_liquidations">
                         <field name="liquidation_ids">
                             <list editable="bottom" create="1">
                                 <field name="week_of_year"/>
