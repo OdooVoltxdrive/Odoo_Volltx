@@ -37,10 +37,10 @@ class FleetWeeklyLiquidation(models.Model):
         ('paid', 'Paid')
     ], default='draft', string='Status', compute='_compute_state', store=True)
 
-    @api.depends('contract_id.purchaser_id', 'contract_id.partner_id')
+    @api.depends('contract_id.purchaser_id')
     def _compute_driver_id(self):
         for liq in self:
-            liq.driver_id = liq.contract_id.purchaser_id or liq.contract_id.partner_id
+            liq.driver_id = liq.contract_id.purchaser_id
 
     @api.model_create_multi
     def create(self, vals_list):
