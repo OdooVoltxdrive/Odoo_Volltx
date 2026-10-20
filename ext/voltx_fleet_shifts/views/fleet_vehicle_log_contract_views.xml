@@ -8,6 +8,12 @@
         <field name="inherit_id" ref="fleet.fleet_vehicle_log_contract_view_form"/>
         <field name="arch" type="xml">
 
+            <!-- 0. Botones de acción en el header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_start_daily_shift" string="Check-in (Iniciar Turno)" type="object" class="oe_highlight" icon="fa-play"/>
+                <button name="action_end_daily_shift" string="Check-out (Finalizar Turno)" type="object" class="btn-secondary" icon="fa-stop"/>
+            </xpath>
+
             <!-- 1. Smart Buttons en el Button Box oficial -->
             <xpath expr="//sheet" position="before">
                 <button name="action_view_daily_logs" type="object" class="oe_stat_button" icon="fa-calendar">

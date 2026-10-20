@@ -21,6 +21,34 @@ class FleetVehicleLogContract(models.Model):
         for contract in self:
             contract.invoice_count = len(contract.liquidation_ids.mapped('invoice_id'))
 
+    def action_start_daily_shift(self):
+        self.ensure_one()
+        # Verificar si hay un log activo para este contrato
+        active_log = self.env['fleet.driver.daily.log'].search([
+            ('contract_id', '=', self.id),
+            ('state', 'in', ['draft', 'active'])
+        ], limit=1)
+        if active_log:
+            active_log.action_start_shift()
+        else:
+            driver = self.purchaser_id or self.partner_id
+            log = self.env['fleet.driver.daily.log'].create({
+                'contract_id': self.id,
+                'vehicle_id': self.vehicle_id.id,
+                'driver_id': driver.id if driver else False,
+                'shift_id': self.shift_id.id if self.shift_id else False,
+            })
+            log.action_start_shift()
+
+    def action_end_daily_shift(self):
+        self.ensure_one()
+        active_log = self.env['fleet.driver.daily.log'].search([
+            ('contract_id', '=', self.id),
+            ('state', '=', 'active')
+        ], limit=1)
+        if active_log:
+            active_log.action_end_shift()
+
     def action_view_daily_logs(self):
         self.ensure_one()
         driver = self.purchaser_id or self.partner_id

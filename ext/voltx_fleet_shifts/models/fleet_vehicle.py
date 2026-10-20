@@ -1,6 +1,6 @@
 from datetime import datetime
 import pytz
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class FleetVehicle(models.Model):
@@ -13,6 +13,50 @@ class FleetVehicle(models.Model):
         'driver_id',
         string='Conductores Asignados'
     )
+
+    def write(self, vals):
+        # Capture current driver_ids before super write to compare removals
+        old_driver_ids = {}
+        if 'driver_ids' in vals:
+            for vehicle in self:
+                old_driver_ids[vehicle.id] = set(vehicle.driver_ids.ids)
+
+        res = super(FleetVehicle, self).write(vals)
+
+        if 'driver_ids' in vals:
+            for vehicle in self:
+                new_ids = set(vehicle.driver_ids.ids)
+                old_ids = old_driver_ids.get(vehicle.id, set())
+
+                added_ids = new_ids - old_ids
+                removed_ids = old_ids - new_ids
+
+                # Cerrar los logs de los conductores que fueron desasignados
+                for driver_id in removed_ids:
+                    active_logs = self.env['fleet.vehicle.assignation.log'].search([
+                        ('vehicle_id', '=', vehicle.id),
+                        ('driver_id', '=', driver_id),
+                        ('date_end', '=', False),
+                    ])
+                    if active_logs:
+                        active_logs.write({'date_end': fields.Date.today()})
+
+                # Buscamos crear en el historial los conductores que se asignaron
+                for driver_id in added_ids:
+                    # Verificar si este conductor ya tiene un log activo en este vehiculo (sin fecha de fin)
+                    existing_log = self.env['fleet.vehicle.assignation.log'].search([
+                        ('vehicle_id', '=', vehicle.id),
+                        ('driver_id', '=', driver_id),
+                        ('date_end', '=', False),
+                    ], limit=1)
+
+                    if not existing_log:
+                        self.env['fleet.vehicle.assignation.log'].create({
+                            'vehicle_id': vehicle.id,
+                            'driver_id': driver_id,
+                            'date_start': fields.Date.today(),
+                        })
+        return res
 
     def _get_current_time_and_day(self):
         """Retorna el día de la semana (0=Lun, 6=Dom) y la hora float con base en la zona horaria del usuario/empresa."""

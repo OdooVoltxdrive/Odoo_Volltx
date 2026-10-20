@@ -84,11 +84,22 @@ class FleetDriverDailyLog(models.Model):
         if vals.get('state') == 'done':
             # Vinculación automática a la liquidación semanal abierta
             for log in self:
-                if log.contract_id and log.week_of_year and not log.liquidation_id:
+                if log.contract_id and log.week_of_year:
                     liq = self.env['fleet.weekly.liquidation'].search([
                         ('contract_id', '=', log.contract_id.id),
                         ('week_of_year', '=', log.week_of_year)
                     ], limit=1)
-                    if liq:
+
+                    if not liq:
+                        # Crear liquidación semanal si no existe
+                        liq = self.env['fleet.weekly.liquidation'].create({
+                            'contract_id': log.contract_id.id,
+                            'week_of_year': log.week_of_year,
+                        })
+
+                    if not log.liquidation_id:
                         log.liquidation_id = liq.id
+
+                    # Actualizar o generar factura automáticamente
+                    liq._auto_generate_or_update_invoice()
         return res
