@@ -24,7 +24,7 @@ class FleetVehicleLogContract(models.Model):
         self.ensure_one()
         return {
             'name': _('Daily Logs'),
-            'view_mode': 'tree,form,calendar,pivot,kanban',
+            'view_mode': 'list,form,calendar,pivot,kanban',
             'res_model': 'fleet.driver.daily.log',
             'domain': [('contract_id', '=', self.id)],
             'type': 'ir.actions.act_window',
@@ -36,7 +36,7 @@ class FleetVehicleLogContract(models.Model):
         invoices = self.liquidation_ids.mapped('invoice_id')
         return {
             'name': _('Invoices'),
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'res_model': 'account.move',
             'domain': [('id', 'in', invoices.ids)],
             'type': 'ir.actions.act_window',

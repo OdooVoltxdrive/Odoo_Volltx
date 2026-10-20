@@ -21,9 +21,9 @@
         </field>
     </record>
 
-    <!-- list View -->
-    <record id="view_fleet_work_shift_list" model="ir.ui.view">
-        <field name="name">fleet.work.shift.list</field>
+    <!-- Tree View -->
+    <record id="view_fleet_work_shift_tree" model="ir.ui.view">
+        <field name="name">fleet.work.shift.tree</field>
         <field name="model">fleet.work.shift</field>
         <field name="arch" type="xml">
             <list string="Work Shifts">

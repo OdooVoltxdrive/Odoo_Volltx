@@ -51,8 +51,8 @@
     </record>
 
     <!-- Tree/List View -->
-    <record id="view_fleet_driver_daily_log_list" model="ir.ui.view">
-        <field name="name">fleet.driver.daily.log.list</field>
+    <record id="view_fleet_driver_daily_log_tree" model="ir.ui.view">
+        <field name="name">fleet.driver.daily.log.tree</field>
         <field name="model">fleet.driver.daily.log</field>
         <field name="arch" type="xml">
             <list string="Daily Logs" decoration-success="worked == True" decoration-danger="worked == False and state == 'done'">
@@ -126,7 +126,7 @@
     <record id="action_fleet_driver_daily_log" model="ir.actions.act_window">
         <field name="name">Daily Logs</field>
         <field name="res_model">fleet.driver.daily.log</field>
-        <field name="view_mode">kanban,tree,calendar,pivot,form</field>
+        <field name="view_mode">kanban,list,calendar,pivot,form</field>
     </record>
 
 </odoo>

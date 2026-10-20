@@ -60,9 +60,9 @@
         </field>
     </record>
 
-    <!-- list View -->
-    <record id="view_fleet_weekly_liquidation_list" model="ir.ui.view">
-        <field name="name">fleet.weekly.liquidation.list</field>
+    <!-- Tree View -->
+    <record id="view_fleet_weekly_liquidation_tree" model="ir.ui.view">
+        <field name="name">fleet.weekly.liquidation.tree</field>
         <field name="model">fleet.weekly.liquidation</field>
         <field name="arch" type="xml">
             <list string="Weekly Liquidations">
