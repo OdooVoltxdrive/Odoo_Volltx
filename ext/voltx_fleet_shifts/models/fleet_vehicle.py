@@ -14,6 +14,27 @@ class FleetVehicle(models.Model):
         string='Conductores Asignados'
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(FleetVehicle, self).create(vals_list)
+        for vehicle in records:
+            if vehicle.driver_ids:
+                for driver in vehicle.driver_ids:
+                    # Crear en historial
+                    self.env['fleet.vehicle.assignation.log'].create({
+                        'vehicle_id': vehicle.id,
+                        'driver_id': driver.id,
+                        'date_start': fields.Date.today(),
+                    })
+                    # Creación automática de contrato
+                    self.env['fleet.vehicle.log.contract'].create({
+                        'vehicle_id': vehicle.id,
+                        'purchaser_id': driver.id,
+                        'state': 'open',
+                        'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
+                    })
+        return records
+
     def write(self, vals):
         # Capture current driver_ids before super write to compare removals
         old_driver_ids = {}
@@ -56,6 +77,22 @@ class FleetVehicle(models.Model):
                             'driver_id': driver_id,
                             'date_start': fields.Date.today(),
                         })
+
+                    # Creación Automática de Contrato para el nuevo conductor asignado
+                    existing_contract = self.env['fleet.vehicle.log.contract'].search([
+                        ('vehicle_id', '=', vehicle.id),
+                        ('purchaser_id', '=', driver_id),
+                        ('state', 'in', ['futur', 'open'])
+                    ], limit=1)
+
+                    if not existing_contract:
+                        self.env['fleet.vehicle.log.contract'].create({
+                            'vehicle_id': vehicle.id,
+                            'purchaser_id': driver_id,
+                            'state': 'open',
+                            'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
+                        })
+
         return res
 
     def _get_current_time_and_day(self):
