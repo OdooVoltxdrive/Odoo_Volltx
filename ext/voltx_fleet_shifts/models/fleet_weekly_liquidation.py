@@ -92,6 +92,66 @@ class FleetWeeklyLiquidation(models.Model):
             else:
                 liq.state = 'invoiced'
 
+    def _auto_generate_or_update_invoice(self):
+        """Genera o actualiza la factura automáticamente sumando los días trabajados en lugar de hacerlo manualmente."""
+        self.ensure_one()
+        if not self.driver_id or self.days_worked <= 0:
+            return
+
+        # Si ya existe una factura en borrador, simplemente actualizamos la cantidad
+        if self.invoice_id and self.invoice_id.state == 'draft':
+            # Solo actualizamos la línea que generamos para esta liquidación
+            target_name_prefix = f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo'
+            for line in self.invoice_id.invoice_line_ids:
+                if line.name and line.name.startswith(target_name_prefix):
+                    # Actualizar la cantidad y el nombre de forma segura
+                    line.quantity = self.days_worked
+                    line.name = f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)'
+            return
+
+        if self.invoice_id and self.invoice_id.state != 'draft':
+            # Si ya hay una factura publicada para esta liquidacion, no la modificamos
+            return
+
+        company = self.contract_id.company_id or self.env.company
+
+        # 1. Buscar Diario de Ventas (Factura Cliente)
+        journal = self.env['account.journal'].search([
+            ('type', '=', 'sale'),
+            ('company_id', '=', company.id)
+        ], limit=1)
+        if not journal:
+            return
+
+        # 2. Cuenta de Ingresos por defecto
+        account = journal.default_account_id or self.env['account.account'].search([
+            ('account_type', 'in', ('income', 'income_other')),
+            ('company_id', '=', company.id)
+        ], limit=1)
+
+        if not account:
+            return
+
+        # 3. Crear Factura Cliente ('out_invoice') en estado borrador
+        invoice_vals = {
+            'move_type': 'out_invoice',
+            'partner_id': self.driver_id.id,
+            'invoice_date': fields.Date.context_today(self),
+            'ref': f"{self.name} - {self.week_of_year}",
+            'journal_id': journal.id,
+            'invoice_line_ids': [
+                Command.create({
+                    'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
+                    'quantity': self.days_worked,
+                    'price_unit': self.contract_id.amount,
+                    'account_id': account.id,
+                })
+            ],
+        }
+
+        move = self.env['account.move'].create(invoice_vals)
+        self.invoice_id = move.id
+
     def action_generate_invoice(self):
         self.ensure_one()
         if self.invoice_id:

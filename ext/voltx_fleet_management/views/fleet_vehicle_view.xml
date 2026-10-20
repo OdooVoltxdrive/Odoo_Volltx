@@ -9,7 +9,12 @@
         <field name="arch" type="xml">
           
 
-       <xpath expr="//field[@name='driver_id']" position="after">
+        <!-- Cambiar la etiqueta del campo nativo -->
+        <xpath expr="//field[@name='driver_id']" position="attributes">
+                <attribute name="string">Conductor actual</attribute>
+        </xpath>
+
+       <xpath expr="//field[@name='driver_id']" position="before">
                 <field 
                     name="driver_slot_ids" 
                     widget="many2many_tags_avatar" 

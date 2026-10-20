@@ -8,6 +8,12 @@
         <field name="inherit_id" ref="fleet.fleet_vehicle_log_contract_view_form"/>
         <field name="arch" type="xml">
 
+            <!-- 0. Botones de acción en el header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_start_daily_shift" string="Check-in (Iniciar Turno)" type="object" class="oe_highlight" icon="fa-play"/>
+                <button name="action_end_daily_shift" string="Check-out (Finalizar Turno)" type="object" class="btn-secondary" icon="fa-stop"/>
+            </xpath>
+
             <!-- 1. Smart Buttons en el Button Box oficial -->
             <xpath expr="//sheet" position="before">
                 <button name="action_view_daily_logs" type="object" class="oe_stat_button" icon="fa-calendar">
@@ -21,6 +27,13 @@
             <!-- 2. Campo Turno al lado del seguro/conductor -->
             <xpath expr="//field[@name='insurer_id']" position="after">
                 <field name="shift_id"/>
+                <field name="secondary_currency_id" invisible="1"/>
+            </xpath>
+
+            <!-- 2.5 Modificar campos amount y cost_generated (si existe en Odoo base) para forzar moneda -->
+            <xpath expr="//field[@name='amount']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+                <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
             </xpath>
 
             <!-- 3. Notebook con las Liquidaciones Semanales al final de la ficha -->

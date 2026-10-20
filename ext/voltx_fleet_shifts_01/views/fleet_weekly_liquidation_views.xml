@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Secuencia para Liquidación Semanal -->
+    <data noupdate="1">
+        <record id="seq_fleet_weekly_liquidation" model="ir.sequence">
+            <field name="name">Weekly Liquidation</field>
+            <field name="code">fleet.weekly.liquidation</field>
+            <field name="prefix">LIQ/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+
+    <!-- Form View -->
+    <record id="view_fleet_weekly_liquidation_form" model="ir.ui.view">
+        <field name="name">fleet.weekly.liquidation.form</field>
+        <field name="model">fleet.weekly.liquidation</field>
+        <field name="arch" type="xml">
+            <form string="Weekly Liquidation">
+                <header>
+                    <button name="action_generate_invoice" 
+                                type="object" 
+                                string="Generar Factura Cliente" 
+                                class="oe_highlight" 
+                                invisible="invoice_id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,invoiced,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Referencia"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Asignación">
+                            <field name="contract_id"/>
+                            <field name="driver_id"/>
+                            <field name="week_of_year"/>
+                        </group>
+                        <group string="Totales">
+                            <field name="days_worked"/>
+                            <field name="total_hours" widget="float_time"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount_total" widget="monetary"/>
+                            <field name="invoice_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Registros diarios">
+                            <field name="daily_log_ids">
+                                <list decoration-success="worked" decoration-danger="not worked and state == 'done'">
+                                    <field name="name"/>
+                                    <field name="check_in"/>
+                                    <field name="check_out"/>
+                                    <field name="hours_worked" widget="float_time"/>
+                                    <field name="worked" widget="boolean_toggle"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_fleet_weekly_liquidation_list" model="ir.ui.view">
+        <field name="name">fleet.weekly.liquidation.list</field>
+        <field name="model">fleet.weekly.liquidation</field>
+        <field name="arch" type="xml">
+            <list string="Liquidaciones semanales">
+                <field name="name"/>
+                <field name="contract_id"/>
+                <field name="driver_id"/>
+                <field name="week_of_year"/>
+                <field name="days_worked"/>
+                <field name="total_hours" widget="float_time"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="amount_total" widget="monetary"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_fleet_weekly_liquidation" model="ir.actions.act_window">
+        <field name="name">Liquidaciones semanales</field>
+        <field name="res_model">fleet.weekly.liquidation</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay liquidaciones semanales registradas
+            </p>
+            <p>
+                Las liquidaciones se generan automáticamente vinculando los registros diarios finalizados de cada contrato por semana.
+            </p>
+        </field>
+    </record>
+
+</odoo>
