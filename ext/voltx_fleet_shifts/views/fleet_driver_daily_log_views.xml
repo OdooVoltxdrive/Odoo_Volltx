@@ -25,21 +25,22 @@
                 </header>
                 <sheet>
                     <div class="oe_title">
+                        <label for="name" string="Referencia"/>
                         <h1>
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
                     <group>
-                        <group>
+                        <group string="Asignación">
+                            <field name="contract_id"/>
                             <field name="vehicle_id"/>
                             <field name="driver_id"/>
-                            <field name="contract_id"/>
                             <field name="shift_id"/>
                         </group>
-                        <group>
+                        <group string="Jornada y Horas">
                             <field name="check_in"/>
                             <field name="check_out"/>
-                            <field name="hours_worked" readonly="1"/>
+                            <field name="hours_worked" readonly="1" widget="float_time"/>
                             <field name="worked" widget="boolean_toggle"/>
                             <field name="week_of_year" readonly="1"/>
                             <field name="liquidation_id" readonly="1"/>
@@ -55,15 +56,16 @@
         <field name="name">fleet.driver.daily.log.list</field>
         <field name="model">fleet.driver.daily.log</field>
         <field name="arch" type="xml">
-            <list string="Daily Logs" decoration-success="worked == True" decoration-danger="worked == False and state == 'done'">
+            <list string="Daily Logs" decoration-success="worked" decoration-danger="not worked and state == 'done'">
                 <field name="name"/>
                 <field name="vehicle_id"/>
                 <field name="driver_id"/>
+                <field name="shift_id"/>
                 <field name="check_in"/>
                 <field name="check_out"/>
-                <field name="hours_worked"/>
+                <field name="hours_worked" widget="float_time"/>
                 <field name="worked"/>
-                <field name="state"/>
+                <field name="state" widget="badge"/>
             </list>
         </field>
     </record>
@@ -94,29 +96,28 @@
         </field>
     </record>
 
-    <!-- Kanban View -->
+    <!-- Kanban View (Corregido para Odoo 19 con <card>) -->
     <record id="view_fleet_driver_daily_log_kanban" model="ir.ui.view">
         <field name="name">fleet.driver.daily.log.kanban</field>
         <field name="model">fleet.driver.daily.log</field>
         <field name="arch" type="xml">
             <kanban default_group_by="state">
-                <field name="name"/>
-                <field name="driver_id"/>
-                <field name="vehicle_id"/>
-                <field name="state"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <div class="oe_kanban_details">
-                                <strong class="o_kanban_record_title"><field name="name"/></strong>
-                                <ul>
-                                    <li>Driver: <field name="driver_id"/></li>
-                                    <li>Vehicle: <field name="vehicle_id"/></li>
-                                    <li>Hours: <field name="hours_worked"/></li>
-                                </ul>
+                    <card class="oe_kanban_global_click">
+                        <div class="oe_kanban_details">
+                            <strong class="o_kanban_record_title"><field name="name"/></strong>
+                            <div class="text-muted"><field name="vehicle_id"/></div>
+                            <div class="mt-1">
+                                <span>Driver: </span><strong><field name="driver_id"/></strong>
+                            </div>
+                            <div invisible="not shift_id">
+                                <span>Shift: </span><field name="shift_id"/>
+                            </div>
+                            <div class="mt-1">
+                                <span>Hours: </span><field name="hours_worked" widget="float_time"/>
                             </div>
                         </div>
-                    </t>
+                    </card>
                 </templates>
             </kanban>
         </field>
@@ -126,7 +127,7 @@
     <record id="action_fleet_driver_daily_log" model="ir.actions.act_window">
         <field name="name">Daily Logs</field>
         <field name="res_model">fleet.driver.daily.log</field>
-        <field name="view_mode">kanban,list,calendar,pivot,form</field>
+        <field name="view_mode">list,kanban,calendar,pivot,form</field>
     </record>
 
 </odoo>

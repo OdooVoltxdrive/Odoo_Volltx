@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 
+
 class FleetVehicleLogContract(models.Model):
     _inherit = 'fleet.vehicle.log.contract'
 
@@ -7,8 +8,8 @@ class FleetVehicleLogContract(models.Model):
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
     daily_log_ids = fields.One2many('fleet.driver.daily.log', 'contract_id', string='Daily Logs')
 
-    daily_logs_count = fields.Integer(compute='_compute_logs_count')
-    invoice_count = fields.Integer(compute='_compute_invoice_count')
+    daily_logs_count = fields.Integer(compute='_compute_logs_count', string='Logs Count')
+    invoice_count = fields.Integer(compute='_compute_invoice_count', string='Invoice Count')
 
     @api.depends('daily_log_ids')
     def _compute_logs_count(self):
@@ -22,13 +23,19 @@ class FleetVehicleLogContract(models.Model):
 
     def action_view_daily_logs(self):
         self.ensure_one()
+        driver = self.purchaser_id or self.partner_id
         return {
             'name': _('Daily Logs'),
-            'view_mode': 'list,form,calendar,pivot,kanban',
+            'view_mode': 'list,kanban,calendar,pivot,form',
             'res_model': 'fleet.driver.daily.log',
             'domain': [('contract_id', '=', self.id)],
             'type': 'ir.actions.act_window',
-            'context': {'default_contract_id': self.id, 'default_vehicle_id': self.vehicle_id.id, 'default_driver_id': self.purchaser_id.id}
+            'context': {
+                'default_contract_id': self.id,
+                'default_vehicle_id': self.vehicle_id.id,
+                'default_driver_id': driver.id if driver else False,
+                'default_shift_id': self.shift_id.id if self.shift_id else False,
+            }
         }
 
     def action_view_invoices(self):

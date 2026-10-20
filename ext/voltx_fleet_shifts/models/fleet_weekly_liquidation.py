@@ -1,30 +1,46 @@
-from odoo import models, fields, api, _
+from odoo import models, fields, api, Command, _
 from odoo.exceptions import UserError
+
 
 class FleetWeeklyLiquidation(models.Model):
     _name = 'fleet.weekly.liquidation'
-    _description = 'Weekly Liquidation for Fleet Drivers'
+    _description = 'Liquidación semanal para conductores de flotas'
     _order = 'name desc'
 
     name = fields.Char(string='Reference', required=True, copy=False, readonly=True, default='New')
     contract_id = fields.Many2one('fleet.vehicle.log.contract', string='Contract', required=True)
-    driver_id = fields.Many2one('res.partner', related='contract_id.purchaser_id', string='Driver', store=True)
-    week_of_year = fields.Char(string='Week', required=True)
+    driver_id = fields.Many2one(
+        'res.partner',
+        string='Driver',
+        compute='_compute_driver_id',
+        store=True
+    )
+    week_of_year = fields.Char(string='Semana', required=True)
 
-    daily_log_ids = fields.One2many('fleet.driver.daily.log', 'liquidation_id', string='Daily Logs')
+    daily_log_ids = fields.One2many('fleet.driver.daily.log', 'liquidation_id', string='Registros diarios')
 
-    days_worked = fields.Integer(string='Days Worked', compute='_compute_totals', store=True)
-    total_hours = fields.Float(string='Total Hours', compute='_compute_totals', store=True)
-    amount_total = fields.Monetary(string='Total Amount', compute='_compute_totals', store=True, currency_field='currency_id')
+    days_worked = fields.Integer(string='Días trabajados', compute='_compute_totals', store=True)
+    total_hours = fields.Float(string='Total de horas', compute='_compute_totals', store=True)
+    amount_total = fields.Monetary(
+        string='Total Amount',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id'
+    )
 
     currency_id = fields.Many2one('res.currency', related='contract_id.company_id.currency_id')
-    invoice_id = fields.Many2one('account.move', string='Invoice/Bill', readonly=True)
+    invoice_id = fields.Many2one('account.move', string='Factura', readonly=True)
 
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('invoiced', 'Invoiced/Billed'),
+        ('invoiced', 'Invoiced'),
         ('paid', 'Paid')
     ], default='draft', string='Status', compute='_compute_state', store=True)
+
+    @api.depends('contract_id.purchaser_id', 'contract_id.partner_id')
+    def _compute_driver_id(self):
+        for liq in self:
+            liq.driver_id = liq.contract_id.purchaser_id or liq.contract_id.partner_id
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -61,9 +77,6 @@ class FleetWeeklyLiquidation(models.Model):
             worked_logs = liq.daily_log_ids.filtered(lambda l: l.worked)
             liq.days_worked = len(worked_logs)
             liq.total_hours = sum(worked_logs.mapped('hours_worked'))
-
-            # Assuming contract.amount is the daily rate
-            # In standard Odoo, amount is often recurrent cost. For this module, we interpret it as daily rate.
             daily_rate = liq.contract_id.amount if liq.contract_id else 0.0
             liq.amount_total = liq.days_worked * daily_rate
 
@@ -74,53 +87,58 @@ class FleetWeeklyLiquidation(models.Model):
                 liq.state = 'draft'
             elif liq.invoice_id.payment_state in ('in_payment', 'paid'):
                 liq.state = 'paid'
+                # Pasa a paid cuando la factura contable se pague realmente
+                liq.daily_log_ids.write({'state': 'paid'})
             else:
                 liq.state = 'invoiced'
 
     def action_generate_invoice(self):
         self.ensure_one()
         if self.invoice_id:
-            raise UserError(_("An invoice is already linked to this liquidation."))
-        if not self.contract_id.purchaser_id:
-            raise UserError(_("The contract has no driver (purchaser) assigned."))
+            raise UserError(_("Ya existe una factura vinculada a esta liquidación."))
+        if not self.driver_id:
+            raise UserError(_("El contrato no tiene conductor asignado."))
+        if self.days_worked <= 0:
+            raise UserError(_("No se puede generar factura para una liquidación con 0 días trabajados."))
 
-        # Try to find a default expense account for the bill line
-        journal = self.env['account.journal'].search([('type', '=', 'purchase'), ('company_id', '=', self.contract_id.company_id.id or self.env.company.id)], limit=1)
+        company = self.contract_id.company_id or self.env.company
+
+        # 1. Buscar Diario de Ventas (Factura Cliente)
+        journal = self.env['account.journal'].search([
+            ('type', '=', 'sale'),
+            ('company_id', '=', company.id)
+        ], limit=1)
         if not journal:
-            raise UserError(_("Please define a Purchase journal for the company to create Vendor Bills."))
+            raise UserError(_("Por favor configure un diario de ventas para la compañía '%s'.") % company.name)
 
-        account = journal.default_account_id
-        if not account:
-            # Fallback to searching for an expense account
-            account = self.env['account.account'].search([
-                ('account_type', '=', 'expense'),
-                ('company_id', '=', self.contract_id.company_id.id or self.env.company.id)
-            ], limit=1)
+        # 2. Cuenta de Ingresos por defecto
+        account = journal.default_account_id or self.env['account.account'].search([
+            ('account_type', 'in', ('income', 'income_other')),
+            ('company_id', '=', company.id)
+        ], limit=1)
 
         if not account:
-             raise UserError(_("Please configure a default expense account on the purchase journal or create an expense account."))
+            raise UserError(_("Configure una cuenta de ingresos en el diario de ventas o en el plan contable."))
 
-        move_type = 'in_invoice'
-
+        # 3. Crear Factura Cliente ('out_invoice')
         invoice_vals = {
-            'move_type': move_type,
+            'move_type': 'out_invoice',
             'partner_id': self.driver_id.id,
             'invoice_date': fields.Date.context_today(self),
-            'ref': self.name,
+            'ref': f"{self.name} - {self.week_of_year}",
             'journal_id': journal.id,
-            'invoice_line_ids': [(0, 0, {
-                'name': f'Weekly Liquidation {self.week_of_year}',
-                'quantity': self.days_worked,
-                'price_unit': self.contract_id.amount, # Daily rate
-                'account_id': account.id,
-            })],
+            'invoice_line_ids': [
+                Command.create({
+                    'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
+                    'quantity': self.days_worked,
+                    'price_unit': self.contract_id.amount,
+                    'account_id': account.id,
+                })
+            ],
         }
 
         move = self.env['account.move'].create(invoice_vals)
         self.invoice_id = move.id
-
-        # Mark daily logs as paid
-        self.daily_log_ids.write({'state': 'paid'})
 
         return {
             'type': 'ir.actions.act_window',

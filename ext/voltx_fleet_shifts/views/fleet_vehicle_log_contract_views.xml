@@ -8,31 +8,38 @@
         <field name="inherit_id" ref="fleet.fleet_vehicle_log_contract_view_form"/>
         <field name="arch" type="xml">
 
-            <xpath expr="//sheet" position="inside">
+            <!-- 1. Smart Buttons en el Button Box oficial -->
+            <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_daily_logs" type="object" class="oe_stat_button" icon="fa-calendar">
                     <field name="daily_logs_count" widget="statinfo" string="Registros diarios"/>
                 </button>
                 <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
-                    <field name="invoice_count" widget="statinfo" string="Factura"/>
+                    <field name="invoice_count" widget="statinfo" string="Facturas"/>
                 </button>
             </xpath>
 
+            <!-- 2. Campo Turno al lado del seguro/conductor -->
             <xpath expr="//field[@name='insurer_id']" position="after">
                 <field name="shift_id"/>
             </xpath>
 
+            <!-- 3. Notebook con las Liquidaciones Semanales al final de la ficha -->
             <xpath expr="//sheet" position="inside">
                 <notebook>
                     <page string="Liquidaciones semanales" name="weekly_liquidations">
                         <field name="liquidation_ids">
-                            <list editable="bottom" create="1">
+                            <list editable="bottom" decoration-info="state == 'draft'" decoration-success="state == 'paid'">
                                 <field name="week_of_year"/>
                                 <field name="days_worked" readonly="1"/>
-                                <field name="total_hours" readonly="1"/>
+                                <field name="total_hours" widget="float_time" readonly="1"/>
                                 <field name="amount_total" readonly="1"/>
                                 <field name="invoice_id" readonly="1"/>
-                                <field name="state" readonly="1"/>
-                                <button name="action_generate_invoice" type="object" string="Liquidar y Facturar" class="btn-primary" invisible="invoice_id != False"/>
+                                <field name="state" widget="badge"/>
+                                <button name="action_generate_invoice" 
+                                        type="object" 
+                                        string="Liquidar y Facturar" 
+                                        class="btn-primary" 
+                                        invisible="invoice_id"/>
                             </list>
                         </field>
                     </page>
