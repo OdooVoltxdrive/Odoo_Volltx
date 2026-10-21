@@ -7,6 +7,9 @@ class FleetVehicleLogContract(models.Model):
     shift_id = fields.Many2one('fleet.work.shift', string='Shift')
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
 
+    # Campo relacionado para los conductores del vehículo (usado para el dominio)
+    vehicle_driver_ids = fields.Many2many(related='vehicle_id.driver_ids')
+
     # Campo para obtener la moneda secundaria de la compañía (Dólar, etc.) si la hay
     secondary_currency_id = fields.Many2one(
         'res.currency',
@@ -46,7 +49,7 @@ class FleetVehicleLogContract(models.Model):
         if active_log:
             active_log.action_start_shift()
         else:
-            driver = self.purchaser_id or self.partner_id
+            driver = self.purchaser_id
             log = self.env['fleet.driver.daily.log'].create({
                 'contract_id': self.id,
                 'vehicle_id': self.vehicle_id.id,
@@ -66,7 +69,7 @@ class FleetVehicleLogContract(models.Model):
 
     def action_view_daily_logs(self):
         self.ensure_one()
-        driver = self.purchaser_id or self.partner_id
+        driver = self.purchaser_id
         return {
             'name': _('Daily Logs'),
             'view_mode': 'list,kanban,calendar,pivot,form',
