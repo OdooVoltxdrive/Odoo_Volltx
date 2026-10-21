@@ -10,6 +10,9 @@ class FleetVehicleLogContract(models.Model):
     # Campo relacionado para los conductores del vehículo (usado para el dominio)
     vehicle_driver_ids = fields.Many2many(related='vehicle_id.driver_ids')
 
+    # Si el usuario agregó un campo customizado cost_generate, lo forzamos a ser monetario
+    cost_generate = fields.Monetary(string="Costo Generado", currency_field='secondary_currency_id')
+
     # Campo para obtener la moneda secundaria de la compañía (Dólar, etc.) si la hay
     secondary_currency_id = fields.Many2one(
         'res.currency',
