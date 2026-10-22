@@ -36,13 +36,33 @@ class FleetVehicle(models.Model):
         return records
 
     def write(self, vals):
-        # Capture current driver_ids before super write to compare removals
         old_driver_ids = {}
         if 'driver_ids' in vals:
             for vehicle in self:
                 old_driver_ids[vehicle.id] = set(vehicle.driver_ids.ids)
 
+        # -------------------------------------------------------------------------
+        # BLOQUEO CLAVE: Si Odoo o el usuario cambia el driver_id del vehículo,
+        # guardamos los purchaser_id actuales de los contratos para restaurarlos
+        # si Odoo intenta sobreescribirlos de forma masiva en el super().
+        # -------------------------------------------------------------------------
+        contracts_before = {}
+        if 'driver_id' in vals:
+            for vehicle in self:
+                contracts = self.env['fleet.vehicle.log.contract'].search([
+                    ('vehicle_id', '=', vehicle.id),
+                    ('state', 'in', ['open', 'futur']),
+                ])
+                contracts_before[vehicle.id] = [(c, c.purchaser_id.id) for c in contracts if c.purchaser_id]
+
         res = super(FleetVehicle, self).write(vals)
+
+        # Restaurar el conductor original de cada contrato si Odoo base los alteró
+        if contracts_before:
+            for vehicle_id, contract_data in contracts_before.items():
+                for contract, original_purchaser_id in contract_data:
+                    if contract.exists() and contract.purchaser_id.id != original_purchaser_id:
+                        super(models.Model, contract).write({'purchaser_id': original_purchaser_id})
 
         if 'driver_ids' in vals:
             for vehicle in self:
@@ -52,7 +72,7 @@ class FleetVehicle(models.Model):
                 added_ids = new_ids - old_ids
                 removed_ids = old_ids - new_ids
 
-                # Cerrar los logs de los conductores que fueron desasignados
+                # Cerrar los logs de los conductores desasignados
                 for driver_id in removed_ids:
                     active_logs = self.env['fleet.vehicle.assignation.log'].search([
                         ('vehicle_id', '=', vehicle.id),
@@ -62,9 +82,8 @@ class FleetVehicle(models.Model):
                     if active_logs:
                         active_logs.write({'date_end': fields.Date.today()})
 
-                # Buscamos crear en el historial los conductores que se asignaron
+                # Crear logs y contratos para los conductores añadidos
                 for driver_id in added_ids:
-                    # Verificar si este conductor ya tiene un log activo en este vehiculo (sin fecha de fin)
                     existing_log = self.env['fleet.vehicle.assignation.log'].search([
                         ('vehicle_id', '=', vehicle.id),
                         ('driver_id', '=', driver_id),
@@ -78,7 +97,6 @@ class FleetVehicle(models.Model):
                             'date_start': fields.Date.today(),
                         })
 
-                    # Creación Automática de Contrato para el nuevo conductor asignado
                     existing_contract = self.env['fleet.vehicle.log.contract'].search([
                         ('vehicle_id', '=', vehicle.id),
                         ('purchaser_id', '=', driver_id),
@@ -92,6 +110,8 @@ class FleetVehicle(models.Model):
                             'state': 'open',
                             'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
                         })
+
+                vehicle.update_drivers_by_shift()
 
         return res
 
