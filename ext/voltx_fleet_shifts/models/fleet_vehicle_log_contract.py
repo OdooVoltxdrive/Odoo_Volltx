@@ -4,6 +4,14 @@ from odoo import models, fields, api, _
 class FleetVehicleLogContract(models.Model):
     _inherit = 'fleet.vehicle.log.contract'
 
+    
+    # 1. Redefinimos purchaser_id como campo propio persistente
+    purchaser_id = fields.Many2one(
+        'res.partner',
+        string='Driver',
+        tracking=True,
+        help="Conductor titular y exclusivo de este contrato"
+    )
     shift_id = fields.Many2one('fleet.work.shift', string='Shift')
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
 
