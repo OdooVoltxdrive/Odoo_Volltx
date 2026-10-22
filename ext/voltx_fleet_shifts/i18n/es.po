@@ -1,0 +1,311 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: voltx_fleet_shifts 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-26 12:00+0000\n"
+"PO-Revision-Date: 2023-10-26 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Assignment"
+msgstr "Asignación"
+
+msgid "Check In"
+msgstr "Check In"
+
+msgid "Check Out"
+msgstr "Check Out"
+
+msgid "Check-in (Start Shift)"
+msgstr "Recepción (Iniciar Turno)"
+
+msgid "Check-out (End Shift)"
+msgstr "Check-out (Finalizar Turno)"
+
+msgid "Assigned Drivers"
+msgstr "Conductores Asignados"
+
+msgid "Configuration"
+msgstr "Configuración"
+
+msgid "Set up a revenue account in the sales journal or in the chart of accounts."
+msgstr "Configure una cuenta de ingresos en el diario de ventas o en el plan contable."
+
+msgid "Contract"
+msgstr "Contrato"
+
+msgid "Create the first work shift"
+msgstr "Crea el primer turno de trabajo"
+
+msgid "Daily Log"
+msgstr "Registro diario"
+
+msgid "Daily Logs"
+msgstr "Registros Diarios"
+
+msgid "Define morning shifts, evening shifts, or 12-hour mixed shifts to assign to fleet contracts."
+msgstr "Define horarios matutinos, vespertinos o jornadas mixtas de 12 horas para asignar a los contratos de flota."
+
+msgid "Done"
+msgstr "Finalizado"
+
+msgid "Driver"
+msgstr "Conductor"
+
+msgid "Application Days"
+msgstr "Días de Aplicación"
+
+msgid "Days worked"
+msgstr "Días trabajados"
+
+msgid "Ejemplo: 14.0 = 14:00, 6.0 = 06:00 (día siguiente)"
+msgstr "Ejemplo: 14.0 = 14:00, 6.0 = 06:00 (día siguiente)"
+
+msgid "Ejemplo: 6.0 = 06:00, 18.0 = 18:00"
+msgstr "Ejemplo: 6.0 = 06:00, 18.0 = 18:00"
+
+msgid "The contract does not have an assigned driver."
+msgstr "El contrato no tiene conductor asignado."
+
+msgid "Bill"
+msgstr "Factura"
+
+msgid "Invoices"
+msgstr "Facturas"
+
+msgid "End shift"
+msgstr "Finalizar turno"
+
+msgid "Generate Customer Invoice"
+msgstr "Generar Factura Cliente"
+
+msgid "End Time"
+msgstr "Hora Fin"
+
+msgid "Start Time"
+msgstr "Hora Inicio"
+
+msgid "Schedules"
+msgstr "Horarios"
+
+msgid "Hours per Day"
+msgstr "Hrs por Día"
+
+msgid "Hours Worked"
+msgstr "Hrs Asistidas"
+
+msgid "Hrs"
+msgstr "Hrs"
+
+msgid "Start shift"
+msgstr "Iniciar turno"
+
+msgid "Invoice Count"
+msgstr "Nro de Facturas"
+
+msgid "Invoices"
+msgstr "Facturas"
+
+msgid "Work Schedule and Hours"
+msgstr "Jornada y Horas"
+
+msgid "LIQ/%(year)s/"
+msgstr "LIQ/%(year)s/"
+
+msgid "LOG/%(year)s/"
+msgstr "LOG/%(year)s/"
+
+msgid "The start and end times must be between 00:00 and 23:59."
+msgstr "Las horas de inicio y fin deben estar comprendidas entre las 00:00 y las 23:59."
+
+msgid "Settlements are generated automatically by linking the completed daily records for each contract on a weekly basis."
+msgstr "Las liquidaciones se generan automáticamente vinculando los registros diarios finalizados de cada contrato por semana."
+
+msgid "Weekly settlements"
+msgstr "Liquidaciones semanales"
+
+msgid "Settle and Invoice"
+msgstr "Liquidar y Facturar"
+
+msgid "Log Reference"
+msgstr "Referencia de Registro"
+
+msgid "Logs Count"
+msgstr "Nro de Registros"
+
+msgid "Secondary Currency"
+msgstr "Moneda Secundaria"
+
+msgid "No weekly settlements recorded"
+msgstr "No hay liquidaciones semanales registradas"
+
+msgid "An invoice cannot be generated for a settlement with 0 days worked."
+msgstr "No se puede generar factura para una liquidación con 0 días trabajados."
+
+msgid "Shift Name"
+msgstr "Turno"
+
+msgid "Paid"
+msgstr "Pagado"
+
+msgid "Please set up a sales journal for the company '%s'."
+msgstr "Por favor configure un diario de ventas para la compañía '%s'."
+
+msgid "Reference"
+msgstr "Referencia"
+
+msgid "Reference"
+msgstr "Referencia"
+
+msgid "Daily records"
+msgstr "Registros diarios"
+
+msgid "Week"
+msgstr "Semana"
+
+msgid "Shift"
+msgstr "Turno"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Shift Type"
+msgstr "Tipo de Turno"
+
+msgid "Total Amount"
+msgstr "Monto Total"
+
+msgid "Total hours"
+msgstr "Total de horas"
+
+msgid "Totals"
+msgstr "Totales"
+
+msgid "Work shifts"
+msgstr "Turnos de trabajo"
+
+msgid "Vehicle"
+msgstr "Vehículo"
+
+msgid "Week"
+msgstr "Semana"
+
+msgid "Weekly Liquidation"
+msgstr "Liquidación Semanal"
+
+msgid "Weekly Liquidations"
+msgstr "Liquidaciones Semanales"
+
+msgid "Worked"
+msgstr "Trabajado"
+
+msgid "An invoice linked to this settlement already exists."
+msgstr "Ya existe una factura vinculada a esta liquidación."
+
+msgid "[('id', 'in', vehicle_driver_ids)]"
+msgstr "[('id', 'in', vehicle_driver_ids)]"
+
+msgid "fleet.driver.daily.log"
+msgstr "fleet.driver.daily.log"
+
+msgid "fleet.driver.daily.log.calendar"
+msgstr "fleet.driver.daily.log.calendar"
+
+msgid "fleet.driver.daily.log.form"
+msgstr "fleet.driver.daily.log.form"
+
+msgid "fleet.driver.daily.log.kanban"
+msgstr "fleet.driver.daily.log.kanban"
+
+msgid "fleet.driver.daily.log.list"
+msgstr "fleet.driver.daily.log.list"
+
+msgid "fleet.driver.daily.log.pivot"
+msgstr "fleet.driver.daily.log.pivot"
+
+msgid "fleet.vehicle"
+msgstr "fleet.vehicle"
+
+msgid "fleet.vehicle.form.inherit.shifts"
+msgstr "fleet.vehicle.form.inherit.shifts"
+
+msgid "fleet.vehicle.log.contract"
+msgstr "fleet.vehicle.log.contract"
+
+msgid "fleet.vehicle.log.contract.form.inherit.shifts"
+msgstr "fleet.vehicle.log.contract.form.inherit.shifts"
+
+msgid "fleet.weekly.liquidation"
+msgstr "fleet.weekly.liquidation"
+
+msgid "fleet.weekly.liquidation.form"
+msgstr "fleet.weekly.liquidation.form"
+
+msgid "fleet.weekly.liquidation.list"
+msgstr "fleet.weekly.liquidation.list"
+
+msgid "fleet.work.shift"
+msgstr "fleet.work.shift"
+
+msgid "fleet.work.shift.form"
+msgstr "fleet.work.shift.form"
+
+msgid "fleet.work.shift.list"
+msgstr "fleet.work.shift.list"
+
+msgid "list,form"
+msgstr "list,form"
+
+msgid "list,kanban,calendar,pivot,form"
+msgstr "list,kanban,calendar,pivot,form"
+
+msgid "monetary"
+msgstr "monetary"
+
+msgid "{'currency_field': 'secondary_currency_id'}"
+msgstr "{'currency_field': 'secondary_currency_id'}"
+
+msgid "Fleet Work Shifts"
+msgstr "Turnos de Trabajo de Flota"
+
+msgid "Morning (AM)"
+msgstr "Mañana (AM)"
+
+msgid "Afternoon (PM)"
+msgstr "Tarde (PM)"
+
+msgid "Nigth"
+msgstr "Noche"
+
+msgid "mixed / 12 Hours"
+msgstr "Mixto / 12 Horas"
+
+msgid "Every day"
+msgstr "Todos los días"
+
+msgid "Monday to Friday"
+msgstr "Lunes a Viernes"
+
+msgid "Saturdays and Sundays (Weekend)"
+msgstr "Sábados y Domingos (Fin de Semana)"
+
+msgid "Daily Log of Driver Journeys"
+msgstr "Registro Diario de Viajes del Conductor"
+
+msgid "Draft"
+msgstr "Borrador"
+
+msgid "Active (In Progress)"
+msgstr "Activo (En Progreso)"
+
+msgid "Weekly settlement for fleet drivers"
+msgstr "Liquidación semanal para conductores de flotas"
+
+msgid "Invoiced"
+msgstr "Facturado"
+

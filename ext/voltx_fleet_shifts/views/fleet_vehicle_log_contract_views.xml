@@ -9,19 +9,21 @@
         <field name="arch" type="xml">
 
             <!-- 0. Botones de acción en el header -->
-            <xpath expr="//header" position="inside">
+            <!--xpath expr="//header" position="inside">
                 <button name="action_start_daily_shift" string="Check-in (Iniciar Turno)" type="object" class="oe_highlight" icon="fa-play"/>
                 <button name="action_end_daily_shift" string="Check-out (Finalizar Turno)" type="object" class="btn-secondary" icon="fa-stop"/>
-            </xpath>
+            </xpath-->
 
             <!-- 1. Smart Buttons en el Button Box oficial -->
-            <xpath expr="//sheet" position="before">
-                <button name="action_view_daily_logs" type="object" class="oe_stat_button" icon="fa-calendar">
-                    <field name="daily_logs_count" widget="statinfo" string="Registros diarios"/>
-                </button>
-                <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
-                    <field name="invoice_count" widget="statinfo" string="Facturas"/>
-                </button>
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_daily_logs" type="object" class="oe_stat_button" icon="fa-calendar">
+                        <field name="daily_logs_count" widget="statinfo" string="Registros diarios"/>
+                    </button>
+                    <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                        <field name="invoice_count" widget="statinfo" string="Facturas"/>
+                    </button>
+                </div>
             </xpath>
 
             <!-- 2. Campo Turno al lado del seguro/conductor -->
