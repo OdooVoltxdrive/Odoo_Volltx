@@ -14,6 +14,18 @@ class FleetVehicle(models.Model):
         string='Conductores Asignados'
     )
 
+    current_shift_driver_id = fields.Many2one(
+        'res.partner',
+        string='Conductor en Turno',
+        help="Conductor asignado al turno que está transcurriendo en este momento"
+    )
+
+    next_shift_driver_id = fields.Many2one(
+        'res.partner',
+        string='Próximo Conductor',
+        help="Conductor asignado al siguiente turno de la jornada"
+    )
+
     @api.model_create_multi
     def create(self, vals_list):
         records = super(FleetVehicle, self).create(vals_list)
@@ -160,6 +172,7 @@ class FleetVehicle(models.Model):
             return current_hour >= shift.start_hour or current_hour < shift.end_hour
 
     def update_drivers_by_shift(self):
+        """Actualiza current_shift_driver_id y next_shift_driver_id sin tocar driver_id."""
         weekday, current_hour = self._get_current_time_and_day()
 
         for vehicle in self:
@@ -193,12 +206,18 @@ class FleetVehicle(models.Model):
                 )
                 next_driver = closest_contract.purchaser_id
 
+            # Si no coinciden horarios pero hay conductores asignados
+            if not current_driver and vehicle.driver_ids:
+                current_driver = vehicle.driver_ids[0]
+                if len(vehicle.driver_ids) > 1:
+                    next_driver = vehicle.driver_ids[1]
+
             vals = {}
-            if current_driver and vehicle.driver_id != current_driver:
-                vals['driver_id'] = current_driver.id
-            if vehicle.future_driver_id != next_driver:
-                vals['future_driver_id'] = next_driver.id if next_driver else False
+            if vehicle.current_shift_driver_id != current_driver:
+                vals['current_shift_driver_id'] = current_driver.id if current_driver else False
+            if vehicle.next_shift_driver_id != next_driver:
+                vals['next_shift_driver_id'] = next_driver.id if next_driver else False
 
             if vals:
-                ### === CAMBIO 4: Pasamos sync_vehicle_turn=True para que Odoo no altere los contratos ===
-                super(FleetVehicle, vehicle.with_context(sync_vehicle_turn=True)).write(vals)
+                # Escribimos exclusivamente en los campos nuevos
+                super(FleetVehicle, vehicle).write(vals)
