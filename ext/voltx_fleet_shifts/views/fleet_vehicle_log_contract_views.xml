@@ -38,7 +38,7 @@
                 <attribute name="invisible">0</attribute>
                 <attribute name="readonly">0</attribute>
                 <attribute name="domain">[('id', 'in', vehicle_driver_ids)]</attribute>
-                <attribute name="options">{'no_create': True}</attribute>]</attribute>
+                <attribute name="options">{'no_create': True}</attribute>
             </xpath>
 
             <!-- 2.5 Modificar campos amount y cost_generated (si existe en Odoo base) para forzar moneda -->
