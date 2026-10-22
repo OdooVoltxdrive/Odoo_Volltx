@@ -43,10 +43,10 @@
                 <attribute name="widget">monetary</attribute>
                 <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
             </xpath>
-            <xpath expr="//field[@name='cost_generate']" position="attributes">
+            <!--xpath expr="//field[@name='cost_generate']" position="attributes">
                 <attribute name="widget">monetary</attribute>
                 <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
-            </xpath>
+            </xpath-->
             <xpath expr="//field[@name='cost_generated']" position="attributes">
                 <attribute name="widget">monetary</attribute>
                 <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
