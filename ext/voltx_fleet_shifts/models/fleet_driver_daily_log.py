@@ -41,7 +41,7 @@ class FleetDriverDailyLog(models.Model):
         """Al seleccionar un contrato, auto-rellena vehículo, conductor y turno."""
         if self.contract_id:
             self.vehicle_id = self.contract_id.vehicle_id
-            self.driver_id = self.contract_id.purchaser_id or self.contract_id.partner_id
+            self.driver_id = self.contract_id.purchaser_id 
             self.shift_id = self.contract_id.shift_id
 
     @api.depends('check_in', 'check_out')

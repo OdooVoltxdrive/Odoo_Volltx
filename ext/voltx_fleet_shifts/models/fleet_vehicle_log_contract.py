@@ -4,14 +4,19 @@ from odoo import models, fields, api, _
 class FleetVehicleLogContract(models.Model):
     _inherit = 'fleet.vehicle.log.contract'
 
+    
+    # 1. Redefinimos purchaser_id como campo propio persistente
+    purchaser_id = fields.Many2one(
+        'res.partner',
+        string='Driver',
+        tracking=True,
+        help="Conductor titular y exclusivo de este contrato"
+    )
     shift_id = fields.Many2one('fleet.work.shift', string='Shift')
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
 
     # Campo relacionado para los conductores del vehículo (usado para el dominio)
     vehicle_driver_ids = fields.Many2many(related='vehicle_id.driver_ids')
-
-    # Si el usuario agregó un campo customizado cost_generate, lo forzamos a ser monetario
-    cost_generate = fields.Monetary(string="Costo Generado", currency_field='secondary_currency_id')
 
     # Campo para obtener la moneda secundaria de la compañía (Dólar, etc.) si la hay
     secondary_currency_id = fields.Many2one(

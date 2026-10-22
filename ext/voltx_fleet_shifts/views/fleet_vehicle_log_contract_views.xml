@@ -9,19 +9,21 @@
         <field name="arch" type="xml">
 
             <!-- 0. Botones de acción en el header -->
-            <xpath expr="//header" position="inside">
+            <!--xpath expr="//header" position="inside">
                 <button name="action_start_daily_shift" string="Check-in (Iniciar Turno)" type="object" class="oe_highlight" icon="fa-play"/>
                 <button name="action_end_daily_shift" string="Check-out (Finalizar Turno)" type="object" class="btn-secondary" icon="fa-stop"/>
-            </xpath>
+            </xpath-->
 
             <!-- 1. Smart Buttons en el Button Box oficial -->
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_daily_logs" type="object" class="oe_stat_button" icon="fa-calendar">
-                    <field name="daily_logs_count" widget="statinfo" string="Registros diarios"/>
-                </button>
-                <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
-                    <field name="invoice_count" widget="statinfo" string="Facturas"/>
-                </button>
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_daily_logs" type="object" class="oe_stat_button" icon="fa-calendar">
+                        <field name="daily_logs_count" widget="statinfo" string="Registros diarios"/>
+                    </button>
+                    <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                        <field name="invoice_count" widget="statinfo" string="Facturas"/>
+                    </button>
+                </div>
             </xpath>
 
             <!-- 2. Campo Turno al lado del seguro/conductor -->
@@ -36,15 +38,18 @@
                 <attribute name="domain">[('id', 'in', vehicle_driver_ids)]</attribute>
             </xpath>
 
-            <!-- 2.5 Modificar campos amount y cost_generated (si existe en Odoo base) para forzar moneda -->
-            <!-- Usamos un xpath flexible que no crasheará si el campo cost_generate no existe -->
+            <!-- 2.5 Modificar campos amount y cost_generate (si existe en Odoo base) para forzar moneda -->
             <xpath expr="//field[@name='amount']" position="attributes">
                 <attribute name="widget">monetary</attribute>
                 <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
             </xpath>
-            <!-- Agregar campo cost_generate si no está en la vista para asegurar que el modelo lo registre -->
-            <xpath expr="//field[@name='amount']" position="after">
-                <field name="cost_generate" widget="monetary" options="{'currency_field': 'secondary_currency_id'}" invisible="1"/>
+            <!--xpath expr="//field[@name='cost_generate']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+                <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
+            </xpath-->
+            <xpath expr="//field[@name='cost_generated']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+                <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
             </xpath>
 
             <!-- 3. Notebook con las Liquidaciones Semanales al final de la ficha -->
