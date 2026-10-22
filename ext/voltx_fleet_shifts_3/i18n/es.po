@@ -1,0 +1,317 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following module:
+# 	* voltx_fleet_shifts
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: voltx_fleet_shifts 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-22 01:00+0000\n"
+"PO-Revision-Date: 2026-10-22 01:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: voltx_fleet_shifts
+msgid "Assignment"
+msgstr "Asignación"
+
+#. module: voltx_fleet_shifts
+msgid "Check In"
+msgstr "Check In"
+
+#. module: voltx_fleet_shifts
+msgid "Check Out"
+msgstr "Check Out"
+
+#. module: voltx_fleet_shifts
+msgid "Check-in (Start Shift)"
+msgstr "Recepción (Iniciar Turno)"
+
+#. module: voltx_fleet_shifts
+msgid "Check-out (End Shift)"
+msgstr "Check-out (Finalizar Turno)"
+
+#. module: voltx_fleet_shifts
+msgid "Assigned Drivers"
+msgstr "Conductores Asignados"
+
+#. module: voltx_fleet_shifts
+msgid "Configuration"
+msgstr "Configuración"
+
+#. module: voltx_fleet_shifts
+msgid "Set up a revenue account in the sales journal or in the chart of accounts."
+msgstr "Configure una cuenta de ingresos en el diario de ventas o en el plan contable."
+
+#. module: voltx_fleet_shifts
+msgid "Contract"
+msgstr "Contrato"
+
+#. module: voltx_fleet_shifts
+msgid "Create the first work shift"
+msgstr "Crea el primer turno de trabajo"
+
+#. module: voltx_fleet_shifts
+msgid "Daily Log"
+msgstr "Registro diario"
+
+#. module: voltx_fleet_shifts
+msgid "Daily Logs"
+msgstr "Registros Diarios"
+
+#. module: voltx_fleet_shifts
+msgid "Define morning shifts, evening shifts, or 12-hour mixed shifts to assign to fleet contracts."
+msgstr "Define horarios matutinos, vespertinos o jornadas mixtas de 12 horas para asignar a los contratos de flota."
+
+#. module: voltx_fleet_shifts
+msgid "Done"
+msgstr "Finalizado"
+
+#. module: voltx_fleet_shifts
+msgid "Driver"
+msgstr "Conductor"
+
+#. module: voltx_fleet_shifts
+msgid "Application Days"
+msgstr "Días de Aplicación"
+
+#. module: voltx_fleet_shifts
+msgid "Days worked"
+msgstr "Días trabajados"
+
+#. module: voltx_fleet_shifts
+msgid "Ejemplo: 14.0 = 14:00, 6.0 = 06:00 (día siguiente)"
+msgstr "Ejemplo: 14.0 = 14:00, 6.0 = 06:00 (día siguiente)"
+
+#. module: voltx_fleet_shifts
+msgid "Ejemplo: 6.0 = 06:00, 18.0 = 18:00"
+msgstr "Ejemplo: 6.0 = 06:00, 18.0 = 18:00"
+
+#. module: voltx_fleet_shifts
+msgid "The contract does not have an assigned driver."
+msgstr "El contrato no tiene conductor asignado."
+
+#. module: voltx_fleet_shifts
+msgid "Bill"
+msgstr "Factura"
+
+#. module: voltx_fleet_shifts
+msgid "Invoices"
+msgstr "Facturas"
+
+#. module: voltx_fleet_shifts
+msgid "End shift"
+msgstr "Finalizar turno"
+
+#. module: voltx_fleet_shifts
+msgid "Generate Customer Invoice"
+msgstr "Generar Factura Cliente"
+
+#. module: voltx_fleet_shifts
+msgid "End Time"
+msgstr "Hora Fin"
+
+#. module: voltx_fleet_shifts
+msgid "Start Time"
+msgstr "Hora Inicio"
+
+#. module: voltx_fleet_shifts
+msgid "Schedules"
+msgstr "Horarios"
+
+#. module: voltx_fleet_shifts
+msgid "Hours per Day"
+msgstr "Hrs por Día"
+
+#. module: voltx_fleet_shifts
+msgid "Hours Worked"
+msgstr "Hrs Asistidas"
+
+#. module: voltx_fleet_shifts
+msgid "Hrs"
+msgstr "Hrs"
+
+#. module: voltx_fleet_shifts
+msgid "Start shift"
+msgstr "Iniciar turno"
+
+#. module: voltx_fleet_shifts
+msgid "Invoice Count"
+msgstr "Nro de Facturas"
+
+#. module: voltx_fleet_shifts
+msgid "Work Schedule and Hours"
+msgstr "Jornada y Horas"
+
+#. module: voltx_fleet_shifts
+msgid "LIQ/%(year)s/"
+msgstr "LIQ/%(year)s/"
+
+#. module: voltx_fleet_shifts
+msgid "LOG/%(year)s/"
+msgstr "LOG/%(year)s/"
+
+#. module: voltx_fleet_shifts
+msgid "The start and end times must be between 00:00 and 23:59."
+msgstr "Las horas de inicio y fin deben estar comprendidas entre las 00:00 y las 23:59."
+
+#. module: voltx_fleet_shifts
+msgid "Settlements are generated automatically by linking the completed daily records for each contract on a weekly basis."
+msgstr "Las liquidaciones se generan automáticamente vinculando los registros diarios finalizados de cada contrato por semana."
+
+#. module: voltx_fleet_shifts
+msgid "Weekly settlements"
+msgstr "Liquidaciones semanales"
+
+#. module: voltx_fleet_shifts
+msgid "Settle and Invoice"
+msgstr "Liquidar y Facturar"
+
+#. module: voltx_fleet_shifts
+msgid "Log Reference"
+msgstr "Referencia de Registro"
+
+#. module: voltx_fleet_shifts
+msgid "Logs Count"
+msgstr "Nro de Registros"
+
+#. module: voltx_fleet_shifts
+msgid "Secondary Currency"
+msgstr "Moneda Secundaria"
+
+#. module: voltx_fleet_shifts
+msgid "No weekly settlements recorded"
+msgstr "No hay liquidaciones semanales registradas"
+
+#. module: voltx_fleet_shifts
+msgid "An invoice cannot be generated for a settlement with 0 days worked."
+msgstr "No se puede generar factura para una liquidación con 0 días trabajados."
+
+#. module: voltx_fleet_shifts
+msgid "Shift Name"
+msgstr "Turno"
+
+#. module: voltx_fleet_shifts
+msgid "Paid"
+msgstr "Pagado"
+
+#. module: voltx_fleet_shifts
+msgid "Please set up a sales journal for the company '%s'."
+msgstr "Por favor configure un diario de ventas para la compañía '%s'."
+
+#. module: voltx_fleet_shifts
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: voltx_fleet_shifts
+msgid "Daily records"
+msgstr "Registros diarios"
+
+#. module: voltx_fleet_shifts
+msgid "Week"
+msgstr "Semana"
+
+#. module: voltx_fleet_shifts
+msgid "Shift"
+msgstr "Turno"
+
+#. module: voltx_fleet_shifts
+msgid "Status"
+msgstr "Estado"
+
+#. module: voltx_fleet_shifts
+msgid "Shift Type"
+msgstr "Tipo de Turno"
+
+#. module: voltx_fleet_shifts
+msgid "Total Amount"
+msgstr "Monto Total"
+
+#. module: voltx_fleet_shifts
+msgid "Total hours"
+msgstr "Total de horas"
+
+#. module: voltx_fleet_shifts
+msgid "Totals"
+msgstr "Totales"
+
+#. module: voltx_fleet_shifts
+msgid "Work shifts"
+msgstr "Turnos de trabajo"
+
+#. module: voltx_fleet_shifts
+msgid "Vehicle"
+msgstr "Vehículo"
+
+#. module: voltx_fleet_shifts
+msgid "Weekly Liquidation"
+msgstr "Liquidación Semanal"
+
+#. module: voltx_fleet_shifts
+msgid "Weekly Liquidations"
+msgstr "Liquidaciones Semanales"
+
+#. module: voltx_fleet_shifts
+msgid "Worked"
+msgstr "Trabajado"
+
+#. module: voltx_fleet_shifts
+msgid "An invoice linked to this settlement already exists."
+msgstr "Ya existe una factura vinculada a esta liquidación."
+
+#. module: voltx_fleet_shifts
+msgid "Fleet Work Shifts"
+msgstr "Turnos de Trabajo de Flota"
+
+#. module: voltx_fleet_shifts
+msgid "Morning (AM)"
+msgstr "Mañana (AM)"
+
+#. module: voltx_fleet_shifts
+msgid "Afternoon (PM)"
+msgstr "Tarde (PM)"
+
+#. module: voltx_fleet_shifts
+msgid "Nigth"
+msgstr "Noche"
+
+#. module: voltx_fleet_shifts
+msgid "mixed / 12 Hours"
+msgstr "Mixto / 12 Horas"
+
+#. module: voltx_fleet_shifts
+msgid "Every day"
+msgstr "Todos los días"
+
+#. module: voltx_fleet_shifts
+msgid "Monday to Friday"
+msgstr "Lunes a Viernes"
+
+#. module: voltx_fleet_shifts
+msgid "Saturdays and Sundays (Weekend)"
+msgstr "Sábados y Domingos (Fin de Semana)"
+
+#. module: voltx_fleet_shifts
+msgid "Daily Log of Driver Journeys"
+msgstr "Registro Diario de Viajes del Conductor"
+
+#. module: voltx_fleet_shifts
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: voltx_fleet_shifts
+msgid "Active (In Progress)"
+msgstr "Activo (En Progreso)"
+
+#. module: voltx_fleet_shifts
+msgid "Weekly settlement for fleet drivers"
+msgstr "Liquidación semanal para conductores de flotas"
+
+#. module: voltx_fleet_shifts
+msgid "Invoiced"
+msgstr "Facturado"
