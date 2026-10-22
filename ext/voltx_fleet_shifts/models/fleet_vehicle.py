@@ -20,19 +20,29 @@ class FleetVehicle(models.Model):
         for vehicle in records:
             if vehicle.driver_ids:
                 for driver in vehicle.driver_ids:
-                    # Crear en historial
+                    # 1. Crear registro en el historial de asignaciones
                     self.env['fleet.vehicle.assignation.log'].create({
                         'vehicle_id': vehicle.id,
                         'driver_id': driver.id,
                         'date_start': fields.Date.today(),
                     })
-                    # Creación automática de contrato
-                    self.env['fleet.vehicle.log.contract'].create({
+
+                    # 2. Creación obligada del contrato individual con su respectivo purchaser_id
+                    # Usamos with_context para que Odoo NO intente leer el driver_id del vehículo
+                    contract_vals = {
                         'vehicle_id': vehicle.id,
                         'purchaser_id': driver.id,
                         'state': 'open',
                         'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
-                    })
+                    }
+                    self.env['fleet.vehicle.log.contract'].with_context(
+                        default_purchaser_id=driver.id,
+                        tracking_disable=True,
+                        mail_create_nolog=True
+                    ).create(contract_vals)
+
+                # 3. Una vez creados todos los contratos individuales, calculamos quién conduce según el turno
+                vehicle.update_drivers_by_shift()
         return records
 
     def write(self, vals):
