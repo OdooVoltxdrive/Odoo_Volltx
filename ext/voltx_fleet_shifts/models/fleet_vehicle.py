@@ -138,7 +138,6 @@ class FleetVehicle(models.Model):
             return current_hour >= shift.start_hour or current_hour < shift.end_hour
 
     def update_drivers_by_shift(self):
-        """Evalúa los contratos abiertos con turno y actualiza driver_id y future_driver_id."""
         weekday, current_hour = self._get_current_time_and_day()
 
         for vehicle in self:
@@ -155,7 +154,10 @@ class FleetVehicle(models.Model):
             upcoming_contracts = []
 
             for contract in contracts:
-                driver = contract.purchaser_id or contract.partner_id
+                driver = contract.purchaser_id
+                if not driver:
+                    continue
+
                 if self._is_shift_matching(contract.shift_id, weekday, current_hour):
                     current_driver = driver
                 else:
@@ -167,7 +169,7 @@ class FleetVehicle(models.Model):
                     upcoming_contracts,
                     key=lambda c: (c.shift_id.start_hour - current_hour) % 24
                 )
-                next_driver = closest_contract.purchaser_id or closest_contract.partner_id
+                next_driver = closest_contract.purchaser_id
 
             vals = {}
             if current_driver and vehicle.driver_id != current_driver:
@@ -176,4 +178,5 @@ class FleetVehicle(models.Model):
                 vals['future_driver_id'] = next_driver.id if next_driver else False
 
             if vals:
-                vehicle.write(vals)
+                # Escribimos los cambios evitando alterar los contratos
+                super(FleetVehicle, vehicle).write(vals)
