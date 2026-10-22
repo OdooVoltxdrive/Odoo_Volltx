@@ -35,7 +35,7 @@
 
             <!-- Restringir la selección de conductor (purchaser_id) a aquellos asignados en el vehículo -->
 
-            
+
             <xpath expr="//field[@name='purchaser_id']" position="attributes">
                 <attribute name="invisible">0</attribute>
                 <attribute name="readonly">0</attribute>
@@ -49,10 +49,16 @@
                 <attribute name="widget">monetary</attribute>
                 <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
             </xpath>
-            <!-- Agregar campo cost_generate si no está en la vista para asegurar que el modelo lo registre -->
-            <xpath expr="//field[@name='amount']" position="after">
-                <field name="cost_generate" widget="monetary" options="{'currency_field': 'secondary_currency_id'}" invisible="1"/>
+
+            <xpath expr="//field[@name='cost_generated']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+                <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
             </xpath>
+
+            <!-- Agregar campo cost_generate si no está en la vista para asegurar que el modelo lo registre -->
+            <!--xpath expr="//field[@name='amount']" position="after">
+                <field name="cost_generate" widget="monetary" options="{'currency_field': 'secondary_currency_id'}" invisible="1"/>
+            </xpath-->
 
             <!-- 3. Notebook con las Liquidaciones Semanales al final de la ficha -->
             <xpath expr="//sheet" position="inside">
