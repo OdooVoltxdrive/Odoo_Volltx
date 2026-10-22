@@ -19,34 +19,20 @@ class FleetVehicle(models.Model):
         records = super(FleetVehicle, self).create(vals_list)
         for vehicle in records:
             if vehicle.driver_ids:
-                for index, driver in enumerate(vehicle.driver_ids):
+                for driver in vehicle.driver_ids:
                     # Crear en historial
                     self.env['fleet.vehicle.assignation.log'].create({
                         'vehicle_id': vehicle.id,
                         'driver_id': driver.id,
                         'date_start': fields.Date.today(),
                     })
-
-                    # ========================================================
-                    # [PRUEBA]: ASIGNACIÓN AUTOMÁTICA DE TURNO DE TEST
-                    # ========================================================
-                    test_shift = False
-                    all_shifts = self.env['fleet.work.shift'].search([], order='start_hour asc')
-                    if all_shifts:
-                        test_shift = all_shifts[index % len(all_shifts)].id
-                    # ========================================================
-
-                    # Creación automática de contrato individual
+                    # Creación automática de contrato
                     self.env['fleet.vehicle.log.contract'].create({
                         'vehicle_id': vehicle.id,
                         'purchaser_id': driver.id,
                         'state': 'open',
                         'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
-                        'shift_id': test_shift,  # <-- Asigna el turno de prueba
                     })
-
-                # Evaluamos los turnos para asignar chofer actual y próximo
-                vehicle.update_drivers_by_shift()
         return records
 
     def write(self, vals):
@@ -77,7 +63,7 @@ class FleetVehicle(models.Model):
                         active_logs.write({'date_end': fields.Date.today()})
 
                 # Buscamos crear en el historial los conductores que se asignaron
-                for index, driver_id in enumerate(added_ids):
+                for driver_id in added_ids:
                     # Verificar si este conductor ya tiene un log activo en este vehiculo (sin fecha de fin)
                     existing_log = self.env['fleet.vehicle.assignation.log'].search([
                         ('vehicle_id', '=', vehicle.id),
@@ -100,36 +86,17 @@ class FleetVehicle(models.Model):
                     ], limit=1)
 
                     if not existing_contract:
-                        # ====================================================
-                        # [PRUEBA]: ASIGNACIÓN AUTOMÁTICA DE TURNO DE TEST
-                        # ====================================================
-                        test_shift = False
-                        all_shifts = self.env['fleet.work.shift'].search([], order='start_hour asc')
-                        if all_shifts:
-                            test_shift = all_shifts[index % len(all_shifts)].id
-                        # ====================================================
-
                         self.env['fleet.vehicle.log.contract'].create({
                             'vehicle_id': vehicle.id,
                             'purchaser_id': driver_id,
                             'state': 'open',
                             'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
-                            'shift_id': test_shift,  # <-- Asigna el turno de prueba
                         })
-
-                # Al terminar de procesar los conductores, actualiza quién conduce según turno
-                vehicle.update_drivers_by_shift()
 
         return res
 
     def _get_current_time_and_day(self):
         """Retorna el día de la semana (0=Lun, 6=Dom) y la hora float con base en la zona horaria del usuario/empresa."""
-        # ================================================================
-        # [PRUEBA]: HORA FIJA SIMULADA
-        # 0 = Lunes, 10.0 = 10:00 AM (Cambia a 16.0 para probar la tarde)
-        return 0, 10.0  # <-- COMENTAR ESTA LÍNEA AL TERMINAR PRUEBAS
-        # ================================================================
-
         tz_name = self.env.user.tz or self.env.company.partner_id.tz or 'UTC'
         user_tz = pytz.timezone(tz_name)
         now_dt = datetime.now(user_tz)
@@ -138,8 +105,6 @@ class FleetVehicle(models.Model):
 
     def _is_shift_matching(self, shift, weekday, current_hour):
         """Valida si un turno coincide con el día y la hora consultada."""
-        if not shift:
-            return False
         # 0=Lunes, 4=Viernes, 5=Sábado, 6=Domingo
         if shift.applies_on == 'weekdays' and weekday >= 5:
             return False
@@ -170,11 +135,7 @@ class FleetVehicle(models.Model):
             upcoming_contracts = []
 
             for contract in contracts:
-                # Usar solo purchaser_id (elimina el .partner_id que causaba error)
-                driver = contract.purchaser_id
-                if not driver:
-                    continue
-
+                driver = contract.purchaser_id or contract.partner_id
                 if self._is_shift_matching(contract.shift_id, weekday, current_hour):
                     current_driver = driver
                 else:
@@ -186,7 +147,7 @@ class FleetVehicle(models.Model):
                     upcoming_contracts,
                     key=lambda c: (c.shift_id.start_hour - current_hour) % 24
                 )
-                next_driver = closest_contract.purchaser_id
+                next_driver = closest_contract.purchaser_id or closest_contract.partner_id
 
             vals = {}
             if current_driver and vehicle.driver_id != current_driver:
@@ -195,6 +156,4 @@ class FleetVehicle(models.Model):
                 vals['future_driver_id'] = next_driver.id if next_driver else False
 
             if vals:
-                # Usamos super() para guardar driver_id y future_driver_id
-                # evitando que Odoo intente alterar los contratos asociados
-                super(FleetVehicle, vehicle).write(vals)
+                vehicle.write(vals)

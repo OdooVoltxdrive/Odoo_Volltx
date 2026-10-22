@@ -7,6 +7,11 @@
         <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
         <field name="arch" type="xml">
 
+            <!-- Renombrar el campo nativo de Odoo a "Conductor actual" -->
+            <xpath expr="//field[@name='driver_id']" position="attributes">
+                <attribute name="string">Conductor actual</attribute>
+            </xpath>
+
             <!-- Asegurar que el campo se ubique justo después de Próximo conductor -->
             <xpath expr="//field[@name='future_driver_id']" position="after">
                 <field name="driver_ids" 
