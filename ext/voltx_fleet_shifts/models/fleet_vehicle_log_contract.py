@@ -6,15 +6,31 @@ class FleetVehicleLogContract(models.Model):
     _inherit = 'fleet.vehicle.log.contract'
 
     # =========================================================================
-    # AJUSTE 1: Redefinir purchaser_id para desacoplarlo del driver_id del vehículo
+    # AJUSTE 1: Redefinir purchaser_id con compute + inverse y readonly=False
+    # Evita que el inspector marque 'Solo lectura: True' y acepte el chofer asignado
     # =========================================================================
     purchaser_id = fields.Many2one(
         'res.partner',
         string='Driver',
+        compute='_compute_purchaser_id',
+        inverse='_inverse_purchaser_id',
+        store=True,
+        readonly=False,
         required=True,
         tracking=True,
         help="Conductor titular único asignado a este contrato"
     )
+
+    @api.depends('vehicle_id.driver_id')
+    def _compute_purchaser_id(self):
+        for contract in self:
+            # Si el contrato ya tiene chofer asignado, lo preserva intacto
+            if not contract.purchaser_id:
+                contract.purchaser_id = contract.vehicle_id.driver_id
+
+    def _inverse_purchaser_id(self):
+        # Permite que el valor de purchaser_id sea persistente y editable
+        pass
 
     shift_id = fields.Many2one('fleet.work.shift', string='Shift')
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
@@ -54,22 +70,18 @@ class FleetVehicleLogContract(models.Model):
 
     # =========================================================================
     # AJUSTE 2: Forzar la persistencia del conductor al crear el contrato
-    # Evita que el create nativo de Odoo lo vacíe si vehicle_id.driver_id no coincide
     # =========================================================================
     @api.model_create_multi
     def create(self, vals_list):
         records = super(FleetVehicleLogContract, self).create(vals_list)
         for record, vals in zip(records, vals_list):
             driver_val = vals.get('purchaser_id') or self.env.context.get('default_purchaser_id')
-            # Si se pasó un conductor pero Odoo lo dejó en blanco, se asegura directamente
             if driver_val and record.purchaser_id.id != driver_val:
                 super(FleetVehicleLogContract, record).write({'purchaser_id': driver_val})
         return records
 
     # =========================================================================
     # AJUSTE 3: Neutralizar sobreescrituras automáticas desde el vehículo
-    # Si Odoo base intenta cambiar el conductor del contrato por cambio de turno en el auto,
-    # se ignora esa modificación para mantener el conductor original
     # =========================================================================
     def write(self, vals):
         if self.env.context.get('sync_vehicle_turn') and 'purchaser_id' in vals:
