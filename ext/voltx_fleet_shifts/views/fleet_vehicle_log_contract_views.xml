@@ -34,6 +34,8 @@
             </xpath>
 
             <!-- Restringir la selección de conductor (purchaser_id) a aquellos asignados en el vehículo -->
+
+            
             <xpath expr="//field[@name='purchaser_id']" position="attributes">
                 <attribute name="invisible">0</attribute>
                 <attribute name="readonly">0</attribute>
