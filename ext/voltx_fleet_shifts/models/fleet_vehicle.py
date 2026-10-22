@@ -28,20 +28,22 @@ class FleetVehicle(models.Model):
                     })
 
                     # 2. Creación obligada del contrato individual con su respectivo purchaser_id
-                    # Usamos with_context para que Odoo NO intente leer el driver_id del vehículo
                     contract_vals = {
                         'vehicle_id': vehicle.id,
                         'purchaser_id': driver.id,
                         'state': 'open',
                         'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
                     }
+                    
+                    ### === CAMBIO 1: Se añade 'sync_vehicle_turn': True para coordinar con el modelo contrato ===
                     self.env['fleet.vehicle.log.contract'].with_context(
                         default_purchaser_id=driver.id,
+                        sync_vehicle_turn=True,
                         tracking_disable=True,
                         mail_create_nolog=True
                     ).create(contract_vals)
 
-                # 3. Una vez creados todos los contratos individuales, calculamos quién conduce según el turno
+                # 3. Calcular quién conduce según turno
                 vehicle.update_drivers_by_shift()
         return records
 
@@ -65,7 +67,8 @@ class FleetVehicle(models.Model):
                 ])
                 contracts_before[vehicle.id] = [(c, c.purchaser_id.id) for c in contracts if c.purchaser_id]
 
-        res = super(FleetVehicle, self).write(vals)
+        ### === CAMBIO 2: Pasamos sync_vehicle_turn=True en el super() para que no arrastre contratos ===
+        res = super(FleetVehicle, self.with_context(sync_vehicle_turn=True)).write(vals)
 
         # Restaurar el conductor original de cada contrato si Odoo base los alteró
         if contracts_before:
@@ -114,7 +117,14 @@ class FleetVehicle(models.Model):
                     ], limit=1)
 
                     if not existing_contract:
-                        self.env['fleet.vehicle.log.contract'].create({
+                        ### === CAMBIO 3: Aquí se aplica with_context exactamente igual que en create ===
+                        # Anteriormente se creaba sin contexto y Odoo borraba el purchaser_id
+                        self.env['fleet.vehicle.log.contract'].with_context(
+                            default_purchaser_id=driver_id,
+                            sync_vehicle_turn=True,
+                            tracking_disable=True,
+                            mail_create_nolog=True
+                        ).create({
                             'vehicle_id': vehicle.id,
                             'purchaser_id': driver_id,
                             'state': 'open',
@@ -135,6 +145,8 @@ class FleetVehicle(models.Model):
 
     def _is_shift_matching(self, shift, weekday, current_hour):
         """Valida si un turno coincide con el día y la hora consultada."""
+        if not shift:
+            return False
         # 0=Lunes, 4=Viernes, 5=Sábado, 6=Domingo
         if shift.applies_on == 'weekdays' and weekday >= 5:
             return False
@@ -188,5 +200,5 @@ class FleetVehicle(models.Model):
                 vals['future_driver_id'] = next_driver.id if next_driver else False
 
             if vals:
-                # Escribimos los cambios evitando alterar los contratos
-                super(FleetVehicle, vehicle).write(vals)
+                ### === CAMBIO 4: Pasamos sync_vehicle_turn=True para que Odoo no altere los contratos ===
+                super(FleetVehicle, vehicle.with_context(sync_vehicle_turn=True)).write(vals)
