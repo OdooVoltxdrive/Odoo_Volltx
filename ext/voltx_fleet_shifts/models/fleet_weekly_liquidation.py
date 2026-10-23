@@ -28,7 +28,7 @@ class FleetWeeklyLiquidation(models.Model):
         currency_field='currency_id'
     )
 
-    currency_id = fields.Many2one('res.currency', related='contract_id.company_id.currency_id')
+    currency_id = fields.Many2one('res.currency', related='contract_id.secondary_currency_id')
     invoice_id = fields.Many2one('account.move', string='Factura', readonly=True)
 
     state = fields.Selection([
@@ -79,7 +79,7 @@ class FleetWeeklyLiquidation(models.Model):
             liq.total_hours = sum(worked_logs.mapped('hours_worked'))
 
             # Usar cost_generate en lugar del amount nativo como solicitó el usuario
-            daily_rate = liq.contract_id.cost_generate if liq.contract_id else 0.0
+            daily_rate = liq.contract_id.cost_generated if liq.contract_id else 0.0
             liq.amount_total = liq.days_worked * daily_rate
 
     @api.depends('invoice_id.state', 'invoice_id.payment_state')

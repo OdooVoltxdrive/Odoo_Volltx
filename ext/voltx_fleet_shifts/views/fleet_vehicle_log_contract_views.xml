@@ -66,6 +66,7 @@
                     <page string="Liquidaciones semanales" name="weekly_liquidations">
                         <field name="liquidation_ids">
                             <list editable="bottom" decoration-info="state == 'draft'" decoration-success="state == 'paid'">
+                                <field name="currency_id" column_invisible="1"/>
                                 <field name="week_of_year"/>
                                 <field name="days_worked" readonly="1"/>
                                 <field name="total_hours" widget="float_time" readonly="1"/>
