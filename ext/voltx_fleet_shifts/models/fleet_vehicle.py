@@ -222,19 +222,33 @@ class FleetVehicle(models.Model):
                 # Escribimos exclusivamente en los campos nuevos
                 super(FleetVehicle, vehicle).write(vals)"""
 
+    # -------------------------------------------------------------------------
+    # BLOQUEO CLAVE CONTRA DUPLICADOS:
+    # Sobrescribimos el método nativo de Odoo para que no cree logs repetidos
+    # -------------------------------------------------------------------------
+    def _create_driver_history(self, driver_id):
+        """Evita que el flujo nativo de Odoo duplique logs si ya hay uno abierto."""
+        for vehicle in self:
+            existing = self.env['fleet.vehicle.assignation.log'].search([
+                ('vehicle_id', '=', vehicle.id),
+                ('driver_id', '=', driver_id),
+                ('date_end', '=', False),
+            ], limit=1)
+            if not existing:
+                super(FleetVehicle, vehicle)._create_driver_history(driver_id)
+
     @api.model_create_multi
     def create(self, vals_list):
         records = super(FleetVehicle, self).create(vals_list)
         for vehicle in records:
             if vehicle.driver_ids:
                 for driver in vehicle.driver_ids:
-                    # 1. VALIDACIÓN ÚNICAMENTE PARA EL HISTORIAL: Solo crear si no existe uno activo
+                    # 1. HISTORIAL: Solo crear si NO existe uno abierto
                     existing_log = self.env['fleet.vehicle.assignation.log'].search([
                         ('vehicle_id', '=', vehicle.id),
                         ('driver_id', '=', driver.id),
                         ('date_end', '=', False),
                     ], limit=1)
-
                     if not existing_log:
                         self.env['fleet.vehicle.assignation.log'].create({
                             'vehicle_id': vehicle.id,
@@ -242,7 +256,7 @@ class FleetVehicle(models.Model):
                             'date_start': fields.Date.today(),
                         })
 
-                    # 2. Tu creación de contrato intacta tal como la tienes
+                    # 2. CONTRATOS: Totalmente intactos
                     contract_vals = {
                         'vehicle_id': vehicle.id,
                         'purchaser_id': driver.id,
@@ -256,7 +270,6 @@ class FleetVehicle(models.Model):
                         mail_create_nolog=True
                     ).create(contract_vals)
 
-                # 3. Calcular turnos
                 vehicle.update_drivers_by_shift()
         return records
 
@@ -266,6 +279,7 @@ class FleetVehicle(models.Model):
             for vehicle in self:
                 old_driver_ids[vehicle.id] = set(vehicle.driver_ids.ids)
 
+        # Proteger purchaser_id de los contratos intacto
         contracts_before = {}
         if 'driver_id' in vals:
             for vehicle in self:
@@ -277,6 +291,7 @@ class FleetVehicle(models.Model):
 
         res = super(FleetVehicle, self.with_context(sync_vehicle_turn=True)).write(vals)
 
+        # Restaurar contratos intacto
         if contracts_before:
             for vehicle_id, contract_data in contracts_before.items():
                 for contract, original_purchaser_id in contract_data:
@@ -291,7 +306,8 @@ class FleetVehicle(models.Model):
                 added_ids = new_ids - old_ids
                 removed_ids = old_ids - new_ids
 
-                # Cerrar logs de conductores desasignados
+                # CONDUCTORES REMOVIDOS:
+                # Solo cerramos la fecha de asignación en el historial, NO tocamos sus contratos
                 for driver_id in removed_ids:
                     active_logs = self.env['fleet.vehicle.assignation.log'].search([
                         ('vehicle_id', '=', vehicle.id),
@@ -301,15 +317,14 @@ class FleetVehicle(models.Model):
                     if active_logs:
                         active_logs.write({'date_end': fields.Date.today()})
 
-                # Crear logs y contratos para conductores añadidos
+                # CONDUCTORES AÑADIDOS:
                 for driver_id in added_ids:
-                    # VALIDACIÓN HISTORIAL: Solo crear si no existe uno activo
+                    # 1. Historial: solo abrir si no existe uno activo
                     existing_log = self.env['fleet.vehicle.assignation.log'].search([
                         ('vehicle_id', '=', vehicle.id),
                         ('driver_id', '=', driver_id),
                         ('date_end', '=', False),
                     ], limit=1)
-
                     if not existing_log:
                         self.env['fleet.vehicle.assignation.log'].create({
                             'vehicle_id': vehicle.id,
@@ -317,7 +332,7 @@ class FleetVehicle(models.Model):
                             'date_start': fields.Date.today(),
                         })
 
-                    # Tu creación de contrato intacta
+                    # 2. Contratos intacto tal como lo tenías
                     existing_contract = self.env['fleet.vehicle.log.contract'].search([
                         ('vehicle_id', '=', vehicle.id),
                         ('purchaser_id', '=', driver_id),
