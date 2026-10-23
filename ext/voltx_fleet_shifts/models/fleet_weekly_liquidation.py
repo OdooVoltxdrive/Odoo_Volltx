@@ -134,6 +134,9 @@ class FleetWeeklyLiquidation(models.Model):
         if not account:
             return
 
+        # Obtener la variante product.product de la plantilla 27
+        product = self.env['product.template'].browse(27).product_variant_id
+
         # 3. Crear Factura Cliente ('out_invoice') en estado borrador
         invoice_vals = {
             'move_type': 'out_invoice',
@@ -143,7 +146,7 @@ class FleetWeeklyLiquidation(models.Model):
             'journal_id': journal.id,
             'invoice_line_ids': [
                 Command.create({
-                    'product_id': 27,
+                    'product_id': product.id,
                     #'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
                     'quantity': self.days_worked,
                     'price_unit': self.contract_id.cost_generated,
@@ -183,6 +186,10 @@ class FleetWeeklyLiquidation(models.Model):
         if not account:
             raise UserError(_("Configure una cuenta de ingresos en el diario de ventas o en el plan contable."))
 
+        # Obtener la variante product.product de la plantilla 27
+        product = self.env['product.template'].browse(27).product_variant_id
+
+
         # 3. Crear Factura Cliente ('out_invoice')
         invoice_vals = {
             'move_type': 'out_invoice',
@@ -192,7 +199,7 @@ class FleetWeeklyLiquidation(models.Model):
             'journal_id': journal.id,
             'invoice_line_ids': [
                 Command.create({
-                    'product_id': 27,
+                    'product_id': product.id,
                     #'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
                     'quantity': self.days_worked,
                     'price_unit': self.contract_id.cost_generated,
