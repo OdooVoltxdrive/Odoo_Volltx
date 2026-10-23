@@ -26,8 +26,8 @@ class FleetVehicle(models.Model):
         help="Conductor asignado al siguiente turno de la jornada"
     )
 
-    @api.model_create_multi
-    def create(self, vals_list):
+    #@api.model_create_multi
+    """def create(self, vals_list):
         records = super(FleetVehicle, self).create(vals_list)
         for vehicle in records:
             if vehicle.driver_ids:
@@ -145,7 +145,7 @@ class FleetVehicle(models.Model):
 
                 vehicle.update_drivers_by_shift()
 
-        return res
+        return res"""
 
     """def _get_current_time_and_day(self):
         #Retorna el día de la semana (0=Lun, 6=Dom) y la hora float con base en la zona horaria del usuario/empresa.
@@ -221,6 +221,125 @@ class FleetVehicle(models.Model):
             if vals:
                 # Escribimos exclusivamente en los campos nuevos
                 super(FleetVehicle, vehicle).write(vals)"""
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(FleetVehicle, self).create(vals_list)
+        for vehicle in records:
+            if vehicle.driver_ids:
+                for driver in vehicle.driver_ids:
+                    # 1. VALIDACIÓN ÚNICAMENTE PARA EL HISTORIAL: Solo crear si no existe uno activo
+                    existing_log = self.env['fleet.vehicle.assignation.log'].search([
+                        ('vehicle_id', '=', vehicle.id),
+                        ('driver_id', '=', driver.id),
+                        ('date_end', '=', False),
+                    ], limit=1)
+
+                    if not existing_log:
+                        self.env['fleet.vehicle.assignation.log'].create({
+                            'vehicle_id': vehicle.id,
+                            'driver_id': driver.id,
+                            'date_start': fields.Date.today(),
+                        })
+
+                    # 2. Tu creación de contrato intacta tal como la tienes
+                    contract_vals = {
+                        'vehicle_id': vehicle.id,
+                        'purchaser_id': driver.id,
+                        'state': 'open',
+                        'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
+                    }
+                    self.env['fleet.vehicle.log.contract'].with_context(
+                        default_purchaser_id=driver.id,
+                        sync_vehicle_turn=True,
+                        tracking_disable=True,
+                        mail_create_nolog=True
+                    ).create(contract_vals)
+
+                # 3. Calcular turnos
+                vehicle.update_drivers_by_shift()
+        return records
+
+    def write(self, vals):
+        old_driver_ids = {}
+        if 'driver_ids' in vals:
+            for vehicle in self:
+                old_driver_ids[vehicle.id] = set(vehicle.driver_ids.ids)
+
+        contracts_before = {}
+        if 'driver_id' in vals:
+            for vehicle in self:
+                contracts = self.env['fleet.vehicle.log.contract'].search([
+                    ('vehicle_id', '=', vehicle.id),
+                    ('state', 'in', ['open', 'futur']),
+                ])
+                contracts_before[vehicle.id] = [(c, c.purchaser_id.id) for c in contracts if c.purchaser_id]
+
+        res = super(FleetVehicle, self.with_context(sync_vehicle_turn=True)).write(vals)
+
+        if contracts_before:
+            for vehicle_id, contract_data in contracts_before.items():
+                for contract, original_purchaser_id in contract_data:
+                    if contract.exists() and contract.purchaser_id.id != original_purchaser_id:
+                        super(models.Model, contract).write({'purchaser_id': original_purchaser_id})
+
+        if 'driver_ids' in vals:
+            for vehicle in self:
+                new_ids = set(vehicle.driver_ids.ids)
+                old_ids = old_driver_ids.get(vehicle.id, set())
+
+                added_ids = new_ids - old_ids
+                removed_ids = old_ids - new_ids
+
+                # Cerrar logs de conductores desasignados
+                for driver_id in removed_ids:
+                    active_logs = self.env['fleet.vehicle.assignation.log'].search([
+                        ('vehicle_id', '=', vehicle.id),
+                        ('driver_id', '=', driver_id),
+                        ('date_end', '=', False),
+                    ])
+                    if active_logs:
+                        active_logs.write({'date_end': fields.Date.today()})
+
+                # Crear logs y contratos para conductores añadidos
+                for driver_id in added_ids:
+                    # VALIDACIÓN HISTORIAL: Solo crear si no existe uno activo
+                    existing_log = self.env['fleet.vehicle.assignation.log'].search([
+                        ('vehicle_id', '=', vehicle.id),
+                        ('driver_id', '=', driver_id),
+                        ('date_end', '=', False),
+                    ], limit=1)
+
+                    if not existing_log:
+                        self.env['fleet.vehicle.assignation.log'].create({
+                            'vehicle_id': vehicle.id,
+                            'driver_id': driver_id,
+                            'date_start': fields.Date.today(),
+                        })
+
+                    # Tu creación de contrato intacta
+                    existing_contract = self.env['fleet.vehicle.log.contract'].search([
+                        ('vehicle_id', '=', vehicle.id),
+                        ('purchaser_id', '=', driver_id),
+                        ('state', 'in', ['futur', 'open'])
+                    ], limit=1)
+
+                    if not existing_contract:
+                        self.env['fleet.vehicle.log.contract'].with_context(
+                            default_purchaser_id=driver_id,
+                            sync_vehicle_turn=True,
+                            tracking_disable=True,
+                            mail_create_nolog=True
+                        ).create({
+                            'vehicle_id': vehicle.id,
+                            'purchaser_id': driver_id,
+                            'state': 'open',
+                            'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
+                        })
+
+                vehicle.update_drivers_by_shift()
+
+        return res
 
 
 

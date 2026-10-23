@@ -32,7 +32,7 @@ class FleetVehicleLogContract(models.Model):
         # Permite que el valor de purchaser_id sea persistente y editable
         pass
 
-    shift_id = fields.Many2one('fleet.work.shift', string='Shift')
+    shift_id = fields.Many2one('fleet.work.shift', string='Turno')
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
 
     # Campo relacionado para los conductores del vehículo (usado para el dominio)
