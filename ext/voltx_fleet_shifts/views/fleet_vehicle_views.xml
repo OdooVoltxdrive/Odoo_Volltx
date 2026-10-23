@@ -41,4 +41,20 @@
         </field>
     </record>
 
+    <record id="fleet_vehicle_assignation_log_view_list_inherit" model="ir.ui.view">
+        <field name="name">fleet.vehicle.assignation.log.view.list.inherit</field>
+        <field name="model">fleet.vehicle.assignation.log</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_assignation_log_view_list"/>
+        <field name="arch" type="xml">
+            <!-- Colocamos el nuevo campo junto al conductor nativo o reemplazándolo en la vista -->
+            <xpath expr="//field[@name='driver_id']" position="before">
+                <field name="assigned_driver_id" widget="many2one_avatar"/>
+            </xpath>
+            <!-- Si deseas ocultar el conductor nativo para evitar confusiones: -->
+            <xpath expr="//field[@name='driver_id']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
