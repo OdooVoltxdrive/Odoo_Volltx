@@ -143,7 +143,7 @@ class FleetWeeklyLiquidation(models.Model):
             'journal_id': journal.id,
             'invoice_line_ids': [
                 Command.create({
-                    'product_id': 3,
+                    'product_id': 27,
                     #'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
                     'quantity': self.days_worked,
                     'price_unit': self.contract_id.cost_generated,
@@ -192,7 +192,7 @@ class FleetWeeklyLiquidation(models.Model):
             'journal_id': journal.id,
             'invoice_line_ids': [
                 Command.create({
-                    'product_id': 3,
+                    'product_id': 27,
                     #'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
                     'quantity': self.days_worked,
                     'price_unit': self.contract_id.cost_generated,
