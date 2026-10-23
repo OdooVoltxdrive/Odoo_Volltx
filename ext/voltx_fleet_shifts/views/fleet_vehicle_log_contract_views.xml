@@ -71,6 +71,9 @@
                                 <field name="days_worked" readonly="1"/>
                                 <field name="total_hours" widget="float_time" readonly="1"/>
                                 <field name="amount_total" readonly="1"/>
+                                <field name="amount_total_bs" readonly="1"/>
+                                <field name="amount_total_usd" readonly="1"/>
+
                                 <field name="invoice_id" readonly="1"/>
                                 <field name="state" widget="badge"/>
                                 <button name="action_generate_invoice" 

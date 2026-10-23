@@ -22,11 +22,22 @@ class FleetWeeklyLiquidation(models.Model):
     days_worked = fields.Integer(string='Días asistidos', compute='_compute_totals', store=True)
     total_hours = fields.Float(string='Total de horas', compute='_compute_totals', store=True)
     amount_total = fields.Monetary(
-        string='Total Amount',
+        string='Tarifa Total',
         compute='_compute_totals',
         store=True,
         currency_field='currency_id'
     )
+
+    amount_total_bs = fields.Monetary(
+        string='Pago Bs ',
+        store=True)
+
+    amount_total_usd = fields.Monetary(
+        string='Pago $',
+        store=True,
+        currency_field='currency_id'
+    )
+
 
     currency_id = fields.Many2one('res.currency', related='contract_id.secondary_currency_id')
     invoice_id = fields.Many2one('account.move', string='Factura', readonly=True)
@@ -35,7 +46,7 @@ class FleetWeeklyLiquidation(models.Model):
         ('draft', 'Draft'),
         ('invoiced', 'Invoiced'),
         ('paid', 'Paid')
-    ], default='draft', string='Status', compute='_compute_state', store=True)
+    ], default='draft', string='Estatus', compute='_compute_state', store=True)
 
     @api.depends('contract_id.purchaser_id')
     def _compute_driver_id(self):
