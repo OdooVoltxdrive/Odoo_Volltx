@@ -19,7 +19,7 @@ class FleetWeeklyLiquidation(models.Model):
 
     daily_log_ids = fields.One2many('fleet.driver.daily.log', 'liquidation_id', string='Registros diarios')
 
-    days_worked = fields.Integer(string='Días trabajados', compute='_compute_totals', store=True)
+    days_worked = fields.Integer(string='Días asistidos', compute='_compute_totals', store=True)
     total_hours = fields.Float(string='Total de horas', compute='_compute_totals', store=True)
     amount_total = fields.Monetary(
         string='Total Amount',
