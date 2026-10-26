@@ -37,7 +37,6 @@
                         <group string="Asignación">
                             <field name="contract_id"/>
                             <field name="driver_id"/>
-                            <field name="week_of_year"/>
                         </group>
                         <group string="Totales">
                             <!--field name="days_worked"/>
@@ -62,9 +61,6 @@
                 <field name="name"/>
                 <field name="contract_id"/>
                 <field name="driver_id"/>
-                <field name="week_of_year"/>
-                <!--field name="days_worked"/>
-                <field name="total_hours" widget="float_time"/-->
                 <field name="currency_id" column_invisible="True"/>
                 <field name="amount_total" widget="monetary"/>
                 <field name="state" widget="badge"/>

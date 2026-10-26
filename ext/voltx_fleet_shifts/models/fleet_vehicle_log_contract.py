@@ -54,15 +54,8 @@ class FleetVehicleLogContract(models.Model):
             usd = self.env.ref('base.USD', raise_if_not_found=False)
             contract.secondary_currency_id = usd.id if usd else contract.company_id.currency_id.id
 
-    #daily_log_ids = fields.One2many('fleet.driver.daily.log', 'contract_id', string='Daily Logs')
-
-    #daily_logs_count = fields.Integer(compute='_compute_logs_count', string='Logs Count')
     invoice_count = fields.Integer(compute='_compute_invoice_count', string='Invoice Count')
 
-    #@api.depends('daily_log_ids')
-    """def _compute_logs_count(self):
-        for contract in self:
-            contract.daily_logs_count = len(contract.daily_log_ids)"""
 
     @api.depends('liquidation_ids.invoice_id')
     def _compute_invoice_count(self):
@@ -110,53 +103,6 @@ class FleetVehicleLogContract(models.Model):
         super(FleetVehicleLogContract, self)._onchange_vehicle_id()
         if saved_purchaser:
             self.purchaser_id = saved_purchaser
-
-    """def action_start_daily_shift(self):
-        self.ensure_one()
-        if not self.purchaser_id:
-            raise UserError(_("El contrato no tiene un conductor asignado."))
-
-        active_log = self.env['fleet.driver.daily.log'].search([
-            ('contract_id', '=', self.id),
-            ('state', 'in', ['draft', 'active'])
-        ], limit=1)
-
-        if active_log:
-            active_log.action_start_shift()
-        else:
-            log = self.env['fleet.driver.daily.log'].create({
-                'contract_id': self.id,
-                'vehicle_id': self.vehicle_id.id,
-                'driver_id': self.purchaser_id.id,
-                'shift_id': self.shift_id.id if self.shift_id else False,
-            })
-            log.action_start_shift()
-
-    def action_end_daily_shift(self):
-        self.ensure_one()
-        active_log = self.env['fleet.driver.daily.log'].search([
-            ('contract_id', '=', self.id),
-            ('state', '=', 'active')
-        ], limit=1)
-        if active_log:
-            active_log.action_end_shift()
-
-    def action_view_daily_logs(self):
-        self.ensure_one()
-        driver = self.purchaser_id
-        return {
-            'name': _('Daily Logs'),
-            'view_mode': 'list,kanban,calendar,pivot,form',
-            'res_model': 'fleet.driver.daily.log',
-            'domain': [('contract_id', '=', self.id)],
-            'type': 'ir.actions.act_window',
-            'context': {
-                'default_contract_id': self.id,
-                'default_vehicle_id': self.vehicle_id.id,
-                'default_driver_id': driver.id if driver else False,
-                'default_shift_id': self.shift_id.id if self.shift_id else False,
-            }
-        }"""
 
     def action_view_invoices(self):
         self.ensure_one()
