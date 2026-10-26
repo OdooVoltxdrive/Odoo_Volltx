@@ -56,10 +56,10 @@
                 <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
             </xpath-->
 
-            <xpath expr="//field[@name='cost_generated']" position="attributes">
+            <!--xpath expr="//field[@name='cost_generated']" position="attributes">
                 <attribute name="widget">monetary</attribute>
                 <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
-            </xpath>
+            </xpath-->
 
 
             <!-- 3. Notebook con las Liquidaciones Semanales al final de la ficha -->
