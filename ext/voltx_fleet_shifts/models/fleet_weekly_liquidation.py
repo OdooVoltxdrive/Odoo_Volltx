@@ -26,7 +26,6 @@ class FleetWeeklyLiquidation(models.Model):
     )
     amount_total_bs = fields.Monetary(
         string='Pago Bs',
-        currency_field='bs_currency_id',
         tracking=True
     )
 
@@ -46,10 +45,6 @@ class FleetWeeklyLiquidation(models.Model):
         ('paid', 'Pagado')
     ], default='draft', string='Status', compute='_compute_state', store=True)
 
-    def _compute_bs_currency(self):
-        bs = self.env.ref('base.VEF', raise_if_not_found=False) or self.env.ref('base.VES', raise_if_not_found=False)
-        for liq in self:
-            liq.bs_currency_id = bs.id if bs else liq.contract_id.company_id.currency_id.id
 
     @api.depends('contract_id.purchaser_id')
     def _compute_driver_id(self):
