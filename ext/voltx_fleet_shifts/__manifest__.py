@@ -11,12 +11,10 @@
     'depends': ['fleet', 'account'],
     'data': [
         'security/ir.model.access.csv',
-        #'views/fleet_work_shift_views.xml',
         'views/res_partner_views.xml',
         'views/fleet_vehicle_views.xml',
         'views/fleet_vehicle_driver_history_views.xml',
         'views/fleet_vehicle_log_contract_views.xml',
-        #'views/fleet_driver_daily_log_views.xml',
         'views/fleet_weekly_liquidation_views.xml',
         'views/fleet_menus.xml',
     ],
