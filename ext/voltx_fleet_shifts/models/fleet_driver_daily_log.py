@@ -21,10 +21,10 @@ class FleetDriverDailyLog(models.Model):
 
     week_of_year = fields.Char(string='Week', compute='_compute_week_of_year', store=True)
     state = fields.Selection([
-        ('draft', 'Borrador'),
-        ('active', 'Activo (In Progress)'),
-        ('done', 'Hecho'),
-        ('paid', 'Pago')
+        ('draft', 'Draft'),
+        ('active', 'Active (In Progress)'),
+        ('done', 'Done'),
+        ('paid', 'Paid')
     ], default='draft', string='Status')
 
     liquidation_id = fields.Many2one('fleet.weekly.liquidation', string='Weekly Liquidation')

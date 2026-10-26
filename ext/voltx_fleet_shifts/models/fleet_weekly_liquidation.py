@@ -19,8 +19,8 @@ class FleetWeeklyLiquidation(models.Model):
 
     daily_log_ids = fields.One2many('fleet.driver.daily.log', 'liquidation_id', string='Registros diarios')
 
-    days_worked = fields.Integer(string='Días asistidos', compute='_compute_totals', store=True)
-    total_hours = fields.Float(string='Total de horas', compute='_compute_totals', store=True)
+    days_worked = fields.Integer(string='Días/Servicios', compute='_compute_totals', store=True)
+    total_hours = fields.Float(string='Horas/Servicios', compute='_compute_totals', store=True)
     amount_total = fields.Monetary(
         string='Tarifa Total',
         compute='_compute_totals',
@@ -28,25 +28,14 @@ class FleetWeeklyLiquidation(models.Model):
         currency_field='currency_id'
     )
 
-    amount_total_bs = fields.Monetary(
-        string='Pago Bs ',
-        store=True)
-
-    amount_total_usd = fields.Monetary(
-        string='Pago $',
-        store=True,
-        currency_field='currency_id'
-    )
-
-
-    currency_id = fields.Many2one('res.currency', related='contract_id.secondary_currency_id')
+    currency_id = fields.Many2one('res.currency', related='contract_id.company_id.currency_id')
     invoice_id = fields.Many2one('account.move', string='Factura', readonly=True)
 
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('invoiced', 'Invoiced'),
-        ('paid', 'Paid')
-    ], default='draft', string='Estatus', compute='_compute_state', store=True)
+        ('draft', 'Borrador'),
+        ('invoiced', 'Factura'),
+        ('paid', 'Pago')
+    ], default='draft', string='Status', compute='_compute_state', store=True)
 
     @api.depends('contract_id.purchaser_id')
     def _compute_driver_id(self):
@@ -90,7 +79,7 @@ class FleetWeeklyLiquidation(models.Model):
             liq.total_hours = sum(worked_logs.mapped('hours_worked'))
 
             # Usar cost_generate en lugar del amount nativo como solicitó el usuario
-            daily_rate = liq.contract_id.cost_generated if liq.contract_id else 0.0
+            daily_rate = liq.contract_id.cost_generate if liq.contract_id else 0.0
             liq.amount_total = liq.days_worked * daily_rate
 
     @api.depends('invoice_id.state', 'invoice_id.payment_state')
@@ -145,9 +134,6 @@ class FleetWeeklyLiquidation(models.Model):
         if not account:
             return
 
-        # Obtener la variante product.product de la plantilla 27
-        product = self.env['product.template'].browse(27).product_variant_id
-
         # 3. Crear Factura Cliente ('out_invoice') en estado borrador
         invoice_vals = {
             'move_type': 'out_invoice',
@@ -157,10 +143,9 @@ class FleetWeeklyLiquidation(models.Model):
             'journal_id': journal.id,
             'invoice_line_ids': [
                 Command.create({
-                    'product_id': product.id,
-                    #'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
+                    'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
                     'quantity': self.days_worked,
-                    'price_unit': self.contract_id.cost_generated,
+                    'price_unit': self.contract_id.cost_generate,
                     'account_id': account.id,
                 })
             ],
@@ -197,10 +182,6 @@ class FleetWeeklyLiquidation(models.Model):
         if not account:
             raise UserError(_("Configure una cuenta de ingresos en el diario de ventas o en el plan contable."))
 
-        # Obtener la variante product.product de la plantilla 27
-        product = self.env['product.template'].browse(27).product_variant_id
-
-
         # 3. Crear Factura Cliente ('out_invoice')
         invoice_vals = {
             'move_type': 'out_invoice',
@@ -210,10 +191,9 @@ class FleetWeeklyLiquidation(models.Model):
             'journal_id': journal.id,
             'invoice_line_ids': [
                 Command.create({
-                    'product_id': product.id,
-                    #'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
+                    'name': f'Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo ({self.days_worked} días)',
                     'quantity': self.days_worked,
-                    'price_unit': self.contract_id.cost_generated,
+                    'price_unit': self.contract_id.cost_generate,
                     'account_id': account.id,
                 })
             ],
