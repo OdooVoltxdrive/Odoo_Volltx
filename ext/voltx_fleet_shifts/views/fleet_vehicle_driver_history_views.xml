@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Vista Lista del nuevo modelo -->
     <record id="fleet_vehicle_driver_history_view_list" model="ir.ui.view">
         <field name="name">fleet.vehicle.driver.history.list</field>
         <field name="model">fleet.vehicle.driver.history</field>
         <field name="arch" type="xml">
-            <list string="Historial de Asignaciones" create="0">
+            <list string="Historial de Conductores" create="0">
                 <field name="vehicle_id"/>
                 <field name="driver_id" widget="many2one_avatar"/>
                 <field name="date_start"/>
@@ -18,12 +17,11 @@
         </field>
     </record>
 
-    <!-- Vista Formulario del nuevo modelo -->
     <record id="fleet_vehicle_driver_history_view_form" model="ir.ui.view">
         <field name="name">fleet.vehicle.driver.history.form</field>
         <field name="model">fleet.vehicle.driver.history</field>
         <field name="arch" type="xml">
-            <form string="Asignación de Conductor" create="0">
+            <form string="Historial de Conductor" create="0">
                 <sheet>
                     <group>
                         <group>
@@ -40,5 +38,12 @@
                 </sheet>
             </form>
         </field>
+    </record>
+
+    <!-- Acción para el nuevo modelo de historial -->
+    <record id="action_fleet_vehicle_driver_history" model="ir.actions.act_window">
+        <field name="name">Historial de Asignaciones</field>
+        <field name="res_model">fleet.vehicle.driver.history</field>
+        <field name="view_mode">list</field>
     </record>
 </odoo>
