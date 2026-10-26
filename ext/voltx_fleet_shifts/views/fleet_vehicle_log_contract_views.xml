@@ -28,7 +28,7 @@
 
             <!-- 2. Campo Turno al lado del seguro/conductor -->
             <xpath expr="//field[@name='insurer_id']" position="after">
-                <field name="shift_id"/>
+                <field name="shift"/>
                 <field name="secondary_currency_id" invisible="1"/>
                 <field name="vehicle_driver_ids" invisible="1"/>
             </xpath>

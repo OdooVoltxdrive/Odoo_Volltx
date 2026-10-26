@@ -33,7 +33,7 @@ class FleetVehicleLogContract(models.Model):
         pass
 
     #shift_id = fields.Many2one('fleet.work.shift', string='Shift')
-    shift_id = fields.Char( string='Turno')
+    shift = fields.Char( string='Turno')
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
 
     # Campo relacionado para los conductores del vehículo (usado para el dominio)
