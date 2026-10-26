@@ -17,7 +17,7 @@ class FleetWeeklyLiquidation(models.Model):
     )
     week_of_year = fields.Char(string='Semana', required=True)
 
-    daily_log_ids = fields.One2many('fleet.driver.daily.log', 'liquidation_id', string='Registros diarios')
+    #daily_log_ids = fields.One2many('fleet.driver.daily.log', 'liquidation_id', string='Registros diarios')
 
     days_worked = fields.Integer(string='Días/Servicios', compute='_compute_totals', store=True)
     total_hours = fields.Float(string='Horas/Servicios', compute='_compute_totals', store=True)
@@ -71,8 +71,8 @@ class FleetWeeklyLiquidation(models.Model):
                 if logs:
                     logs.write({'liquidation_id': liq.id})
 
-    @api.depends('daily_log_ids.worked', 'daily_log_ids.hours_worked', 'contract_id.cost_generate')
-    def _compute_totals(self):
+    #@api.depends('daily_log_ids.worked', 'daily_log_ids.hours_worked', 'contract_id.cost_generate')
+    """def _compute_totals(self):
         for liq in self:
             worked_logs = liq.daily_log_ids.filtered(lambda l: l.worked)
             liq.days_worked = len(worked_logs)
@@ -80,10 +80,10 @@ class FleetWeeklyLiquidation(models.Model):
 
             # Usar cost_generate en lugar del amount nativo como solicitó el usuario
             daily_rate = liq.contract_id.cost_generate if liq.contract_id else 0.0
-            liq.amount_total = liq.days_worked * daily_rate
+            liq.amount_total = liq.days_worked * daily_rate"""
 
-    @api.depends('invoice_id.state', 'invoice_id.payment_state')
-    def _compute_state(self):
+    #@api.depends('invoice_id.state', 'invoice_id.payment_state')
+    """def _compute_state(self):
         for liq in self:
             if not liq.invoice_id:
                 liq.state = 'draft'
@@ -92,7 +92,7 @@ class FleetWeeklyLiquidation(models.Model):
                 # Pasa a paid cuando la factura contable se pague realmente
                 liq.daily_log_ids.write({'state': 'paid'})
             else:
-                liq.state = 'invoiced'
+                liq.state = 'invoiced'"""
 
     def _auto_generate_or_update_invoice(self):
         """Genera o actualiza la factura automáticamente sumando los días trabajados en lugar de hacerlo manualmente."""
