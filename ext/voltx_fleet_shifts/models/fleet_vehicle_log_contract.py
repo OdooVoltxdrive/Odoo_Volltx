@@ -5,10 +5,6 @@ from odoo.exceptions import UserError
 class FleetVehicleLogContract(models.Model):
     _inherit = 'fleet.vehicle.log.contract'
 
-    # =========================================================================
-    # AJUSTE 1: Redefinir purchaser_id con compute + inverse y readonly=False
-    # Evita que el inspector marque 'Solo lectura: True' y acepte el chofer asignado
-    # =========================================================================
     purchaser_id = fields.Many2one(
         'res.partner',
         string='Driver',
@@ -24,25 +20,19 @@ class FleetVehicleLogContract(models.Model):
     @api.depends('vehicle_id.driver_id')
     def _compute_purchaser_id(self):
         for contract in self:
-            # Si el contrato ya tiene chofer asignado, lo preserva intacto
             if not contract.purchaser_id:
                 contract.purchaser_id = contract.vehicle_id.driver_id
 
     def _inverse_purchaser_id(self):
-        # Permite que el valor de purchaser_id sea persistente y editable
         pass
 
-    #shift_id = fields.Many2one('fleet.work.shift', string='Shift')
-    shift = fields.Char( string='Turno')
+    # Turno configurado como texto libre (ej: '08:00 a 16:00')
+    shift = fields.Char(string='Turno / Horario')
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
-
-    # Campo relacionado para los conductores del vehículo (usado para el dominio)
     vehicle_driver_ids = fields.Many2many(related='vehicle_id.driver_ids')
 
-    # Si el usuario agregó un campo customizado cost_generate, lo forzamos a ser monetario
     cost_generate = fields.Monetary(string="Costo Generado", currency_field='secondary_currency_id')
 
-    # Campo para obtener la moneda secundaria de la compañía (Dólar, etc.) si la hay
     secondary_currency_id = fields.Many2one(
         'res.currency',
         string='Moneda Secundaria',
@@ -56,15 +46,11 @@ class FleetVehicleLogContract(models.Model):
 
     invoice_count = fields.Integer(compute='_compute_invoice_count', string='Invoice Count')
 
-
     @api.depends('liquidation_ids.invoice_id')
     def _compute_invoice_count(self):
         for contract in self:
             contract.invoice_count = len(contract.liquidation_ids.mapped('invoice_id'))
 
-    # =========================================================================
-    # AJUSTE 2: Forzar la persistencia del conductor al crear el contrato
-    # =========================================================================
     @api.model_create_multi
     def create(self, vals_list):
         records = super(FleetVehicleLogContract, self).create(vals_list)
@@ -74,29 +60,14 @@ class FleetVehicleLogContract(models.Model):
                 super(FleetVehicleLogContract, record).write({'purchaser_id': driver_val})
         return records
 
-    # =========================================================================
-    # AJUSTE 3: Neutralizar sobreescrituras automáticas desde el vehículo
-    # =========================================================================
     def write(self, vals):
         if self.env.context.get('sync_vehicle_turn') and 'purchaser_id' in vals:
             vals = dict(vals)
             del vals['purchaser_id']
             if not vals:
                 return True
+        return super(FleetVehicleLogContract, self).write(vals)
 
-        res = super(FleetVehicleLogContract, self).write(vals)
-
-        # Si cambias manualmente el turno o el chofer en el contrato, actualiza quién conduce en el auto
-        if not self.env.context.get('skip_driver_sync'):
-            if any(k in vals for k in ['shift_id', 'purchaser_id', 'state']):
-                for contract in self:
-                    if contract.vehicle_id:
-                        contract.vehicle_id.update_drivers_by_shift()
-        return res
-
-    # =========================================================================
-    # AJUSTE 4: Bloquear el onchange nativo que copia el chofer del auto al contrato
-    # =========================================================================
     @api.onchange('vehicle_id')
     def _onchange_vehicle_id(self):
         saved_purchaser = self.purchaser_id
