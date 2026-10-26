@@ -23,6 +23,7 @@
                         </group>
                         <group>
                             <field name="currency_id" invisible="1"/>
+                            <field name="bs_currency_id" invisible="1"/>
                             <field name="amount_total_usd" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             <field name="amount_total_bs" widget="monetary" options="{'currency_field': 'bs_currency_id'}"/>
                             <field name="invoice_id" invisible="invoice_id == False"/>
