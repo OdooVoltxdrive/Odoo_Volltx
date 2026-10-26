@@ -1,6 +1,6 @@
 {
     'name': 'Voltx Fleet Shifts',
-    'version': '19.0.0',
+    'version': '19.0.1',
     'summary': 'Gestionar los turnos de los vehículos de la flota y a los distintos conductores',
     'description': """
         Este módulo amplía la aplicación Fleet para permitir la asignación de varios 
