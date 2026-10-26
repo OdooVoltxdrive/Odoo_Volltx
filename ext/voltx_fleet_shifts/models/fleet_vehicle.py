@@ -26,6 +26,7 @@ class FleetVehicle(models.Model):
         help="Conductor asignado al siguiente turno de la jornada"
     )
 
+
     @api.model_create_multi
     def create(self, vals_list):
         records = super(FleetVehicle, self).create(vals_list)
