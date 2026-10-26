@@ -33,13 +33,25 @@
                 <attribute name="options">{'no_create': True}</attribute>
             </xpath>
 
-            <!-- 3. OCULTAR GRUPO NATIVO 'Cost' -->
-            <xpath expr="//group[@string='Cost']" position="attributes">
+           <!-- 4. OCULTAR TODOS LOS CAMPOS NATIVOS DEL GRUPO 'Cost' -->
+            <xpath expr="//field[@name='amount']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-           <!-- 4. REEMPLAZO TOTAL DEL GRUPO DE COSTOS POR 'Horario y Zona' -->
-            <xpath expr="//field[@name='amount']/parent::group/parent::group" position="replace">
+            <xpath expr="//label[@for='cost_generated']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='cost_generated']/ancestor::div[hasclass('o_row')]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+           <!-- 5. INSERTAR EL NUEVO GRUPO 'Horario y Zona' antes de notes -->
+            <xpath expr="//field[@name='notes']" position="before">
                 <group string="Horario y Zona" col="2">
                     <group>
                         <field name="start_time" placeholder="Ej: 06:00 AM"/>
