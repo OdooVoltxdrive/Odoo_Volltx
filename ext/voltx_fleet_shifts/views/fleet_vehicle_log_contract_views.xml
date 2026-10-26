@@ -38,8 +38,9 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-            <xpath expr="//group[@string='Cost']" position="after">
-                <group string="Horario y Zona">
+           <!-- 4. REEMPLAZO TOTAL DEL GRUPO DE COSTOS POR 'Horario y Zona' -->
+            <xpath expr="//field[@name='amount']/parent::group/parent::group" position="replace">
+                <group string="Horario y Zona" col="2">
                     <group>
                         <field name="start_time" placeholder="Ej: 06:00 AM"/>
                         <field name="end_time" placeholder="Ej: 02:00 PM"/>
@@ -51,15 +52,6 @@
                 </group>
             </xpath>
 
-            <!--xpath expr="//field[@name='amount']" position="attributes">
-                <attribute name="widget">monetary</attribute>
-                <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
-            </xpath-->
-
-            <!--xpath expr="//field[@name='cost_generated']" position="attributes">
-                <attribute name="widget">monetary</attribute>
-                <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
-            </xpath-->
 
 
             <!-- 3. Notebook con las Liquidaciones Semanales al final de la ficha -->

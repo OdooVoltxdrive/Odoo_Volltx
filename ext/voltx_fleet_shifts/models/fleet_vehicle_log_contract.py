@@ -34,7 +34,7 @@ class FleetVehicleLogContract(models.Model):
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
     vehicle_driver_ids = fields.Many2many(related='vehicle_id.driver_ids')
 
-    cost_generate = fields.Monetary(string="Costo Generado", currency_field='secondary_currency_id')
+    cost_generate = fields.Monetary(string="Costo paquete", currency_field='secondary_currency_id')
 
     secondary_currency_id = fields.Many2one(
         'res.currency',
