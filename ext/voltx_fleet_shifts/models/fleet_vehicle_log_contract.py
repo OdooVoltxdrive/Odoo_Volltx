@@ -32,7 +32,8 @@ class FleetVehicleLogContract(models.Model):
         # Permite que el valor de purchaser_id sea persistente y editable
         pass
 
-    shift_id = fields.Many2one('fleet.work.shift', string='Shift')
+    #shift_id = fields.Many2one('fleet.work.shift', string='Shift')
+    shift_id = fields.Char( string='Turno')
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
 
     # Campo relacionado para los conductores del vehículo (usado para el dominio)
@@ -110,7 +111,7 @@ class FleetVehicleLogContract(models.Model):
         if saved_purchaser:
             self.purchaser_id = saved_purchaser
 
-    def action_start_daily_shift(self):
+    """def action_start_daily_shift(self):
         self.ensure_one()
         if not self.purchaser_id:
             raise UserError(_("El contrato no tiene un conductor asignado."))
@@ -155,7 +156,7 @@ class FleetVehicleLogContract(models.Model):
                 'default_driver_id': driver.id if driver else False,
                 'default_shift_id': self.shift_id.id if self.shift_id else False,
             }
-        }
+        }"""
 
     def action_view_invoices(self):
         self.ensure_one()

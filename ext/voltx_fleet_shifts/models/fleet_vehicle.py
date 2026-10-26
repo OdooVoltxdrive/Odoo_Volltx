@@ -26,39 +26,34 @@ class FleetVehicle(models.Model):
         help="Conductor asignado al siguiente turno de la jornada"
     )
 
+    # Relación con el nuevo historial propio
+    custom_driver_history_ids = fields.One2many(
+        'fleet.vehicle.driver.history',
+        'vehicle_id',
+        string='Historial de Conductores'
+    )
+    custom_driver_history_count = fields.Integer(
+        string='Nro Conductores Histórico',
+        compute='_compute_custom_driver_history_count'
+    )
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        records = super(FleetVehicle, self).create(vals_list)
-        for vehicle in records:
-            if vehicle.driver_ids:
-                for driver in vehicle.driver_ids:
-                    # 1. Crear registro en el historial de asignaciones
-                    self.env['fleet.vehicle.assignation.log'].create({
-                        'vehicle_id': vehicle.id,
-                        'driver_id': driver.id,
-                        'date_start': fields.Date.today(),
-                    })
+    @api.depends('custom_driver_history_ids')
+    def _compute_custom_driver_history_count(self):
+        for vehicle in self:
+            vehicle.custom_driver_history_count = len(vehicle.custom_driver_history_ids)
 
-                    # 2. Creación obligada del contrato individual con su respectivo purchaser_id
-                    contract_vals = {
-                        'vehicle_id': vehicle.id,
-                        'purchaser_id': driver.id,
-                        'state': 'open',
-                        'cost_subtype_id': self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False).id if self.env.ref('fleet.type_contract_leasing', raise_if_not_found=False) else False,
-                    }
-                    
-                    ### === CAMBIO 1: Se añade 'sync_vehicle_turn': True para coordinar con el modelo contrato ===
-                    self.env['fleet.vehicle.log.contract'].with_context(
-                        default_purchaser_id=driver.id,
-                        sync_vehicle_turn=True,
-                        tracking_disable=True,
-                        mail_create_nolog=True
-                    ).create(contract_vals)
+    def action_open_custom_driver_history(self):
+        """Acción para abrir el nuevo historial desde el Smart Button"""
+        self.ensure_one()
+        return {
+            'name': 'Historial de Asignaciones',
+            'type': 'ir.actions.act_window',
+            'res_model': 'fleet.vehicle.driver.history',
+            'view_mode': 'list,form',
+            'domain': [('vehicle_id', '=', self.id)],
+            'context': {'default_vehicle_id': self.id},
+        }
 
-                # 3. Calcular quién conduce según turno
-                vehicle.update_drivers_by_shift()
-        return records
 
     def write(self, vals):
         old_driver_ids = {}
@@ -66,11 +61,7 @@ class FleetVehicle(models.Model):
             for vehicle in self:
                 old_driver_ids[vehicle.id] = set(vehicle.driver_ids.ids)
 
-        # -------------------------------------------------------------------------
-        # BLOQUEO CLAVE: Si Odoo o el usuario cambia el driver_id del vehículo,
-        # guardamos los purchaser_id actuales de los contratos para restaurarlos
-        # si Odoo intenta sobreescribirlos de forma masiva en el super().
-        # -------------------------------------------------------------------------
+        # Proteger purchaser_id de contratos frente a modificaciones externas
         contracts_before = {}
         if 'driver_id' in vals:
             for vehicle in self:
@@ -80,10 +71,8 @@ class FleetVehicle(models.Model):
                 ])
                 contracts_before[vehicle.id] = [(c, c.purchaser_id.id) for c in contracts if c.purchaser_id]
 
-        ### === CAMBIO 2: Pasamos sync_vehicle_turn=True en el super() para que no arrastre contratos ===
         res = super(FleetVehicle, self.with_context(sync_vehicle_turn=True)).write(vals)
 
-        # Restaurar el conductor original de cada contrato si Odoo base los alteró
         if contracts_before:
             for vehicle_id, contract_data in contracts_before.items():
                 for contract, original_purchaser_id in contract_data:
@@ -98,9 +87,9 @@ class FleetVehicle(models.Model):
                 added_ids = new_ids - old_ids
                 removed_ids = old_ids - new_ids
 
-                # Cerrar los logs de los conductores desasignados
+                # CONDUCTORES REMOVIDOS: Se sella la fecha fin en el nuevo historial
                 for driver_id in removed_ids:
-                    active_logs = self.env['fleet.vehicle.assignation.log'].search([
+                    active_logs = self.env['fleet.vehicle.driver.history'].search([
                         ('vehicle_id', '=', vehicle.id),
                         ('driver_id', '=', driver_id),
                         ('date_end', '=', False),
@@ -108,21 +97,22 @@ class FleetVehicle(models.Model):
                     if active_logs:
                         active_logs.write({'date_end': fields.Date.today()})
 
-                # Crear logs y contratos para los conductores añadidos
+                # CONDUCTORES AÑADIDOS: Se crea la línea en el nuevo historial
                 for driver_id in added_ids:
-                    existing_log = self.env['fleet.vehicle.assignation.log'].search([
+                    existing_log = self.env['fleet.vehicle.driver.history'].search([
                         ('vehicle_id', '=', vehicle.id),
                         ('driver_id', '=', driver_id),
                         ('date_end', '=', False),
                     ], limit=1)
 
                     if not existing_log:
-                        self.env['fleet.vehicle.assignation.log'].create({
+                        self.env['fleet.vehicle.driver.history'].create({
                             'vehicle_id': vehicle.id,
                             'driver_id': driver_id,
                             'date_start': fields.Date.today(),
                         })
 
+                    # Contrato intacto
                     existing_contract = self.env['fleet.vehicle.log.contract'].search([
                         ('vehicle_id', '=', vehicle.id),
                         ('purchaser_id', '=', driver_id),
@@ -130,8 +120,6 @@ class FleetVehicle(models.Model):
                     ], limit=1)
 
                     if not existing_contract:
-                        ### === CAMBIO 3: Aquí se aplica with_context exactamente igual que en create ===
-                        # Anteriormente se creaba sin contexto y Odoo borraba el purchaser_id
                         self.env['fleet.vehicle.log.contract'].with_context(
                             default_purchaser_id=driver_id,
                             sync_vehicle_turn=True,
@@ -147,78 +135,4 @@ class FleetVehicle(models.Model):
                 vehicle.update_drivers_by_shift()
 
         return res
-
-    def _get_current_time_and_day(self):
-        """Retorna el día de la semana (0=Lun, 6=Dom) y la hora float con base en la zona horaria del usuario/empresa."""
-        tz_name = self.env.user.tz or self.env.company.partner_id.tz or 'UTC'
-        user_tz = pytz.timezone(tz_name)
-        now_dt = datetime.now(user_tz)
-        current_hour = now_dt.hour + (now_dt.minute / 60.0)
-        return now_dt.weekday(), current_hour
-
-    def _is_shift_matching(self, shift, weekday, current_hour):
-        """Valida si un turno coincide con el día y la hora consultada."""
-        if not shift:
-            return False
-        # 0=Lunes, 4=Viernes, 5=Sábado, 6=Domingo
-        if shift.applies_on == 'weekdays' and weekday >= 5:
-            return False
-        if shift.applies_on == 'weekends' and weekday < 5:
-            return False
-
-        if shift.end_hour > shift.start_hour:
-            return shift.start_hour <= current_hour < shift.end_hour
-        else:
-            # Turno que cruza la medianoche
-            return current_hour >= shift.start_hour or current_hour < shift.end_hour
-
-    def update_drivers_by_shift(self):
-        """Actualiza current_shift_driver_id y next_shift_driver_id sin tocar driver_id."""
-        weekday, current_hour = self._get_current_time_and_day()
-
-        for vehicle in self:
-            contracts = self.env['fleet.vehicle.log.contract'].search([
-                ('vehicle_id', '=', vehicle.id),
-                ('state', '=', 'open'),
-                ('shift_id', '!=', False)
-            ])
-
-            if not contracts:
-                continue
-
-            current_driver = False
-            upcoming_contracts = []
-
-            for contract in contracts:
-                driver = contract.purchaser_id
-                if not driver:
-                    continue
-
-                if self._is_shift_matching(contract.shift_id, weekday, current_hour):
-                    current_driver = driver
-                else:
-                    upcoming_contracts.append(contract)
-
-            next_driver = False
-            if upcoming_contracts:
-                closest_contract = min(
-                    upcoming_contracts,
-                    key=lambda c: (c.shift_id.start_hour - current_hour) % 24
-                )
-                next_driver = closest_contract.purchaser_id
-
-            # Si no coinciden horarios pero hay conductores asignados
-            if not current_driver and vehicle.driver_ids:
-                current_driver = vehicle.driver_ids[0]
-                if len(vehicle.driver_ids) > 1:
-                    next_driver = vehicle.driver_ids[1]
-
-            vals = {}
-            if vehicle.current_shift_driver_id != current_driver:
-                vals['current_shift_driver_id'] = current_driver.id if current_driver else False
-            if vehicle.next_shift_driver_id != next_driver:
-                vals['next_shift_driver_id'] = next_driver.id if next_driver else False
-
-            if vals:
-                # Escribimos exclusivamente en los campos nuevos
-                super(FleetVehicle, vehicle).write(vals)
+    

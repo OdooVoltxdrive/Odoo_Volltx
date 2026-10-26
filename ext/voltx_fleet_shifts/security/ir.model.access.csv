@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_fleet_work_shift_user,fleet.work.shift user,model_fleet_work_shift,fleet.fleet_group_user,1,1,1,1
 access_fleet_driver_daily_log_user,fleet.driver.daily.log user,model_fleet_driver_daily_log,fleet.fleet_group_user,1,1,1,1
 access_fleet_weekly_liquidation_user,fleet.weekly.liquidation user,model_fleet_weekly_liquidation,fleet.fleet_group_user,1,1,1,1
+access_fleet_vehicle_driver_history_user,fleet.vehicle.driver.history.user,model_fleet_vehicle_driver_history,fleet.fleet_group_user,1,1,1,1

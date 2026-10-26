@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Lista del nuevo modelo -->
+    <record id="fleet_vehicle_driver_history_view_list" model="ir.ui.view">
+        <field name="name">fleet.vehicle.driver.history.list</field>
+        <field name="model">fleet.vehicle.driver.history</field>
+        <field name="arch" type="xml">
+            <list string="Historial de Asignaciones" create="0">
+                <field name="vehicle_id"/>
+                <field name="driver_id" widget="many2one_avatar"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="tz"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'active'" 
+                       decoration-muted="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Formulario del nuevo modelo -->
+    <record id="fleet_vehicle_driver_history_view_form" model="ir.ui.view">
+        <field name="name">fleet.vehicle.driver.history.form</field>
+        <field name="model">fleet.vehicle.driver.history</field>
+        <field name="arch" type="xml">
+            <form string="Asignación de Conductor" create="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="vehicle_id" readonly="1"/>
+                            <field name="driver_id" readonly="1"/>
+                            <field name="tz"/>
+                        </group>
+                        <group>
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_end"/>
+                            <field name="state" widget="badge"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

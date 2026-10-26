@@ -7,12 +7,20 @@
         <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
         <field name="arch" type="xml">
 
-            <!-- Renombrar el campo nativo de Odoo a "Conductor actual" -->
-            <!--xpath expr="//field[@name='driver_id']" position="attributes">
-                <attribute name="string">Conductor actual</attribute>
-            </xpath-->
+            <!-- 1. Ocultar el smart button nativo de Odoo -->
+            <xpath expr="//button[@name='open_assignation_logs']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
 
-            <!-- Asegurar que el campo se ubique justo después de Próximo conductor -->
+            <!-- 2. Agregar nuestro nuevo Smart Button al inicio de la botonera -->
+            <xpath expr="//button[@name='return_action_to_open']" position="before">
+                <button name="action_open_custom_driver_history"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-history">
+                    <field name="custom_driver_history_count" widget="statinfo" string="Historial Conductores"/>
+                </button>
+            </xpath>
 
             <xpath expr="//field[@name='driver_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
