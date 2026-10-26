@@ -4,11 +4,12 @@
     'summary': 'Gestionar los turnos de los vehículos de la flota y a los distintos conductores',
     'description': """
         Este módulo amplía la aplicación Fleet para permitir la asignación de varios 
-        conductores a un mismo vehículo en diferentes turnos y cada uno con su contrato individual. Incluye  llevar el controlde las
-        liquidaciones .
+        conductores a un mismo vehículo en diferentes turnos y cada uno con su contrato individual. 
+        Incluye llevar el control de las liquidaciones.
+    """,
     'category': 'Human Resources/Fleet',
     'author': 'Your Company',
-    'depends': ['fleet', 'account','base'],
+    'depends': ['fleet', 'account', 'base'],
     'data': [
         'security/ir.model.access.csv',
         'views/fleet_vehicle_views.xml',
