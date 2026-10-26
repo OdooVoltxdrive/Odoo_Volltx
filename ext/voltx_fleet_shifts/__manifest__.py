@@ -11,12 +11,12 @@
     'depends': ['fleet', 'account','base'],
     'data': [
         'security/ir.model.access.csv',
-        'views/res_partner_views.xml',
         'views/fleet_vehicle_views.xml',
         'views/fleet_vehicle_driver_history_views.xml',
         'views/fleet_vehicle_log_contract_views.xml',
         'views/fleet_weekly_liquidation_views.xml',
         'views/fleet_menus.xml',
+        'views/res_partner_views.xml',
     ],
     'installable': True,
     'application': False,
