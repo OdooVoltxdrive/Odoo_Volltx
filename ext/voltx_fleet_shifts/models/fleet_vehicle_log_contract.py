@@ -27,7 +27,10 @@ class FleetVehicleLogContract(models.Model):
         pass
 
     # Turno configurado como texto libre (ej: '08:00 a 16:00')
-    shift = fields.Char(string='Turno / Horario')
+
+    start_time = fields.Char(string='Inicio')
+    end_time = fields.Char(string='Fin ')
+    shift = fields.Char(string='Zona de retorno ')
     liquidation_ids = fields.One2many('fleet.weekly.liquidation', 'contract_id', string='Weekly Liquidations')
     vehicle_driver_ids = fields.Many2many(related='vehicle_id.driver_ids')
 

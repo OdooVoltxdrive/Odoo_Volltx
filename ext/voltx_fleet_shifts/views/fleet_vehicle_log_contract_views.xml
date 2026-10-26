@@ -33,10 +33,28 @@
                 <attribute name="options">{'no_create': True}</attribute>
             </xpath>
 
-            <xpath expr="//field[@name='amount']" position="attributes">
+            <!-- 3. OCULTAR GRUPO NATIVO 'Cost' -->
+            <xpath expr="//group[@string='Cost']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//group[@string='Cost']" position="after">
+                <group string="Horario y Zona">
+                    <group>
+                        <field name="start_time" placeholder="Ej: 06:00 AM"/>
+                        <field name="end_time" placeholder="Ej: 02:00 PM"/>
+                    </group>
+                    <group>
+                        <field name="shift"/>
+                        <field name="cost_generate" widget="monetary" options="{'currency_field': 'secondary_currency_id'}"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <!--xpath expr="//field[@name='amount']" position="attributes">
                 <attribute name="widget">monetary</attribute>
                 <attribute name="options">{'currency_field': 'secondary_currency_id'}</attribute>
-            </xpath>
+            </xpath-->
 
             <xpath expr="//field[@name='cost_generated']" position="attributes">
                 <attribute name="widget">monetary</attribute>
@@ -47,16 +65,16 @@
             <!-- 3. Notebook con las Liquidaciones Semanales al final de la ficha -->
             <xpath expr="//sheet" position="inside">
                 <notebook>
-                    <page string="Liquidaciones" name="weekly_liquidations">
+                   <page string="Liquidaciones" name="weekly_liquidations">
                         <field name="liquidation_ids">
-                            <list editable="bottom" decoration-info="state == 'draft'" decoration-success="state == 'paid'">
-                                <field name="invoice_id" readonly="1"/>
+                            <list editable="bottom" decoration-info="state == 'draft'" decoration-warning="state == 'invoiced'" decoration-success="state == 'paid'">
+                                <field name="name" readonly="1"/>
+                                <field name="week_of_year"/>
+                                <field name="observation"/>
+                                <field name="amount_total_bs"/>
+                                <field name="amount_total_usd"/>
+                                <field name="invoice_id" readonly="1" widget="many2one"/>
                                 <field name="state" widget="badge"/>
-                                <button name="action_generate_invoice" 
-                                        type="object" 
-                                        string="Liquidar y Facturar" 
-                                        class="btn-primary" 
-                                        invisible="invoice_id"/>
                             </list>
                         </field>
                     </page>
