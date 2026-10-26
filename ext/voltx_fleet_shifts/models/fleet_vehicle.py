@@ -9,7 +9,8 @@ class FleetVehicle(models.Model):
         'fleet_vehicle_driver_rel',
         'vehicle_id',
         'driver_id',
-        string='Conductores Asignados'
+        string='Conductores Asignados',
+        domain=[('is_driver', '=', True)]
     )
 
     current_shift_driver_id = fields.Many2one(
