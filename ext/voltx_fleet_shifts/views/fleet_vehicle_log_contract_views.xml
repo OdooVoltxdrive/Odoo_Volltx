@@ -32,35 +32,21 @@
                 <attribute name="options">{'no_create': True}</attribute>
             </xpath>
 
-           <!-- 4. OCULTAR TODOS LOS CAMPOS NATIVOS DEL GRUPO 'Cost' -->
-            <xpath expr="//field[@name='amount']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-
-            <xpath expr="//label[@for='cost_generated']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-
-            <xpath expr="//field[@name='cost_generated']/ancestor::div[hasclass('o_row')]" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-
-            <xpath expr="//field[@name='date']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-
-           <!-- 5. INSERTAR EL NUEVO GRUPO 'Horario y Zona' antes de notes -->
-            <xpath expr="//field[@name='notes']" position="before">
+            <!-- 4. INSERTAR 'Horario y Zona' justo después del grupo de Vehículo / Conductor -->
+            <xpath expr="//field[@name='purchaser_id']/ancestor::group[3]" position="after">
                 <group string="Horario y Zona" col="2">
                     <group>
                         <field name="start_time" placeholder="Ej: 06:00 AM"/>
                         <field name="end_time" placeholder="Ej: 02:00 PM"/>
-                         <field name="shift"/>
+                    </group>
+                    <group>
+                        <field name="shift"/>
                         <field name="cost_generate" widget="monetary" options="{'currency_field': 'secondary_currency_id'}"/>
                     </group>
                 </group>
             </xpath>
 
+      
 
 
             <!-- 3. Notebook con las Liquidaciones Semanales al final de la ficha -->
