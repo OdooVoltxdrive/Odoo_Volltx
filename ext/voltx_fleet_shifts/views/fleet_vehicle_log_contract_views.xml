@@ -33,7 +33,7 @@
             </xpath>
 
             <!-- 4. INSERTAR 'Horario y Zona' justo después del grupo de Vehículo / Conductor -->
-            <xpath expr="//field[@name='purchaser_id']/ancestor::group[3]" position="after">
+            <xpath expr="//field[@name='vehicle_id']/ancestor::group[2]" position="after">
                 <group string="Horario y Zona" col="2">
                     <group>
                         <field name="start_time" placeholder="Ej: 06:00 AM"/>
