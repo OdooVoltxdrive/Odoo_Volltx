@@ -54,15 +54,15 @@ class FleetVehicleLogContract(models.Model):
             usd = self.env.ref('base.USD', raise_if_not_found=False)
             contract.secondary_currency_id = usd.id if usd else contract.company_id.currency_id.id
 
-    daily_log_ids = fields.One2many('fleet.driver.daily.log', 'contract_id', string='Daily Logs')
+    #daily_log_ids = fields.One2many('fleet.driver.daily.log', 'contract_id', string='Daily Logs')
 
-    daily_logs_count = fields.Integer(compute='_compute_logs_count', string='Logs Count')
+    #daily_logs_count = fields.Integer(compute='_compute_logs_count', string='Logs Count')
     invoice_count = fields.Integer(compute='_compute_invoice_count', string='Invoice Count')
 
-    @api.depends('daily_log_ids')
-    def _compute_logs_count(self):
+    #@api.depends('daily_log_ids')
+    """def _compute_logs_count(self):
         for contract in self:
-            contract.daily_logs_count = len(contract.daily_log_ids)
+            contract.daily_logs_count = len(contract.daily_log_ids)"""
 
     @api.depends('liquidation_ids.invoice_id')
     def _compute_invoice_count(self):
