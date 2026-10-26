@@ -19,14 +19,14 @@ class FleetWeeklyLiquidation(models.Model):
 
     #daily_log_ids = fields.One2many('fleet.driver.daily.log', 'liquidation_id', string='Registros diarios')
 
-    days_worked = fields.Integer(string='Días/Servicios', compute='_compute_totals', store=True)
-    total_hours = fields.Float(string='Horas/Servicios', compute='_compute_totals', store=True)
-    amount_total = fields.Monetary(
+    #days_worked = fields.Integer(string='Días/Servicios', compute='_compute_totals', store=True)
+    #total_hours = fields.Float(string='Horas/Servicios', compute='_compute_totals', store=True)
+    """amount_total = fields.Monetary(
         string='Tarifa Total',
         compute='_compute_totals',
         store=True,
         currency_field='currency_id'
-    )
+    )"""
 
     currency_id = fields.Many2one('res.currency', related='contract_id.company_id.currency_id')
     invoice_id = fields.Many2one('account.move', string='Factura', readonly=True)

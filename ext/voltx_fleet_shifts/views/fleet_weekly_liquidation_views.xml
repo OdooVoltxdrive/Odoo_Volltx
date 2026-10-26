@@ -40,27 +40,14 @@
                             <field name="week_of_year"/>
                         </group>
                         <group string="Totales">
-                            <field name="days_worked"/>
-                            <field name="total_hours" widget="float_time"/>
+                            <!--field name="days_worked"/>
+                            <field name="total_hours" widget="float_time"/-->
                             <field name="currency_id" invisible="1"/>
                             <field name="amount_total" widget="monetary"/>
                             <field name="invoice_id"/>
                         </group>
                     </group>
-                    <notebook>
-                        <page string="Registros diarios">
-                            <field name="daily_log_ids">
-                                <list decoration-success="worked" decoration-danger="not worked and state == 'done'">
-                                    <field name="name"/>
-                                    <field name="check_in"/>
-                                    <field name="check_out"/>
-                                    <field name="hours_worked" widget="float_time"/>
-                                    <field name="worked" widget="boolean_toggle"/>
-                                    <field name="state" widget="badge"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
+                   
                 </sheet>
             </form>
         </field>
@@ -76,8 +63,8 @@
                 <field name="contract_id"/>
                 <field name="driver_id"/>
                 <field name="week_of_year"/>
-                <field name="days_worked"/>
-                <field name="total_hours" widget="float_time"/>
+                <!--field name="days_worked"/>
+                <field name="total_hours" widget="float_time"/-->
                 <field name="currency_id" column_invisible="True"/>
                 <field name="amount_total" widget="monetary"/>
                 <field name="state" widget="badge"/>
