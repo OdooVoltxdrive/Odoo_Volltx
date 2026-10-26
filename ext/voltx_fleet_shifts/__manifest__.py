@@ -8,7 +8,7 @@
     """,
     'category': 'Human Resources/Fleet',
     'author': 'Your Company',
-    'depends': ['fleet', 'account'],
+    'depends': ['fleet', 'account','base'],
     'data': [
         'security/ir.model.access.csv',
         #'views/fleet_work_shift_views.xml',

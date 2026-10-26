@@ -1,5 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- 1. Vista Lista -->
+    <record id="fleet_weekly_liquidation_view_list" model="ir.ui.view">
+        <field name="name">fleet.weekly.liquidation.list</field>
+        <field name="model">fleet.weekly.liquidation</field>
+        <field name="arch" type="xml">
+            <list string="Liquidaciones Semanales">
+                <field name="name"/>
+                <field name="contract_id"/>
+                <field name="driver_id"/>
+                <field name="week_of_year"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="amount_total_usd" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="amount_total_bs" widget="monetary"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'invoiced'"
+                       decoration-success="state == 'paid'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 2. Vista Formulario -->
     <record id="fleet_weekly_liquidation_view_form" model="ir.ui.view">
         <field name="name">fleet.weekly.liquidation.form</field>
         <field name="model">fleet.weekly.liquidation</field>
@@ -33,6 +55,18 @@
                     </group>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <!-- 3. Acción de Ventana para el Menú -->
+    <record id="action_fleet_weekly_liquidation" model="ir.actions.act_window">
+        <field name="name">Liquidaciones Semanales</field>
+        <field name="res_model">fleet.weekly.liquidation</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Cree una nueva liquidación semanal.
+            </p>
         </field>
     </record>
 </odoo>
