@@ -20,7 +20,6 @@
 
             <!-- 2. Campo Turno al lado del seguro/conductor -->
             <xpath expr="//field[@name='insurer_id']" position="after">
-                <field name="shift"/>
                 <field name="secondary_currency_id" invisible="1"/>
                 <field name="vehicle_driver_ids" invisible="1"/>
             </xpath>
@@ -56,9 +55,7 @@
                     <group>
                         <field name="start_time" placeholder="Ej: 06:00 AM"/>
                         <field name="end_time" placeholder="Ej: 02:00 PM"/>
-                    </group>
-                    <group>
-                        <field name="shift"/>
+                         <field name="shift"/>
                         <field name="cost_generate" widget="monetary" options="{'currency_field': 'secondary_currency_id'}"/>
                     </group>
                 </group>

@@ -34,8 +34,7 @@
                 <field name="current_shift_driver_id" readonly="1" widget="many2one_avatar"/>
                 <field name="next_shift_driver_id" readonly="1" widget="many2one_avatar"/>
                 <field name="driver_ids" 
-                       widget="many2many_tags" 
-                       domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]"
+                       widget="many2one_avatar" 
                        placeholder="Seleccione los conductores autorizados..."/>
             </xpath>
 
