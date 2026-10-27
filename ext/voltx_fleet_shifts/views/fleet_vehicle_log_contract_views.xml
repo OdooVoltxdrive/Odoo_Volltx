@@ -58,8 +58,10 @@
                                 <field name="name" readonly="1"/>
                                 <field name="week_of_year"/>
                                 <field name="observation"/>
-                                <field name="amount_total_bs"/>
-                                <field name="amount_total_usd"/>
+                                <field name="currency_id" column_invisible="1"/>
+                                <field name="bs_currency_id" column_invisible="1"/>
+                                <field name="amount_total_bs" widget="monetary" options="{'currency_field': 'bs_currency_id'}"/>
+                                <field name="amount_total_usd" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                 <field name="invoice_id" readonly="1" widget="many2one"/>
                                 <field name="state" widget="badge"/>
                             </list>

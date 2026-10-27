@@ -26,6 +26,7 @@ class FleetWeeklyLiquidation(models.Model):
     )
     amount_total_bs = fields.Monetary(
         string='Pago Bs',
+        currency_field='bs_currency_id',
         tracking=True
     )
 
@@ -35,7 +36,11 @@ class FleetWeeklyLiquidation(models.Model):
         related='contract_id.secondary_currency_id',
         string='Moneda USD'
     )
-
+    bs_currency_id = fields.Many2one(
+        'res.currency',
+        compute='_compute_bs_currency',
+        string='Moneda Bs'
+    )
 
     invoice_id = fields.Many2one('account.move', string='Factura', readonly=True)
 
@@ -45,6 +50,11 @@ class FleetWeeklyLiquidation(models.Model):
         ('paid', 'Pagado')
     ], default='draft', string='Status', compute='_compute_state', store=True)
 
+
+    def _compute_bs_currency(self):
+        bs = self.env.ref('base.VES')
+        for liq in self:
+            liq.bs_currency_id = bs
 
     @api.depends('contract_id.purchaser_id')
     def _compute_driver_id(self):
@@ -93,6 +103,7 @@ class FleetWeeklyLiquidation(models.Model):
             return
 
         company = self.contract_id.company_id or self.env.company
+        currency = self.currency_id if self.amount_total_usd > 0 else self.bs_currency_id
 
         # 1. Diario de Ventas
         journal = self.env['account.journal'].search([
@@ -121,6 +132,9 @@ class FleetWeeklyLiquidation(models.Model):
 
         invoice_vals = {
             'move_type': 'out_invoice',
+            'state': 'draft',
+            'company_id': company.id,
+            'currency_id': currency.id,
             'partner_id': self.driver_id.id,
             'invoice_date': fields.Date.context_today(self),
             'ref': f"{self.name} - {self.week_of_year}",
@@ -136,7 +150,8 @@ class FleetWeeklyLiquidation(models.Model):
             ],
         }
 
-        move = self.env['account.move'].with_context(skip_invoice_sync=True).create(invoice_vals)
+        # Este contexto también controla los cálculos contables nativos de Odoo.
+        move = self.env['account.move'].with_context(skip_invoice_sync=False).create(invoice_vals)
         self.with_context(skip_invoice_sync=True).write({'invoice_id': move.id})
 
     def action_generate_invoice(self):
