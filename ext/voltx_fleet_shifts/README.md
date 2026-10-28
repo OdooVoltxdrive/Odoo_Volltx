@@ -55,6 +55,8 @@ La suite nativa incluye 10 regresiones fiscales además de las 26 anteriores. `s
 
 ## USD con IVA e IGTF: 19.0.0.5.0
 
+> **Bloqueo confirmado con admin en la UI de calidad (2026-10-28):** la factura 482 existe en el listado, pero abrir su formulario falla con `Expected singleton: account.tax(18, 19)`. `Localizacion_contable/base_contable/model/account_move.py:191`, `_compute_aliquot_general`, accede a `det.tax_ids.amount` cuando la línea contiene IVA e IGTF clasificados como generales. T-7 está **reabierto**: la verificación de creación/RPC de abajo no acredita un formulario operable. No se modificó ese módulo de terceros ni la factura para ocultar el error; resolver compatibilidad/configuración y repetir la prueba antes de habilitar este flujo.
+
 `fiscal_breakdown` v2 usa `{version:2,currency:'USD',base,vat,igtf,total}`, con los cuatro importes como texto de dos decimales. IVA 16 % sobre base e IGTF SENIAT 3 % sobre base + IVA, redondeo decimal de cada impuesto; total igual a `amount_total_usd`, sin Bs simultáneos. La capacidad readonly `fiscal_breakdown_version`, consultable por `default_get`, vale 2. VES v1 y liquidaciones heredadas sin desglose se conservan.
 
 La compañía configura **impuestos separados**, sin alterar IVA ni producto compartidos: `voltx_usd_vat_tax_id` (IVA 16 % no incluido, primero, amplía la base siguiente) y `voltx_igtf_tax_id` (IGTF 3 % no incluido, afectado por la base anterior, sin ampliarla, con cuenta de pasivo propia distinta del IVA). El ORM verifica individualmente los impuestos, base y total de la factura nativa antes de enlazarla. Las liquidaciones fiscales facturadas no admiten cambios financieros.
@@ -62,6 +64,14 @@ La compañía configura **impuestos separados**, sin alterar IVA ni producto com
 **Verificación funcional real, 2026-10-28:** el usuario autorizó subir `1cb9c50` a `calidad`; se confirmó instalada 19.0.0.5.0 y se creó una fixture nueva desde candidato/conductor/vehículo/contrato hasta pago USD por navegador con pasarela falsa. Liquidación **4**, factura **482**: base **92,50**, IVA **14,80**, IGTF **3,22**, total **110,52 USD**, `draft/not_paid`, `auto_post=no`. Reentregar la publicación no duplica. Solo se usaron impuestos QA 18/19, cuenta IGTF **453 / 2175021**, **a revisar por un contador**, no aprobada para producción. Compañía restaurada `(false,false) → (18,19) → (false,false)`; IVA 10 y producto 26 intactos. No se publica, paga ni concilia el borrador.
 
 **Límite:** la suite ORM completa de `tests/test_liquidation_fiscal.py` no se ejecutó: Community local no carga la cadena Unidigital/Enterprise y no se obtuvieron logs de tests Odoo.sh. La verificación real acredita el recorrido feliz e idempotente, no todos los rechazos/rollback de esa suite ni bancos reales. Producción necesita configuración aprobada por contabilidad. Las notas de crédito con IGTF o varias líneas permanecen bloqueadas en el backend.
+
+## Compatibilidad de la vista fiscal USD: 19.0.0.6.0
+
+El error de apertura anterior se corrige mediante herencia de `account.move` **solo en este addon**. Se identifican las facturas enlazadas a liquidaciones USD v2; sus campos de alícuota general e IGTF leen los apuntes fiscales nativos en moneda de factura, sin exigir singleton sobre IVA+IGTF ni depender de los impuestos actualmente asignados a la compañía. Reducida/adicional son cero en este contrato 16 %/3 %. `amount_total_aux` conserva el total nativo, que ya incluye IGTF, en lugar de sumarlo de nuevo. Los documentos no v2 siguen usando los cálculos heredados. No se cambian módulos de terceros, importes, impuestos o apuntes existentes ni se agrega una columna/migración.
+
+**Solo borradores:** se bloquean `action_post` y el envío directo `enviar_fact_digital` para estas facturas con `ODOO_USD_FISCAL_POSTING_MAPPING_REQUIRED`. El generador Unidigital heredado mezcla el impuesto total de línea con IVA y vuelve a calcular IGTF; reparar la vista no acredita ese envío. Publicación y envío requieren un acuerdo/mapeo electrónico específico, fuera del recorrido hasta borrador. Esta guarda no debe quitarse para conseguir una prueba verde.
+
+Pruebas nuevas en `tests/test_usd_localization.py`: lectura pública de los campos del formulario, restauración de impuestos de compañía, lotes USD/VES y rechazo de publicación/envío. Se conserva íntegra la suite previa. El fallo real se reprodujo por navegador y por `read` de los campos de localización en calidad **antes de implementar**. La suite ORM completa aún requiere ejecución Enterprise; parseo y tests de metadatos no la sustituyen.
 
 ## Pruebas nativas
 

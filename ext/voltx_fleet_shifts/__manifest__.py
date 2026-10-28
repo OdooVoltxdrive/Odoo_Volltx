@@ -1,6 +1,6 @@
 {
     'name': 'Voltx Fleet Shifts',
-    'version': '19.0.0.5.0',
+    'version': '19.0.0.6.0',
     'summary': 'Manage fleet vehicle shifts and multiple drivers',
     'description': """
         This module extends the Fleet app to support multiple drivers assigned to a single vehicle
