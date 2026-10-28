@@ -1,3 +1,5 @@
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
 from odoo import models, fields, api, Command, _
 from odoo.exceptions import UserError
 
@@ -40,6 +42,7 @@ class FleetWeeklyLiquidation(models.Model):
         string='Moneda Bs'
     )
 
+    fiscal_breakdown = fields.Json(string='Desglose fiscal VoltX', readonly=True, copy=False)
     invoice_id = fields.Many2one('account.move', string='Factura', readonly=True)
 
     state = fields.Selection([
@@ -82,6 +85,9 @@ class FleetWeeklyLiquidation(models.Model):
         return records
 
     def write(self, vals):
+        if {'fiscal_breakdown', 'amount_total_usd', 'amount_total_bs', 'contract_id', 'invoice_id'} & vals.keys():
+            if any(record.invoice_id and (record.fiscal_breakdown or vals.get('fiscal_breakdown')) for record in self):
+                raise UserError(_('No se puede modificar una liquidación fiscal ya facturada.'))
         res = super().write(vals)
         # Si se ingresa o actualiza el monto en USD o Bs y no tiene factura, se dispara la creación
         if ('amount_total_usd' in vals or 'amount_total_bs' in vals) and not self.env.context.get('skip_invoice_sync'):
@@ -89,6 +95,64 @@ class FleetWeeklyLiquidation(models.Model):
                 if not record.invoice_id and (record.amount_total_usd > 0 or record.amount_total_bs > 0):
                     record._auto_generate_invoice()
         return res
+
+    @api.constrains('fiscal_breakdown', 'amount_total_usd', 'amount_total_bs')
+    def _check_fiscal_breakdown(self):
+        for record in self:
+            if record.fiscal_breakdown:
+                record._fiscal_amounts()
+
+    def _fiscal_amounts(self):
+        self.ensure_one()
+        data = self.fiscal_breakdown
+        error = _('ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: desglose fiscal VES inválido.')
+        if not isinstance(data, dict) or set(data) != {'version', 'currency', 'base', 'service', 'vat', 'total'}:
+            raise UserError(error)
+        if type(data['version']) is not int or data['version'] != 1 or data['currency'] != 'VES':
+            raise UserError(error)
+        amounts = {}
+        for key in ('base', 'service', 'vat', 'total'):
+            try:
+                if isinstance(data[key], bool) or not isinstance(data[key], (str, int, float)):
+                    raise ValueError()
+                value = Decimal(str(data[key]))
+                if not value.is_finite() or value < 0 or value != value.quantize(Decimal('0.01')):
+                    raise ValueError()
+                amounts[key] = value
+            except (InvalidOperation, ValueError):
+                raise UserError(error) from None
+        taxable = amounts['base'] + amounts['service']
+        if (amounts['base'] <= 0 or amounts['total'] <= 0
+                or (taxable * Decimal('0.16')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP) != amounts['vat']
+                or taxable + amounts['vat'] != amounts['total']
+                or self.amount_total_usd != 0 or Decimal(str(self.amount_total_bs)) != amounts['total']):
+            raise UserError(error)
+        return amounts
+
+    def _fiscal_invoice_lines(self, company, rental, account, description):
+        amounts = self._fiscal_amounts()
+        service = company.voltx_service_product_id
+        if amounts['service'] and not service:
+            raise UserError(_('ODOO_LIQUIDATION_SERVICE_MAPPING_REQUIRED: contabilidad debe confirmar el producto de servicio de la compañía.'))
+        lines = []
+        for product, value, label in ((rental, amounts['base'], description), (service, amounts['service'], _('Servicio — ') + description)):
+            if not value:
+                continue
+            if not product or not product.active or not product.sale_ok or (product.company_id and product.company_id != company):
+                raise UserError(_('ODOO_LIQUIDATION_SERVICE_MAPPING_REQUIRED: producto de venta inválido.'))
+            taxes = product.taxes_id.filtered(lambda tax: tax.company_id == company)
+            if (len(taxes) != 1 or taxes.amount_type != 'percent' or taxes.amount != 16
+                    or taxes.price_include or taxes.include_base_amount or taxes.type_tax_use != 'sale'):
+                raise UserError(_('ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: los productos deben tener únicamente IVA de venta 16 % no incluido.'))
+            income = product.with_company(company).property_account_income_id or product.categ_id.with_company(company).property_account_income_categ_id
+            if product == service and (not income or income.account_type not in ('income', 'income_other')):
+                raise UserError(_('ODOO_LIQUIDATION_SERVICE_MAPPING_REQUIRED: confirmar la cuenta de ingresos del producto de servicio.'))
+            lines.append(Command.create({
+                'product_id': product.id, 'name': label, 'quantity': 1,
+                'price_unit': float(value), 'account_id': (income or account).id,
+                'tax_ids': [Command.set(taxes.ids)],
+            }))
+        return lines
 
     def _auto_generate_invoice(self):
         """Genera la factura borrador manteniendo la estructura contable original."""
@@ -148,8 +212,16 @@ class FleetWeeklyLiquidation(models.Model):
             ],
         }
 
+        if self.fiscal_breakdown:
+            invoice_vals['invoice_line_ids'] = self._fiscal_invoice_lines(company, product, account, line_desc)
         # Este contexto también controla los cálculos contables nativos de Odoo.
         move = self.env['account.move'].with_context(skip_invoice_sync=False).create(invoice_vals)
+        if self.fiscal_breakdown:
+            amounts = self._fiscal_amounts()
+            if (currency.compare_amounts(move.amount_total, float(amounts['total']))
+                    or currency.compare_amounts(move.amount_tax, float(amounts['vat']))
+                    or currency.compare_amounts(move.amount_untaxed, float(amounts['base'] + amounts['service']))):
+                raise UserError(_('ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: los cálculos nativos de Odoo no coinciden con el cobro; no se conserva el borrador.'))
         self.with_context(skip_invoice_sync=True).write({'invoice_id': move.id})
 
     def action_generate_invoice(self):

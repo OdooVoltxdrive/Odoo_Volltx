@@ -41,6 +41,18 @@ Desde la raíz del repositorio, `python3 -m unittest discover -s tests -p test_w
 
 La deprecación de XML-RPC en Odoo 19 (retirada prevista para Odoo 22), los adjuntos ausentes del filestore y los permisos de catálogo PostgreSQL de Odoo.sh son asuntos separados. No se ocultan avisos ni se amplían permisos para eliminarlos.
 
+## Mapeo fiscal VES: 19.0.0.4.0
+
+El campo opcional `fiscal_breakdown` recibe el desglose guardado del pago: `{"version":1,"currency":"VES","base":"3900.00","service":"487.50","vat":"702.00","total":"5089.50"}`. Los importes son decimales de hasta dos posiciones. Solo admite VES, sin importe USD simultáneo, base positiva, servicio no negativo e IVA exacto del 16 % sobre base + servicio. El total debe coincidir con `amount_total_bs`. Se conserva el comportamiento histórico de las liquidaciones sin este campo; no se migran documentos anteriores.
+
+**Configuración pendiente de contabilidad:** en Ajustes → Compañías → compañía → «Facturación VoltX», seleccionar la variante de producto de servicio en `voltx_service_product_id`, con cuenta de ingresos de producto/categoría confirmada. Queda vacío por defecto; no se infiere del nombre de un producto ni se modifica calidad automáticamente. El arrendamiento sigue usando la plantilla 27. Ambos productos deben tener solo IVA de venta 16 % no incluido, de la compañía correcta.
+
+Sin configuración válida, `create` devuelve `ODOO_LIQUIDATION_SERVICE_MAPPING_REQUIRED` o `ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED` y la transacción RPC no conserva la liquidación ni la factura. Con configuración válida, Odoo genera líneas de arrendamiento y servicio netas, aplica sus impuestos nativos y verifica base, impuesto y total. Una discrepancia de redondeo tampoco se corrige inventando ajustes: se rechaza. La factura queda `draft`, `auto_post=no`, sin pago ni conciliación. Los datos financieros de una liquidación fiscal facturada no pueden cambiarse ni desvincular su factura.
+
+Desplegar y actualizar el addon antes del backend que envía el protocolo fiscal. El backend detecta addons antiguos y conserva el bloqueo. USD/IGTF, pagos multisemana y el reparto de impuestos en reembolsos de facturas multilínea siguen pendientes. No habilitar colas generales ni reutilizar pagos QA ya consumidos.
+
+La suite nativa incluye 10 regresiones fiscales además de las 26 anteriores. `scripts/seed_fiscal_local.py`, ejecutado por `odoo shell` exclusivamente en una base desechable llamada `voltx_fiscal_test` y con `FISCAL_QA_PASSWORD` local, prepara la comprobación visual/RPC. Incluye asserts de importes, borrador y rechazo sin configuración. Reproduce la plantilla 27 solo en esa base vacía, preservando el avance previo de su secuencia; nunca usar ese script en calidad. Escribe `/tmp/fiscal-ui-fixture.json`, que debe copiarse al host para las pruebas Chromium del frontend.
+
 ## Pruebas nativas
 
 Ejecutar solo en una base Odoo/PostgreSQL aislada, con los addons oficiales y este módulo disponibles en `addons_path`:
