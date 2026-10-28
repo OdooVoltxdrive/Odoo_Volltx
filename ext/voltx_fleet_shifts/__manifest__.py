@@ -8,7 +8,7 @@
     """,
     'category': 'Human Resources/Fleet',
     'author': 'Your Company',
-    'depends': ['fleet', 'account','contacts','base'],
+    'depends': ['fleet', 'account','contacts','base','factura_digital_unidigital',],
     'data': [
         'security/ir.model.access.csv',
         'views/res_partner_view.xml',
