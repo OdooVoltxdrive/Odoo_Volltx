@@ -31,6 +31,16 @@ La actualización anterior encontró contratos existentes sin `purchaser_id`, si
 
 `tests/test_contract_purchaser.py` cubre el esquema compatible, contratos heredados, altas válidas/inválidas, lotes atómicos, valores por contexto/vehículo, borrado del contacto, independencia entre titular y conductor actual del vehículo, conservación del titular al sincronizar turnos, bloqueo de facturación sin conductor y ausencia de duplicados al asignar conductores.
 
+## Limpieza de avisos: 19.0.0.3.0
+
+Se eliminan `tracking=True` de los dos importes de liquidación: el modelo no hereda `mail.thread`, por lo que Odoo no admitía ese parámetro. No se añade chatter ni se cambian cálculos, impuestos o generación de facturas.
+
+En `Localizacion_contable/iva_retention` e `isrl_retention` se declaran las descripciones de los modelos y la licencia `LGPL-3` que Odoo ya aplicaba por defecto. Los dos `readonly` de texto pasan a booleanos y se retira `filters` de los campos binarios de descarga; sus nombres de archivo XML y vistas se conservan. Son correcciones de declaraciones Python/manifiestos, sin una migración de datos contables.
+
+Desde la raíz del repositorio, `python3 -m unittest discover -s tests -p test_warning_metadata.py -v` comprueba las cinco familias de declaraciones. La instalación aislada con las extensiones Python de contabilidad/retenciones mantiene las 26 pruebas ORM aprobadas y no emite estos avisos. No sustituye una prueba con todos los módulos Enterprise de calidad.
+
+La deprecación de XML-RPC en Odoo 19 (retirada prevista para Odoo 22), los adjuntos ausentes del filestore y los permisos de catálogo PostgreSQL de Odoo.sh son asuntos separados. No se ocultan avisos ni se amplían permisos para eliminarlos.
+
 ## Pruebas nativas
 
 Ejecutar solo en una base Odoo/PostgreSQL aislada, con los addons oficiales y este módulo disponibles en `addons_path`:

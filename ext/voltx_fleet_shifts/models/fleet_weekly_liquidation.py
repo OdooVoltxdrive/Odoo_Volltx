@@ -21,13 +21,11 @@ class FleetWeeklyLiquidation(models.Model):
     # Campos de pago en moneda extranjera y local
     amount_total_usd = fields.Monetary(
         string='Pago $',
-        currency_field='currency_id',
-        tracking=True
+        currency_field='currency_id'
     )
     amount_total_bs = fields.Monetary(
         string='Pago Bs',
-        currency_field='bs_currency_id',
-        tracking=True
+        currency_field='bs_currency_id'
     )
 
     # Monedas

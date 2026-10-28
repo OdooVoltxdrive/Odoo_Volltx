@@ -11,7 +11,7 @@ _logger = logging.getLogger('__name__')
 class AccountMove(models.Model):
     _inherit = 'account.move'    
 
-    vat_ret_id = fields.Many2one('vat.retention', string='Retención IVA', readonly="True", copy=False, help='Voucher Retencion IVA')
+    vat_ret_id = fields.Many2one('vat.retention', string='Retención IVA', readonly=True, copy=False, help='Voucher Retencion IVA')
     vat_ret_aux_id = fields.Char(copy=False)
     contacto_id = fields.Many2one('res.partner', compute='_compute_contacto',string="Contacto")
 
