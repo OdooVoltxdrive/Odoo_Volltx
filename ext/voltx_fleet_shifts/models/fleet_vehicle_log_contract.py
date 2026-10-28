@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class FleetVehicleLogContract(models.Model):
@@ -8,11 +8,14 @@ class FleetVehicleLogContract(models.Model):
     purchaser_id = fields.Many2one(
         'res.partner',
         string='Driver',
+        related=False,
         compute='_compute_purchaser_id',
         inverse='_inverse_purchaser_id',
         store=True,
         readonly=False,
-        required=True,
+        # La validación ORM permite conservar contratos heredados sin inventar su conductor.
+        required=False,
+        ondelete='restrict',
         tracking=True,
         help="Conductor titular único asignado a este contrato"
     )
@@ -61,6 +64,8 @@ class FleetVehicleLogContract(models.Model):
             driver_val = vals.get('purchaser_id') or self.env.context.get('default_purchaser_id')
             if driver_val and record.purchaser_id.id != driver_val:
                 super(FleetVehicleLogContract, record).write({'purchaser_id': driver_val})
+        if records.filtered(lambda contract: not contract.purchaser_id):
+            raise ValidationError(_("Debe asignar un conductor al contrato."))
         return records
 
     def write(self, vals):
@@ -69,6 +74,8 @@ class FleetVehicleLogContract(models.Model):
             del vals['purchaser_id']
             if not vals:
                 return True
+        if 'purchaser_id' in vals and not vals['purchaser_id'] and self.mapped('purchaser_id'):
+            raise ValidationError(_("No puede quitar el conductor de un contrato asignado."))
         return super(FleetVehicleLogContract, self).write(vals)
 
     @api.onchange('vehicle_id')

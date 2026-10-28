@@ -19,6 +19,18 @@ La actualización no convierte importes ni corrige facturas anteriores. Cualquie
 
 El backend conserva `ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED`: separar monedas no acuerda cómo representar base, servicio, IVA e IGTF. Tampoco resuelve pagos que abarcan varias semanas. No quitar estas protecciones ni reintentar todos los eventos pendientes para comprobar el parche.
 
+## Compatibilidad con contratos heredados: 19.0.0.2.0
+
+La actualización anterior encontró contratos existentes sin `purchaser_id`, sin asignación de conductor ni historial que permita recuperarlo. El `NOT NULL` global impedía validar el esquema. No se rellena ese dato con el administrador, un contacto ficticio o el conductor actual de otro contrato.
+
+- La columna admite los nulos heredados; no se borran contratos ni se cambian sus estados, importes o asignaciones.
+- Las altas de contratos siguen exigiendo conductor mediante validación ORM, incluidos los lotes. No se permite quitar un conductor ya asignado ni eliminar el contacto referenciado (`ondelete='restrict'`).
+- El formulario mantiene el conductor obligatorio. Se elimina el `related` heredado de `vehicle_id.driver_id` para que se ejecuten el cálculo y la inversa propios ya definidos por el módulo: el titular del contrato no sustituye al conductor actual del vehículo ni se pierde al cambiar el turno. Los contratos heredados pueden conservarse y recibir una asignación real cuando esté confirmada.
+- Se conserva la protección existente: una liquidación sin conductor no genera factura.
+- Actualizar `voltx_fleet_shifts` para aplicar la compatibilidad de esquema. Los contratos heredados sin conductor siguen pendientes de revisión manual; este parche no afirma haber reconstruido esa información.
+
+`tests/test_contract_purchaser.py` cubre el esquema compatible, contratos heredados, altas válidas/inválidas, lotes atómicos, valores por contexto/vehículo, borrado del contacto, independencia entre titular y conductor actual del vehículo, conservación del titular al sincronizar turnos, bloqueo de facturación sin conductor y ausencia de duplicados al asignar conductores.
+
 ## Pruebas nativas
 
 Ejecutar solo en una base Odoo/PostgreSQL aislada, con los addons oficiales y este módulo disponibles en `addons_path`:
