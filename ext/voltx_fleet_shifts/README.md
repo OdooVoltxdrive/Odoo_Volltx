@@ -35,9 +35,9 @@ La actualización anterior encontró contratos existentes sin `purchaser_id`, si
 
 Se eliminan `tracking=True` de los dos importes de liquidación: el modelo no hereda `mail.thread`, por lo que Odoo no admitía ese parámetro. No se añade chatter ni se cambian cálculos, impuestos o generación de facturas.
 
-En `Localizacion_contable/iva_retention` e `isrl_retention` se declaran las descripciones de los modelos y la licencia `LGPL-3` que Odoo ya aplicaba por defecto. Los dos `readonly` de texto pasan a booleanos y se retira `filters` de los campos binarios de descarga; sus nombres de archivo XML y vistas se conservan. Son correcciones de declaraciones Python/manifiestos, sin una migración de datos contables.
+Se revirtieron íntegramente los cambios de metadatos que se habían aplicado a `Localizacion_contable/iva_retention` e `isrl_retention`. Los ocho archivos vuelven al contenido previo al commit `4eb2a1c`. Los módulos de Darrell Sojo no forman parte del alcance autorizado: no deben modificarse para limpiar sus avisos. Esos warnings pueden reaparecer y no se deben silenciar ni corregir desde este trabajo.
 
-Desde la raíz del repositorio, `python3 -m unittest discover -s tests -p test_warning_metadata.py -v` comprueba las cinco familias de declaraciones. La instalación aislada con las extensiones Python de contabilidad/retenciones mantiene las 26 pruebas ORM aprobadas y no emite estos avisos. No sustituye una prueba con todos los módulos Enterprise de calidad.
+Desde la raíz del repositorio, `python3 -m unittest discover -s tests -p test_warning_metadata.py -v` comprueba únicamente la declaración de los importes del addon propio. Se retiraron las cuatro comprobaciones nuevas que exigían cambios en los módulos de terceros. Las pruebas ORM del addon propio no cambian; sus resultados anteriores no sustituyen una prueba con todos los módulos Enterprise de calidad.
 
 La deprecación de XML-RPC en Odoo 19 (retirada prevista para Odoo 22), los adjuntos ausentes del filestore y los permisos de catálogo PostgreSQL de Odoo.sh son asuntos separados. No se ocultan avisos ni se amplían permisos para eliminarlos.
 
