@@ -5,5 +5,4 @@ from . import fleet_weekly_liquidation
 from . import res_partner
 from . import res_company
 from . import account_move_send
-from . import account_move
 

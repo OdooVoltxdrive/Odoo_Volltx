@@ -7,8 +7,6 @@
             <xpath expr="//sheet" position="inside">
                 <group string="Facturación VoltX" groups="account.group_account_manager">
                     <field name="voltx_service_product_id" domain="[('sale_ok', '=', True), ('type', '=', 'service')]" options="{'no_create': True}"/>
-                    <field name="voltx_usd_vat_tax_id" domain="[('type_tax_use', '=', 'sale'), ('amount_type', '=', 'percent'), ('amount', '=', 16)]" options="{'no_create': True}"/>
-                    <field name="voltx_igtf_tax_id" domain="[('type_tax_use', '=', 'sale'), ('amount_type', '=', 'percent'), ('amount', '=', 3)]" options="{'no_create': True}"/>
                 </group>
             </xpath>
         </field>
