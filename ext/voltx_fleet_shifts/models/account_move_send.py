@@ -6,6 +6,8 @@ from odoo import models
 
 _logger = logging.getLogger(__name__)
 
+from odoo import api, fields, models, _
+
 
 class AccountMoveSend(models.AbstractModel):
     _inherit = 'account.move.send'
