@@ -99,3 +99,88 @@ class AccountMoveSend(models.AbstractModel):
             return super()._prepare_invoice_pdf_report(remaining_invoices_data, **kwargs)
 
         return invoices_data
+
+
+
+class AccountMoveSendWizard(models.TransientModel):
+    _inherit = 'account.move.send.wizard'
+
+    @api.depends('move_id')
+    def _compute_mail_attachments_widget(self):
+        """
+        Al abrir la ventana emergente de envío, descarga el PDF de Unidigital
+        si aún no existe y reemplaza el adjunto nativo de Odoo en la vista previa.
+        """
+        # Ejecuta primero el cálculo nativo
+        super()._compute_mail_attachments_widget()
+
+        Attachment = self.env['ir.attachment']
+
+        for wizard in self:
+            move = wizard.move_id
+            if not move or not move.company_id.usar_fact_digi or not move.result:
+                continue
+
+            # 1. Obtener identificador limpio de Unidigital
+            raw_res = move.result
+            clean_result = ""
+            try:
+                parsed_res = json.loads(raw_res)
+                if isinstance(parsed_res, dict):
+                    clean_result = str(parsed_res.get('id') or parsed_res.get('documentId') or '')
+                else:
+                    clean_result = str(parsed_res)
+            except Exception:
+                clean_result = str(raw_res)
+
+            clean_result = clean_result.strip('"\'' ).strip()
+            if not clean_result:
+                continue
+
+            file_name = f"{move.name.replace('/', '_')}_fiscal.pdf"
+
+            # 2. Buscar si ya lo habíamos descargado y guardado en la factura
+            attachment = Attachment.search([
+                ('res_model', '=', 'account.move'),
+                ('res_id', '=', move.id),
+                ('name', '=', file_name),
+            ], limit=1)
+
+            # 3. Si no existe en la base de datos, descargarlo directamente de Unidigital
+            if not attachment:
+                base_url = (move.company_id.url or '').strip().rstrip('/')
+                endpoint = (move.company_id.endpoint_pdf_doc or '').strip().strip('/')
+                pdf_url = f"{base_url}/{endpoint}/{clean_result}"
+
+                try:
+                    headers = {
+                        "User-Agent": "Mozilla/5.0",
+                        "Accept": "application/pdf, application/json, */*"
+                    }
+                    if move.company_id.unidg_jwt_token:
+                        headers["Authorization"] = f"Bearer {move.company_id.unidg_jwt_token}"
+
+                    res = requests.get(pdf_url, headers=headers, timeout=20)
+                    if res.status_code == 200 and res.content:
+                        attachment = Attachment.create({
+                            'name': file_name,
+                            'raw': res.content,
+                            'mimetype': 'application/pdf',
+                            'res_model': 'account.move',
+                            'res_id': move.id,
+                            'type': 'binary',
+                        })
+                        _logger.info("Unidigital: PDF descargado y guardado para el wizard: %s", file_name)
+                except Exception as e:
+                    _logger.error("Unidigital: Error descargando PDF para el wizard de %s: %s", move.name, str(e))
+
+            # 4. Sustituir el widget de adjuntos en la pantalla emergente
+            if attachment:
+                # Reemplazamos la lista visual con únicamente el PDF digital
+                wizard.mail_attachments_widget = [{
+                    'id': attachment.id,
+                    'name': attachment.name,
+                    'mimetype': attachment.mimetype,
+                    'placeholder': False,
+                    'protect_from_deletion': True,
+                }]
