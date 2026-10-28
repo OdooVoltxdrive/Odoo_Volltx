@@ -1,4 +1,5 @@
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+import re
 
 from odoo import models, fields, api, Command, _
 from odoo.exceptions import UserError
@@ -43,6 +44,7 @@ class FleetWeeklyLiquidation(models.Model):
     )
 
     fiscal_breakdown = fields.Json(string='Desglose fiscal VoltX', readonly=True, copy=False)
+    fiscal_breakdown_version = fields.Integer(default=2, readonly=True, copy=False)
     invoice_id = fields.Many2one('account.move', string='Factura', readonly=True)
 
     state = fields.Selection([
@@ -105,14 +107,19 @@ class FleetWeeklyLiquidation(models.Model):
     def _fiscal_amounts(self):
         self.ensure_one()
         data = self.fiscal_breakdown
-        error = _('ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: desglose fiscal VES inválido.')
-        if not isinstance(data, dict) or set(data) != {'version', 'currency', 'base', 'service', 'vat', 'total'}:
+        error = _('ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: desglose fiscal inválido.')
+        if not isinstance(data, dict) or type(data.get('version')) is not int:
             raise UserError(error)
-        if type(data['version']) is not int or data['version'] != 1 or data['currency'] != 'VES':
+        usd = data['version'] == 2 and data.get('currency') == 'USD'
+        ves = data['version'] == 1 and data.get('currency') == 'VES'
+        keys = ('base', 'vat', 'igtf', 'total') if usd else ('base', 'service', 'vat', 'total')
+        if not (usd or ves) or set(data) != {'version', 'currency', *keys}:
             raise UserError(error)
         amounts = {}
-        for key in ('base', 'service', 'vat', 'total'):
+        for key in keys:
             try:
+                if usd and (not isinstance(data[key], str) or not re.fullmatch(r'\d+\.\d{2}', data[key])):
+                    raise ValueError()
                 if isinstance(data[key], bool) or not isinstance(data[key], (str, int, float)):
                     raise ValueError()
                 value = Decimal(str(data[key]))
@@ -121,21 +128,28 @@ class FleetWeeklyLiquidation(models.Model):
                 amounts[key] = value
             except (InvalidOperation, ValueError):
                 raise UserError(error) from None
-        taxable = amounts['base'] + amounts['service']
+        taxable = amounts['base'] + amounts.get('service', Decimal(0))
         if (amounts['base'] <= 0 or amounts['total'] <= 0
-                or (taxable * Decimal('0.16')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP) != amounts['vat']
-                or taxable + amounts['vat'] != amounts['total']
-                or self.amount_total_usd != 0 or Decimal(str(self.amount_total_bs)) != amounts['total']):
+                or (taxable * Decimal('0.16')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP) != amounts['vat']):
+            raise UserError(error)
+        if usd:
+            expected_igtf = ((taxable + amounts['vat']) * Decimal('0.03')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            if (amounts['igtf'] != expected_igtf or taxable + amounts['vat'] + amounts['igtf'] != amounts['total']
+                    or self.amount_total_bs != 0 or Decimal(str(self.amount_total_usd)) != amounts['total']):
+                raise UserError(error)
+        elif (taxable + amounts['vat'] != amounts['total']
+              or self.amount_total_usd != 0 or Decimal(str(self.amount_total_bs)) != amounts['total']):
             raise UserError(error)
         return amounts
 
     def _fiscal_invoice_lines(self, company, rental, account, description):
         amounts = self._fiscal_amounts()
         service = company.voltx_service_product_id
-        if amounts['service'] and not service:
+        usd = self.fiscal_breakdown['version'] == 2
+        if amounts.get('service') and not service:
             raise UserError(_('ODOO_LIQUIDATION_SERVICE_MAPPING_REQUIRED: contabilidad debe confirmar el producto de servicio de la compañía.'))
         lines = []
-        for product, value, label in ((rental, amounts['base'], description), (service, amounts['service'], _('Servicio — ') + description)):
+        for product, value, label in ((rental, amounts['base'], description), (service, amounts.get('service', 0), _('Servicio — ') + description)):
             if not value:
                 continue
             if not product or not product.active or not product.sale_ok or (product.company_id and product.company_id != company):
@@ -144,6 +158,8 @@ class FleetWeeklyLiquidation(models.Model):
             if (len(taxes) != 1 or taxes.amount_type != 'percent' or taxes.amount != 16
                     or taxes.price_include or taxes.include_base_amount or taxes.type_tax_use != 'sale'):
                 raise UserError(_('ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: los productos deben tener únicamente IVA de venta 16 % no incluido.'))
+            if usd:
+                taxes = self._usd_fiscal_taxes(company)
             income = product.with_company(company).property_account_income_id or product.categ_id.with_company(company).property_account_income_categ_id
             if product == service and (not income or income.account_type not in ('income', 'income_other')):
                 raise UserError(_('ODOO_LIQUIDATION_SERVICE_MAPPING_REQUIRED: confirmar la cuenta de ingresos del producto de servicio.'))
@@ -153,6 +169,27 @@ class FleetWeeklyLiquidation(models.Model):
                 'tax_ids': [Command.set(taxes.ids)],
             }))
         return lines
+
+    def _usd_fiscal_taxes(self, company):
+        vat, igtf = company.voltx_usd_vat_tax_id, company.voltx_igtf_tax_id
+        error = _('ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: configurar IVA USD e IGTF SENIAT con cuenta propia, a revisar por un contador.')
+        if not vat or not igtf or vat == igtf:
+            raise UserError(error)
+        for tax, rate in ((vat, 16), (igtf, 3)):
+            if (not tax.active or tax.company_id != company or tax.type_tax_use != 'sale'
+                    or tax.amount_type != 'percent' or tax.amount != rate or tax.price_include):
+                raise UserError(error)
+            repartitions = tax.invoice_repartition_line_ids.filtered(lambda line: line.repartition_type == 'tax')
+            if (not repartitions or sum(repartitions.mapped('factor_percent')) != 100
+                    or any(not line.account_id for line in repartitions)):
+                raise UserError(error)
+        igtf_accounts = igtf.invoice_repartition_line_ids.filtered(lambda line: line.repartition_type == 'tax').account_id
+        vat_accounts = vat.invoice_repartition_line_ids.filtered(lambda line: line.repartition_type == 'tax').account_id
+        if (not vat.include_base_amount or not igtf.is_base_affected or igtf.include_base_amount
+                or vat.sequence >= igtf.sequence or igtf_accounts & vat_accounts
+                or any(account.account_type != 'liability_current' for account in igtf_accounts)):
+            raise UserError(error)
+        return vat | igtf
 
     def _auto_generate_invoice(self):
         """Genera la factura borrador manteniendo la estructura contable original."""
@@ -219,9 +256,14 @@ class FleetWeeklyLiquidation(models.Model):
         if self.fiscal_breakdown:
             amounts = self._fiscal_amounts()
             if (currency.compare_amounts(move.amount_total, float(amounts['total']))
-                    or currency.compare_amounts(move.amount_tax, float(amounts['vat']))
-                    or currency.compare_amounts(move.amount_untaxed, float(amounts['base'] + amounts['service']))):
+                    or currency.compare_amounts(move.amount_tax, float(amounts['vat'] + amounts.get('igtf', 0)))
+                    or currency.compare_amounts(move.amount_untaxed, float(amounts['base'] + amounts.get('service', 0)))):
                 raise UserError(_('ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: los cálculos nativos de Odoo no coinciden con el cobro; no se conserva el borrador.'))
+            if self.fiscal_breakdown['version'] == 2:
+                for tax, key in ((company.voltx_usd_vat_tax_id, 'vat'), (company.voltx_igtf_tax_id, 'igtf')):
+                    native = -sum(move.line_ids.filtered(lambda line: line.tax_line_id == tax).mapped('amount_currency'))
+                    if currency.compare_amounts(native, float(amounts[key])):
+                        raise UserError(_('ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: el impuesto nativo no coincide con el desglose.'))
         self.with_context(skip_invoice_sync=True).write({'invoice_id': move.id})
 
     def action_generate_invoice(self):
