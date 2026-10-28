@@ -2,7 +2,7 @@
 from odoo import models
 
 
-class AccountMoveSend(models.TransientModel):
+class AccountMoveSend(models.AbstractModel):
     _inherit = 'account.move.send'
 
     def _prepare_invoice_pdf_report(self, invoice, invoice_data):
