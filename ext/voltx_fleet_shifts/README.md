@@ -53,26 +53,6 @@ Desplegar y actualizar el addon antes del backend que envía el protocolo fiscal
 
 La suite nativa incluye 10 regresiones fiscales además de las 26 anteriores. `scripts/seed_fiscal_local.py`, ejecutado por `odoo shell` exclusivamente en una base desechable llamada `voltx_fiscal_test` y con `FISCAL_QA_PASSWORD` local, prepara la comprobación visual/RPC. Incluye asserts de importes, borrador y rechazo sin configuración. Reproduce la plantilla 27 solo en esa base vacía, preservando el avance previo de su secuencia; nunca usar ese script en calidad. Escribe `/tmp/fiscal-ui-fixture.json`, que debe copiarse al host para las pruebas Chromium del frontend.
 
-## Reversión USD/IGTF y alícuotas: 19.0.0.7.0
-
-Por solicitud expresa del usuario se revierten los cambios del addon de `1cb9c50` (USD v2/IGTF nativo) y `0608571` (compatibilidad de alícuotas/totales y guardas de publicación/envío). Los modelos, vistas e imports quedan como en `d0e2cc5` / funcionalidad 19.0.0.4.0; el número 19.0.0.7.0 solo permite desplegar la reversión mediante actualización del módulo. No se modifica la localización de terceros, el backend ni su cálculo de cobro.
-
-Se retiran junto con la funcionalidad sus casos de prueba nuevos de USD v2/localización, restaurando **exactamente** las pruebas existentes antes de T-7, sin rebajar ninguna expectativa VES/legacy. El historial y la evidencia roja quedan conservados. No se presenta esta retirada como arreglo ni como aprobación de la suite Enterprise.
-
-La reversión no borra facturas, liquidaciones, impuestos QA ni snapshots financieros ya guardados. Las asignaciones temporales de compañía estaban vacías antes del despliegue. Los documentos antiguos con dos impuestos pueden volver a mostrar el error heredado de singleton; no se reescriben para ocultarlo. El backend conserva la negociación de capacidad y debe bloquear nuevos envíos USD v2 al addon revertido. El recorrido nuevo se detiene en el primer fallo real, sin forzar la factura ni corregir el error todavía.
-
-**Comprobación real tras desplegar la reversión:** `28656eb` instalado como 19.0.0.7.0; `fields_get` ya no declara capacidad v2 ni impuestos de compañía añadidos. Fixture nueva **RZC37**, contacto/vehículo/contrato **79/44/87**, pago local `369ef66f-e712-4161-88bb-e738cad3de61`: candidato y altas por HTTP, login y pago de una cuota por navegador TesterArmy con Stripe falso, base 92,50 y cobro 110,52 USD. El primer intento de publicación falla en el backend intacto con `ODOO_LIQUIDATION_TAX_MAPPING_REQUIRED: upgrade the liquidation addon before sending fiscal data`. **Cero liquidaciones/facturas nuevas** y ninguna escritura de impuestos/compañía. El flujo global termina bloqueado (exit 1), no aprobado; no se llega a comprobar el IGTF heredado y no se corrige todavía. Los impuestos/documentos históricos quedan conservados, sin reintento ni limpieza.
-
-## Histórico retirado — USD con IVA e IGTF: 19.0.0.5.0
-
-`fiscal_breakdown` v2 usa `{version:2,currency:'USD',base,vat,igtf,total}`, con los cuatro importes como texto de dos decimales. IVA 16 % sobre base e IGTF SENIAT 3 % sobre base + IVA, redondeo decimal de cada impuesto; total igual a `amount_total_usd`, sin Bs simultáneos. La capacidad readonly `fiscal_breakdown_version`, consultable por `default_get`, vale 2. VES v1 y liquidaciones heredadas sin desglose se conservan.
-
-La compañía configura **impuestos separados**, sin alterar IVA ni producto compartidos: `voltx_usd_vat_tax_id` (IVA 16 % no incluido, primero, amplía la base siguiente) y `voltx_igtf_tax_id` (IGTF 3 % no incluido, afectado por la base anterior, sin ampliarla, con cuenta de pasivo propia distinta del IVA). El ORM verifica individualmente los impuestos, base y total de la factura nativa antes de enlazarla. Las liquidaciones fiscales facturadas no admiten cambios financieros.
-
-**Verificación funcional real, 2026-10-28:** el usuario autorizó subir `1cb9c50` a `calidad`; se confirmó instalada 19.0.0.5.0 y se creó una fixture nueva desde candidato/conductor/vehículo/contrato hasta pago USD por navegador con pasarela falsa. Liquidación **4**, factura **482**: base **92,50**, IVA **14,80**, IGTF **3,22**, total **110,52 USD**, `draft/not_paid`, `auto_post=no`. Reentregar la publicación no duplica. Solo se usaron impuestos QA 18/19, cuenta IGTF **453 / 2175021**, **a revisar por un contador**, no aprobada para producción. Compañía restaurada `(false,false) → (18,19) → (false,false)`; IVA 10 y producto 26 intactos. No se publica, paga ni concilia el borrador.
-
-**Límite:** la suite ORM completa de `tests/test_liquidation_fiscal.py` no se ejecutó: Community local no carga la cadena Unidigital/Enterprise y no se obtuvieron logs de tests Odoo.sh. La verificación real acredita el recorrido feliz e idempotente, no todos los rechazos/rollback de esa suite ni bancos reales. Producción necesita configuración aprobada por contabilidad. Las notas de crédito con IGTF o varias líneas permanecen bloqueadas en el backend.
-
 ## Pruebas nativas
 
 Ejecutar solo en una base Odoo/PostgreSQL aislada, con los addons oficiales y este módulo disponibles en `addons_path`:

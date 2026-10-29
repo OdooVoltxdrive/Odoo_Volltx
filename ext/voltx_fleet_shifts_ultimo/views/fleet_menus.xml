@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Menu Items under Fleet app -->
+    <menuitem id="menu_fleet_shifts_root" name="Turnos /registros" parent="fleet.menu_root" sequence="15"/>
+
+    <menuitem id="menu_fleet_weekly_liquidation" name="Liquidaciones" parent="menu_fleet_shifts_root" action="action_fleet_weekly_liquidation" sequence="20"/>
+
+</odoo>
