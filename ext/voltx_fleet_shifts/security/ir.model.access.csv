@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_fleet_weekly_liquidation_user,fleet.weekly.liquidation user,model_fleet_weekly_liquidation,fleet.fleet_group_user,1,1,1,1
 access_fleet_vehicle_driver_history_user,fleet.vehicle.driver.history.user,model_fleet_vehicle_driver_history,fleet.fleet_group_user,1,1,1,1
+access_account_move_mass_confirm,account.move.mass.confirm,model_account_move_mass_confirm,account.group_account_invoice,1,1,1,1
