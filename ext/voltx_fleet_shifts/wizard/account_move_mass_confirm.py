@@ -40,8 +40,8 @@ class AccountMoveMassConfirm(models.TransientModel):
                 }
             }
 
-        for invoice in invoices:
-            invoice.action_post()
+        invoices.action_post()
+
 
         return {
             'type': 'ir.actions.client',
