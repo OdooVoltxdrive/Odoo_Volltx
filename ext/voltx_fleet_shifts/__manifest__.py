@@ -12,6 +12,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/res_partner_view.xml',
+        'wizard/account_move_mass_confirm_views.xml',
         'views/res_company_views.xml',
         'views/fleet_vehicle_views.xml',
         'views/fleet_vehicle_driver_history_views.xml',
