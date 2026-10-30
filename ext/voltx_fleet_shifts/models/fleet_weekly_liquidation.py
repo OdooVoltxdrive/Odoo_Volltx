@@ -10,7 +10,7 @@ class FleetWeeklyLiquidation(models.Model):
     _order = 'name desc'
 
     name = fields.Char(string='Reference', required=True, copy=False, readonly=True, default='New')
-    contract_id = fields.Many2one('fleet.vehicle.log.contract', string='Contract', required=True)
+    contract_id = fields.Many2one('fleet.vehicle.log.contract', string='Contrato', required=True)
     driver_id = fields.Many2one(
         'res.partner',
         string='Driver',
