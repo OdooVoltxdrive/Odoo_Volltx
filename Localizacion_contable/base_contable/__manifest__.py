@@ -17,6 +17,7 @@
         'base',
         'stock',
         'account',
+        'account_payment'
         'account_accountant',
         'account_debit_note',
         'sale',
