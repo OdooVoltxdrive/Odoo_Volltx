@@ -29,6 +29,7 @@ class TestLiquidationFiscal(TestLiquidationCurrency):
         self.assertAlmostEqual(move.amount_untaxed, 4387.50, places=2)
         self.assertAlmostEqual(move.amount_tax, 702, places=2)
         self.assertEqual(move.invoice_line_ids.mapped('product_id'), self.product_a | self.product_b)
+        self.assertEqual(move.invoice_line_ids.mapped('name'), [self.product_a.name, self.product_b.name])
         self.assertAlmostEqual(move.invoice_line_ids[0].price_unit, 3900, places=2)
         self.assertAlmostEqual(move.invoice_line_ids[1].price_unit, 487.50, places=2)
 
