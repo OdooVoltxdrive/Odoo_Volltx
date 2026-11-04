@@ -1,0 +1,14 @@
+<odoo>
+    <record id="view_company_form_voltx_fiscal" model="ir.ui.view">
+        <field name="name">res.company.form.voltx.fiscal</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Facturación VoltX" groups="account.group_account_manager">
+                    <field name="voltx_service_product_id" domain="[('sale_ok', '=', True), ('type', '=', 'service')]" options="{'no_create': True}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,5 +1,4 @@
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
-from html import escape
 
 from odoo import models, fields, api, Command, _
 from odoo.exceptions import UserError
@@ -11,7 +10,7 @@ class FleetWeeklyLiquidation(models.Model):
     _order = 'name desc'
 
     name = fields.Char(string='Reference', required=True, copy=False, readonly=True, default='New')
-    contract_id = fields.Many2one('fleet.vehicle.log.contract', string='Contrato', required=True)
+    contract_id = fields.Many2one('fleet.vehicle.log.contract', string='Contract', required=True)
     driver_id = fields.Many2one(
         'res.partner',
         string='Driver',
@@ -130,13 +129,13 @@ class FleetWeeklyLiquidation(models.Model):
             raise UserError(error)
         return amounts
 
-    def _fiscal_invoice_lines(self, company, rental, account):
+    def _fiscal_invoice_lines(self, company, rental, account, description):
         amounts = self._fiscal_amounts()
         service = company.voltx_service_product_id
         if amounts['service'] and not service:
             raise UserError(_('ODOO_LIQUIDATION_SERVICE_MAPPING_REQUIRED: contabilidad debe confirmar el producto de servicio de la compañía.'))
         lines = []
-        for product, value in ((rental, amounts['base']), (service, amounts['service'])):
+        for product, value, label in ((rental, amounts['base'], description), (service, amounts['service'], _('Servicio — ') + description)):
             if not value:
                 continue
             if not product or not product.active or not product.sale_ok or (product.company_id and product.company_id != company):
@@ -149,7 +148,7 @@ class FleetWeeklyLiquidation(models.Model):
             if product == service and (not income or income.account_type not in ('income', 'income_other')):
                 raise UserError(_('ODOO_LIQUIDATION_SERVICE_MAPPING_REQUIRED: confirmar la cuenta de ingresos del producto de servicio.'))
             lines.append(Command.create({
-                'product_id': product.id, 'name': product.name, 'quantity': 1,
+                'product_id': product.id, 'name': label, 'quantity': 1,
                 'price_unit': float(value), 'account_id': (income or account).id,
                 'tax_ids': [Command.set(taxes.ids)],
             }))
@@ -185,16 +184,13 @@ class FleetWeeklyLiquidation(models.Model):
             return
 
         # 3. Producto de la plantilla (ID 27)
-        product = self.env['product.template'].browse(27).exists().product_variant_id
-        if not product:
-            raise UserError(_('Debe configurar el producto de arrendamiento (plantilla 27).'))
+        product = self.env['product.template'].browse(27).product_variant_id
 
-        vehicle = self.contract_id.vehicle_id
-        vehicle_note = '/'.join(
-            value.strip() for value in (
-                vehicle.model_id.brand_id.name, vehicle.license_plate, vehicle.vin_sn,
-            ) if value and value.strip()
-        )
+        # 4. Descripción de la línea
+        vehicle_name = self.contract_id.vehicle_id.name or ''
+        line_desc = f"Liquidación Semanal {self.week_of_year} - Alquiler/Leasing Vehículo {vehicle_name}".strip()
+        if self.observation:
+            line_desc += f" ({self.observation})"
 
         invoice_vals = {
             'move_type': 'out_invoice',
@@ -204,12 +200,11 @@ class FleetWeeklyLiquidation(models.Model):
             'partner_id': self.driver_id.id,
             'invoice_date': fields.Date.context_today(self),
             'ref': f"{self.name} - {self.week_of_year}",
-            'narration': escape(vehicle_note),
             'journal_id': journal.id,
             'invoice_line_ids': [
                 Command.create({
-                    'product_id': product.id,
-                    'name': product.name,
+                    'product_id': product.id if product else False,
+                    'name': line_desc,
                     'quantity': 1.0,
                     'price_unit': amount,
                     'account_id': account.id,
@@ -218,7 +213,7 @@ class FleetWeeklyLiquidation(models.Model):
         }
 
         if self.fiscal_breakdown:
-            invoice_vals['invoice_line_ids'] = self._fiscal_invoice_lines(company, product, account)
+            invoice_vals['invoice_line_ids'] = self._fiscal_invoice_lines(company, product, account, line_desc)
         # Este contexto también controla los cálculos contables nativos de Odoo.
         move = self.env['account.move'].with_context(skip_invoice_sync=False).create(invoice_vals)
         if self.fiscal_breakdown:

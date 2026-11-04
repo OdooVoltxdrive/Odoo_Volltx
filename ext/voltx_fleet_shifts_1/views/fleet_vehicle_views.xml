@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_fleet_vehicle_form_inherit_shifts" model="ir.ui.view">
+        <field name="name">fleet.vehicle.form.inherit.shifts</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+        <field name="arch" type="xml">
+
+            <!-- 1. Ocultar el smart button nativo de Odoo -->
+            <xpath expr="//button[@name='open_assignation_logs']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- 2. Agregar nuestro nuevo Smart Button al inicio de la botonera -->
+            <xpath expr="//button[@name='return_action_to_open']" position="before">
+                <button name="action_open_custom_driver_history"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-history">
+                    <field name="custom_driver_history_count" widget="statinfo" string="Historial Conductores"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//field[@name='driver_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='future_driver_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Mostramos nuestros campos propios de control de turnos -->
+            <xpath expr="//field[@name='driver_id']" position="before">
+                <field name="current_shift_driver_id" readonly="1" widget="many2one_avatar"/>
+                <field name="next_shift_driver_id" readonly="1" widget="many2one_avatar"/>
+                <field name="driver_ids" 
+                       widget="many2many_avatar_user" 
+                       placeholder="Seleccione los conductores autorizados..."/>
+            </xpath>
+
+
+        </field>
+    </record>
+
+</odoo>

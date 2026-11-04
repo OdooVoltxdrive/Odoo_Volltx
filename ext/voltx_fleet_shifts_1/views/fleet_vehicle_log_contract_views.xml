@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherit fleet.vehicle.log.contract form view -->
+    <record id="view_fleet_vehicle_log_contract_form_inherit_shifts" model="ir.ui.view">
+        <field name="name">fleet.vehicle.log.contract.form.inherit.shifts</field>
+        <field name="model">fleet.vehicle.log.contract</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_log_contract_view_form"/>
+        <field name="arch" type="xml">
+
+
+            <!-- 1. Smart Buttons en el Button Box oficial -->
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                        <field name="invoice_count" widget="statinfo" string="Facturas"/>
+                    </button>
+                </div>
+            </xpath>
+
+            <!-- 2. Campo Turno al lado del seguro/conductor -->
+            <xpath expr="//field[@name='insurer_id']" position="after">
+                <field name="secondary_currency_id" invisible="1"/>
+                <field name="vehicle_driver_ids" invisible="1"/>
+            </xpath>
+
+
+            <xpath expr="//field[@name='purchaser_id']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="readonly">0</attribute>
+                <attribute name="required">1</attribute>
+                <attribute name="domain">[('id', 'in', vehicle_driver_ids)]</attribute>
+                <attribute name="options">{'no_create': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='purchaser_id'][@widget='many2one_avatar']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
+
+            <!-- 4. INSERTAR 'Horario y Zona' justo después del grupo de Vehículo / Conductor -->
+            <xpath expr="//field[@name='vehicle_id']/ancestor::group[2]" position="after">
+                <group string="Horario y Zona" col="2">
+                    <group>
+                        <field name="start_time" placeholder="Ej: 06:00 AM"/>
+                        <field name="end_time" placeholder="Ej: 02:00 PM"/>
+                    </group>
+                    <group>
+                        <field name="shift"/>
+                        <field name="cost_generate" widget="monetary" options="{'currency_field': 'secondary_currency_id'}"/>
+                    </group>
+                </group>
+            </xpath>
+
+      
+
+
+            <!-- 3. Notebook con las Liquidaciones Semanales al final de la ficha -->
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                   <page string="Liquidaciones" name="weekly_liquidations">
+                        <field name="liquidation_ids">
+                            <list editable="bottom" decoration-info="state == 'draft'" decoration-warning="state == 'invoiced'" decoration-success="state == 'paid'">
+                                <field name="name" readonly="1"/>
+                                <field name="week_of_year"/>
+                                <field name="observation"/>
+                                <field name="currency_id" column_invisible="1"/>
+                                <field name="bs_currency_id" column_invisible="1"/>
+                                <field name="amount_total_bs" widget="monetary" options="{'currency_field': 'bs_currency_id'}"/>
+                                <field name="amount_total_usd" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="invoice_id" readonly="1" widget="many2one"/>
+                                <field name="state" widget="badge"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

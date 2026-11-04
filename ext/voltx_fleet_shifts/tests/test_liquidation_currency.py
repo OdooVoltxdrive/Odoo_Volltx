@@ -2,7 +2,6 @@ from odoo import Command
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.exceptions import UserError
 from odoo.tests import tagged
-from odoo.tools import html2plaintext
 
 
 @tagged('post_install', '-at_install')
@@ -131,38 +130,6 @@ class TestLiquidationCurrency(AccountTestInvoicingCommon):
         self.assertFalse(liquidation.invoice_id)
         with self.assertRaises(UserError):
             liquidation.action_generate_invoice()
-
-    def test_invoice_line_uses_only_registered_product_name(self):
-        self.product_a.write({
-            'name': 'Arrendamiento',
-            'description_sale': 'Backend description that must not appear',
-        })
-        liquidation = self._create_liquidation(
-            amount_total_usd=97.50, observation='voltx-payment:internal-reference',
-        )
-        invoice = liquidation.invoice_id
-        self.assertEqual(invoice.state, 'draft')
-        self.assertEqual(invoice.invoice_line_ids.name, self.product_a.name)
-
-    def test_vehicle_note_is_ready_on_draft_and_preserved_on_retry(self):
-        vehicle = self.contract.vehicle_id
-        vehicle.model_id.brand_id.name = 'TOYOTA'
-        vehicle.write({'license_plate': 'AB123CD', 'vin_sn': '1HGCM82633A004352'})
-        liquidation = self._create_liquidation(amount_total_usd=97.50)
-        invoice = liquidation.invoice_id
-        self.assertEqual(invoice.state, 'draft')
-        self.assertEqual(html2plaintext(invoice.narration).strip(), 'TOYOTA/AB123CD/1HGCM82633A004352')
-        invoice.narration = '<p>Approved custom note</p>'
-        liquidation._auto_generate_invoice()
-        self.assertEqual(html2plaintext(invoice.narration).strip(), 'Approved custom note')
-
-    def test_vehicle_note_omits_missing_values_without_false_text(self):
-        self.contract.vehicle_id.write({'license_plate': False, 'vin_sn': False})
-        liquidation = self._create_liquidation(amount_total_usd=97.50)
-        self.assertEqual(
-            html2plaintext(liquidation.invoice_id.narration).strip(),
-            self.contract.vehicle_id.model_id.brand_id.name,
-        )
 
     def test_product_taxes_are_not_removed_by_currency_patch(self):
         self.tax_sale_a.amount = 16
