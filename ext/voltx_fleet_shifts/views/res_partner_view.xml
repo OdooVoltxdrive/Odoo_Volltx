@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="base.view_partner_form" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_type']" position="after">
-                <field name="is_driver" string="Is Driver"/>
+                <field name="is_driver"/>
                 <field name="birth_date_drive" invisible="is_company or not is_driver"/>
                 <!-- Lugar de trabajo del conductor (lo manda el backend desde la
                      referencia laboral del candidato). Campo nativo function. -->
